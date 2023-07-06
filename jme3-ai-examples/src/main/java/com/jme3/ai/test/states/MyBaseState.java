@@ -18,22 +18,22 @@ import com.jme3.system.AppSettings;
  * @author capdevon
  */
 public abstract class MyBaseState extends BaseAppState {
-	
+
     // cache fields
-	public SimpleApplication app;
-	public AppSettings       settings;
-	public AppStateManager	 stateManager;
-	public AssetManager      assetManager;
-	public InputManager      inputManager;
-	public ViewPort          viewPort;
-	public Camera            camera;
-	public Node              rootNode;
-	public Node              guiNode;
-	
+    public SimpleApplication app;
+    public AppSettings settings;
+    public AppStateManager stateManager;
+    public AssetManager assetManager;
+    public InputManager inputManager;
+    public ViewPort viewPort;
+    public Camera camera;
+    public Node rootNode;
+    public Node guiNode;
+
     protected void refreshCacheFields() {
-        this.app            = (SimpleApplication) getApplication();
+        this.app = (SimpleApplication) getApplication();
         this.settings       = app.getContext().getSettings();
-        this.stateManager	= app.getStateManager();
+        this.stateManager   = app.getStateManager();
         this.assetManager   = app.getAssetManager();
         this.inputManager   = app.getInputManager();
         this.viewPort       = app.getViewPort();
@@ -41,7 +41,7 @@ public abstract class MyBaseState extends BaseAppState {
         this.rootNode       = app.getRootNode();
         this.guiNode        = app.getGuiNode();
     }
-    
+
     protected PhysicsSpace getPhysicsSpace() {
         return getState(BulletAppState.class).getPhysicsSpace();
     }

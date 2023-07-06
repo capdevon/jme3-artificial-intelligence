@@ -16,8 +16,8 @@ import com.jme3.scene.Node;
 public class PathViewer {
 
     // Asset manager
-	protected AssetManager assetManager;
-	
+    protected AssetManager assetManager;
+
     // Node for attaching debug geometries
     private Node debugNode = new Node("Debug Node");
     private MotionPath motionPath;
@@ -29,8 +29,8 @@ public class PathViewer {
     }
 
     /**
-     * Displays a motion path showing each waypoint. Stays in scene until
-     * another path is set.
+     * Displays a motion path showing each waypoint. 
+     * Stays in scene until another path is set.
      *
      * @param path
      */

@@ -24,20 +24,20 @@ public class Animator extends AbstractControl {
         super.setSpatial(spatial);
 
         if (spatial != null) {
-        	animComposer = GameObject.getComponentInChildren(spatial, AnimComposer.class);
+            animComposer = GameObject.getComponentInChildren(spatial, AnimComposer.class);
             Objects.requireNonNull(animComposer, "AnimComposer not found: " + spatial);
         }
     }
 
     public void setAnimation(String animName) {
         if (!animName.equals(currentAnim)) {
-        	currentAnim = animName;
-        	animComposer.setCurrentAction(animName);
+            currentAnim = animName;
+            animComposer.setCurrentAction(animName);
         }
     }
-    
+
     public String getCurrentAnimName() {
-    	return currentAnim;
+        return currentAnim;
     }
 
     @Override

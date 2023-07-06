@@ -19,7 +19,7 @@ import com.jme3.scene.Spatial.CullHint;
  */
 public class NavMeshDebugRenderer {
 
-    //Asset manager
+    // Asset manager
     protected AssetManager assetManager;
     // Node for attaching debug geometries
     public final Node debugNode = new Node("NavMeshDebugRenderer");

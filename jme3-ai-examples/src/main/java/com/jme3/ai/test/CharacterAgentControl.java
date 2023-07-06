@@ -23,7 +23,7 @@ public class CharacterAgentControl extends AbstractControl {
         if (spatial != null) {
             this.agent = spatial.getControl(NavMeshAgentMT.class);
             Objects.requireNonNull(agent, "NavMeshAgentMT not found: " + spatial);
-            
+
             this.animator = spatial.getControl(Animator.class);
             Objects.requireNonNull(animator, "Animator not found: " + spatial);
         }
