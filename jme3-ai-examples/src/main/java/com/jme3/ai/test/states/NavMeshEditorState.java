@@ -138,8 +138,6 @@ public class NavMeshEditorState extends MyBaseState {
         builder.setTimeout(40000);
         
         System.out.println("Generating new navmesh... please wait");
-        long startTime = System.currentTimeMillis();
-        
         Mesh optiMesh = builder.buildNavMesh(provider.build(), nmSettings);
 
         if (optiMesh != null) {
@@ -156,9 +154,6 @@ public class NavMeshEditorState extends MyBaseState {
             Node debugNode = navMeshRenderer.debugNode;
 //            debugNode.setLocalTranslation(0, -127.98f, 0);
             
-            long endTime = System.currentTimeMillis();
-            System.out.println("Generated navmesh in " + (endTime - startTime) + " ms");
-
         } else {
             logger.log(Level.SEVERE, "NavMesh generation failed!");
         }

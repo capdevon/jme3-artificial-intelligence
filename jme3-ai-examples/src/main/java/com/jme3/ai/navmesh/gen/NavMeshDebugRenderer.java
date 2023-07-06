@@ -23,6 +23,9 @@ public class NavMeshDebugRenderer {
     protected AssetManager assetManager;
     // Node for attaching debug geometries
     public final Node debugNode = new Node("NavMeshDebugRenderer");
+    
+    private static final ColorRGBA Black = new ColorRGBA(0f, 0f, 0f, 1f);
+    private static final ColorRGBA Cyan = new ColorRGBA(0f, 1f, 1f, 0.1f);
 
     /**
      *
@@ -37,7 +40,7 @@ public class NavMeshDebugRenderer {
 
         Geometry g1 = new Geometry("WireMesh", mesh);
         Material m1 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        m1.setColor("Color", ColorRGBA.Black);
+        m1.setColor("Color", Black);
         m1.getAdditionalRenderState().setWireframe(true);
         g1.setMaterial(m1);
         g1.setShadowMode(ShadowMode.Off);
@@ -45,7 +48,7 @@ public class NavMeshDebugRenderer {
 
         Geometry g2 = new Geometry("AlphaMesh", mesh);
         Material m2 = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        m2.setColor("Color", ColorRGBA.Cyan.clone().setAlpha(0.1f));
+        m2.setColor("Color", Cyan);
         m2.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         g2.setMaterial(m2);
         g2.setShadowMode(ShadowMode.Off);

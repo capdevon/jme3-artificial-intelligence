@@ -42,11 +42,11 @@ public abstract class MyBaseState extends BaseAppState {
         this.guiNode        = app.getGuiNode();
     }
 
-    protected PhysicsSpace getPhysicsSpace() {
+    public PhysicsSpace getPhysicsSpace() {
         return getState(BulletAppState.class).getPhysicsSpace();
     }
 
-    protected Vector2f getScreenSize() {
+    public Vector2f getScreenSize() {
         return new Vector2f(settings.getWidth(), settings.getHeight());
     }
 

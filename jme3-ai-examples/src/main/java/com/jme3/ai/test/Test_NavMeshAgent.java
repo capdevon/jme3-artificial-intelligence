@@ -203,8 +203,6 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
         navMeshBuilder.setTimeout(40000);
 
         System.out.println("Generating new navmesh... please wait");
-        long startTime = System.currentTimeMillis();
-        
         navMesh = navMeshBuilder.buildNavMesh(provider.build(), nmSettings);
 
         if (navMesh != null) {
@@ -213,9 +211,6 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
             navMeshRenderer.drawNavMesh(navMesh);
             Node debugNode = navMeshRenderer.debugNode;
             //debugNode.setLocalTranslation(0, -127.98f, 0);
-            
-            long endTime = System.currentTimeMillis();
-            System.out.println("Generated navmesh in " + (endTime - startTime) + " ms");
 
         } else {
             throw new RuntimeException("NavMesh generation failed!");
