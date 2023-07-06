@@ -156,10 +156,10 @@ public class NavMeshAgentMT extends AbstractControl {
      * Spherically interpolates between quaternions a and b by ratio t. The
      * parameter t is clamped to the range [0, 1].
      */
-    private Vector3f smoothDamp(Quaternion from, Quaternion to, float smoothTime, Vector3f dir) {
+    private Vector3f smoothDamp(Quaternion from, Quaternion to, float smoothTime, Vector3f store) {
     	float changeAmount = FastMath.clamp(smoothTime, 0, 1);
         from.slerp(to, changeAmount);
-        return from.mult(Vector3f.UNIT_Z, dir);
+        return from.mult(Vector3f.UNIT_Z, store);
     }
 
     private void startPathfinder() {
