@@ -3,7 +3,7 @@ plugins {
     id 'java-library'
 }
 
-description = 'jme3-artificial-intelligence'
+description = 'jme3-ai'
 
 // select one source-code (JDK) option
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -38,11 +38,8 @@ repositories {
 }
 
 dependencies {
-    // from jcenter (or mavenLocal) repositories:
+    // jMonkeyEngine
     implementation 'org.jmonkeyengine:jme3-core:' + jmeVersion
-    implementation 'org.jmonkeyengine:jme3-desktop:' + jmeVersion
-    implementation 'org.jmonkeyengine:jme3-effects:' + jmeVersion
-    runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmeVersion // LWJGL 3.x
     
 }
 
