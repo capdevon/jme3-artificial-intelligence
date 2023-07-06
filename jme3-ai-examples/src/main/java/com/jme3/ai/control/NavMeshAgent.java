@@ -38,18 +38,17 @@ public class NavMeshAgent extends AbstractControl {
     private NavMeshPathfinder nav;
     private PathViewer pathViewer;
     
-    //The status of the current path (complete or invalid).
-    private boolean pathStatus;
+    private boolean hasPath;
     private boolean pathChanged;
     private boolean stopped = false;
     
-    //Stop within this distance from the target position.
+    // Stop within this distance from the target position.
     private float stoppingDistance = .25f;
-    //Maximum movement speed when following a path.
+    // Maximum movement speed when following a path.
     private float speed = 4;
-    //Maximum turning speed in (deg/s) while following a path.
+    // Maximum turning speed in (deg/s) while following a path.
     private float angularSpeed = 6;
-    //Should the agent update the transform orientation?
+    // Should the agent update the transform orientation?
     private boolean updateRotation = true;
 
     /**
@@ -155,10 +154,10 @@ public class NavMeshAgent extends AbstractControl {
         nav.setPosition(spatial.getWorldTranslation());
         nav.warpInside(targetPos);
         
-        pathStatus = nav.computePath(targetPos);
-        logger.log(Level.INFO, "Finish Path Finder: {0}", pathStatus);
+        hasPath = nav.computePath(targetPos);
+        logger.log(Level.INFO, "Finish Path Finder: {0}", hasPath);
 
-        if (pathStatus) {
+        if (hasPath) {
             // display motion path
             pathChanged = true;
         }
@@ -171,6 +170,7 @@ public class NavMeshAgent extends AbstractControl {
         clearPath();
         nav.clearPath();
         bcc.setWalkDirection(Vector3f.ZERO);
+        hasPath = false;
     }
 
     @Override
@@ -271,8 +271,8 @@ public class NavMeshAgent extends AbstractControl {
         this.stopped = stopped;
     }
 
-    public boolean pathStatus() {
-        return pathStatus;
+    public boolean hasPath() {
+        return hasPath;
     }
 
 }
