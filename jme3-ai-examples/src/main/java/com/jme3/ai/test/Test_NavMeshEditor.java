@@ -1,0 +1,61 @@
+package com.jme3.ai.test;
+
+import com.jme3.ai.test.states.NavMeshEditorState;
+import com.jme3.ai.test.states.TerrainState;
+import com.jme3.ai.test.util.LogUtils;
+import com.jme3.ai.test.util.TogglePhysxDebugState;
+import com.jme3.app.BasicProfilerState;
+import com.jme3.app.SimpleApplication;
+import com.jme3.bullet.BulletAppState;
+import com.jme3.math.Vector3f;
+import com.jme3.system.AppSettings;
+
+/**
+ *
+ * @author capdevon
+ */
+public class Test_NavMeshEditor extends SimpleApplication {
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        Test_NavMeshEditor app = new Test_NavMeshEditor();
+
+        AppSettings settings = new AppSettings(true);
+        settings.setTitle("Test_NavMeshEditor");
+        settings.setResolution(1280, 720);
+        settings.setBitsPerPixel(32);
+        settings.setSamples(4);
+
+        app.setSettings(settings);
+        app.setShowSettings(false);
+        app.setPauseOnLostFocus(false);
+        app.start();
+    }
+
+    @Override
+    public void simpleInitApp() {
+
+        //LogUtils.setLevel(Level.FINE);
+        LogUtils.setJmeFormatter();
+
+        configureCamera();
+
+        stateManager.attach(new BasicProfilerState());
+        stateManager.attach(new BulletAppState());
+        stateManager.attach(new TogglePhysxDebugState());
+        stateManager.attach(new TerrainState());
+        stateManager.attach(new NavMeshEditorState());
+    }
+
+    private void configureCamera() {
+        cam.setLocation(new Vector3f(10, 256, 10));
+        cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_Y);
+        cam.setFrustumPerspective(45, (float) cam.getWidth() / cam.getHeight(), 0.1f, 2000f);
+
+        flyCam.setMoveSpeed(50);
+        flyCam.setDragToRotate(true);
+    }
+    
+}
