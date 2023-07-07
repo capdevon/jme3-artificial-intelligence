@@ -19,7 +19,6 @@ import com.jme3.app.Application;
 import com.jme3.math.Vector2f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Mesh;
-import com.jme3.scene.Node;
 import com.simsilica.lemur.Button;
 import com.simsilica.lemur.Container;
 import com.simsilica.lemur.GuiGlobals;
@@ -138,21 +137,19 @@ public class NavMeshEditorState extends MyBaseState {
         builder.setTimeout(40000);
         
         System.out.println("Generating new navmesh... please wait");
-        Mesh optiMesh = builder.buildNavMesh(provider.build(), nmSettings);
+        Mesh navMesh = builder.buildNavMesh(provider.build(), nmSettings);
 
-        if (optiMesh != null) {
+        if (navMesh != null) {
             logger.log(Level.INFO, ReflectionToStringBuilder.toString(data, ToStringStyle.MULTI_LINE_STYLE));
             
             if (autoSave) {
                 Path dir = Paths.get("src/main/resources", "Scenes", "NavMesh");
                 File file = new File(dir.toFile(), "NavMesh.j3o");
                 NavMeshExporter exporter = new NavMeshExporter(assetManager);
-                exporter.save(optiMesh, file);
+                exporter.save(navMesh, file);
             }
 
-            navMeshRenderer.drawNavMesh(optiMesh);
-            Node debugNode = navMeshRenderer.debugNode;
-//            debugNode.setLocalTranslation(0, -127.98f, 0);
+            navMeshRenderer.drawNavMesh(navMesh);
             
         } else {
             logger.log(Level.SEVERE, "NavMesh generation failed!");
