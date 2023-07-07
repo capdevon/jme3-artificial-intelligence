@@ -14,7 +14,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
-import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 
@@ -52,20 +52,20 @@ public class NavMeshAgent extends AbstractControl {
     private boolean updateRotation = true;
 
     /**
-     * 
-     * @param geom
+     * Instantiate a NavMeshAgent.
+     * @param mesh
      */
-    public NavMeshAgent(Geometry geom) {
-        this(geom, null);
+    public NavMeshAgent(Mesh mesh) {
+        this(mesh, null);
     }
     
     /**
-     * 
-     * @param geom
+     * Instantiate a NavMeshAgent.
+     * @param mesh
      * @param pathViewer
      */
-    public NavMeshAgent(Geometry geom, PathViewer pathViewer) {
-        this.navMesh = new NavMesh(geom.getMesh());
+    public NavMeshAgent(Mesh mesh, PathViewer pathViewer) {
+        this.navMesh = new NavMesh(mesh);
         this.nav = new NavMeshPathfinder(navMesh);
         this.nav.setEntityRadius(radius);
         this.pathViewer = pathViewer;
@@ -245,6 +245,7 @@ public class NavMeshAgent extends AbstractControl {
      */
     public void setRadius(float radius) {
         this.radius = radius;
+        this.nav.setEntityRadius(radius);
     }
 
     public float getStoppingDistance() {

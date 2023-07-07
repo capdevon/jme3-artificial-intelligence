@@ -294,6 +294,7 @@ public class NavMeshAgentMT extends AbstractControl {
      */
     public void setRadius(float radius) {
         this.radius = radius;
+        this.nav.setEntityRadius(radius);
     }
 
     public float getStoppingDistance() {
