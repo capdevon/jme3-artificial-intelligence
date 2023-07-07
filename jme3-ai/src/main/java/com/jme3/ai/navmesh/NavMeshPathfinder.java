@@ -320,11 +320,10 @@ public class NavMeshPathfinder {
                     break;
             }
 
-
             if (debugInfo != null) {
                 debugInfo.addPreOptWaypoints(newWayPoint.clone());
             }
-//                newWayPoint = snapPointToCell(currentCell, newWayPoint);
+            //newWayPoint = snapPointToCell(currentCell, newWayPoint);
             lastWayPoint = newWayPoint.clone();
 
             navPath.addWaypoint(newWayPoint, currentCell);
