@@ -2,7 +2,6 @@ package com.jme3.ai.test;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.critterai.nmgen.IntermediateData;
 
 import com.jme3.ai.control.NavMeshAgentMT;
 import com.jme3.ai.control.PathViewer;
@@ -103,10 +102,11 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
     private NavMeshAgentMT agent;
     private NavMeshDebugRenderer navMeshRenderer;
     private boolean showNavMesh = true;
+    private boolean bakeNavMesh = false;
 
     @Override
     public void simpleInitApp() {
-
+        
         initPhysics();
         createWireMaterial();
         createTerrainMaterial();
@@ -162,7 +162,7 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
         player.addControl(bcc);
         physics.getPhysicsSpace().add(player);
         rootNode.attachChild(player);
-
+        
         PathViewer pathViewer = new PathViewer(assetManager);
         agent = new NavMeshAgentMT(navMesh, pathViewer);
         agent.setSpeed(5f);
@@ -189,28 +189,30 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
      * creates the NavMesh
      */
     public void generateNavMesh() {
-        
+
         navMeshRenderer = new NavMeshDebugRenderer(assetManager);
 
-        NavMeshBuildSettings nmSettings = new NavMeshBuildSettings();
-        nmSettings.setCellSize(.5f);
-        nmSettings.setCellHeight(.8f);
-        System.out.println(ReflectionToStringBuilder.toString(nmSettings, ToStringStyle.MULTI_LINE_STYLE));
+        if (bakeNavMesh) {
+            NavMeshBuildSettings nmSettings = new NavMeshBuildSettings();
+            nmSettings.setCellSize(.5f);
+            nmSettings.setCellHeight(.8f);
+            System.out.println(ReflectionToStringBuilder.toString(nmSettings, ToStringStyle.MULTI_LINE_STYLE));
 
-        // the data object to use for storing data related to building the navigation mesh.
-        IntermediateData data = new IntermediateData();
-        GeometryProviderBuilder provider = new GeometryProviderBuilder(worldNode);
-        NavMeshBuilder navMeshBuilder = new NavMeshBuilder();
-        navMeshBuilder.setIntermediateData(data);
-        navMeshBuilder.setTimeout(40000);
+            GeometryProviderBuilder provider = new GeometryProviderBuilder(worldNode);
+            NavMeshBuilder navMeshBuilder = new NavMeshBuilder();
+            navMeshBuilder.setTimeout(40000);
 
-        System.out.println("Generating new navmesh... please wait");
-        navMesh = navMeshBuilder.buildNavMesh(provider.build(), nmSettings);
+            System.out.println("Generating new navmesh...");
+            navMesh = navMeshBuilder.buildNavMesh(provider.build(), nmSettings);
+
+        } else {
+            System.out.println("Loading navmesh...");
+            Geometry geom = (Geometry) assetManager.loadModel("Scenes/NavMesh/NavMesh.j3o");
+            navMesh = geom.getMesh();
+        }
 
         if (navMesh != null) {
-            System.out.println(ReflectionToStringBuilder.toString(data, ToStringStyle.MULTI_LINE_STYLE));
             navMeshRenderer.drawNavMesh(navMesh);
-
         } else {
             throw new RuntimeException("NavMesh generation failed!");
         }
