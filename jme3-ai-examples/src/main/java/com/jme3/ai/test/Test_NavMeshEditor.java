@@ -3,8 +3,7 @@ package com.jme3.ai.test;
 import com.jme3.ai.test.states.NavMeshEditorState;
 import com.jme3.ai.test.states.TerrainState;
 import com.jme3.ai.test.util.LogUtils;
-import com.jme3.ai.test.util.TogglePhysxDebugState;
-import com.jme3.app.BasicProfilerState;
+import com.jme3.ai.test.util.TogglePhysicsDebugState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.math.Vector3f;
@@ -42,9 +41,8 @@ public class Test_NavMeshEditor extends SimpleApplication {
 
         configureCamera();
 
-        stateManager.attach(new BasicProfilerState());
         stateManager.attach(new BulletAppState());
-        stateManager.attach(new TogglePhysxDebugState());
+        stateManager.attach(new TogglePhysicsDebugState());
         stateManager.attach(new TerrainState());
         stateManager.attach(new NavMeshEditorState());
     }

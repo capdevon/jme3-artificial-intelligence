@@ -175,7 +175,7 @@ public class NavMeshAgentMT extends AbstractControl {
                     nav.warpInside(targetPos);
 
                     hasPath = nav.computePath(targetPos);
-                    System.out.println("TargetPos: " + targetPos + " --PathStatus: " + hasPath);
+                    System.out.println("TargetPos: " + targetPos + " Path found: " + hasPath);
 
                     if (hasPath) {
                         // display motion path
@@ -211,7 +211,6 @@ public class NavMeshAgentMT extends AbstractControl {
         clearPath();
         nav.clearPath();
         bcc.setWalkDirection(Vector3f.ZERO);
-        pathPending = false;
         hasPath = false;
     }
 

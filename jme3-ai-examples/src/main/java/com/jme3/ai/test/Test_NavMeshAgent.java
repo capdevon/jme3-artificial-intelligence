@@ -13,7 +13,7 @@ import com.jme3.ai.navmesh.gen.NavMeshDebugRenderer;
 import com.jme3.ai.test.terrain.FractalHeightMap;
 import com.jme3.ai.test.terrain.TreeGenerator;
 import com.jme3.ai.test.util.MainCamera;
-import com.jme3.ai.test.util.TogglePhysxDebugState;
+import com.jme3.ai.test.util.TogglePhysicsDebugState;
 import com.jme3.anim.util.AnimMigrationUtils;
 import com.jme3.app.DebugKeysAppState;
 import com.jme3.app.SimpleApplication;
@@ -47,6 +47,7 @@ import com.jme3.math.Transform;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.FXAAFilter;
+import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
@@ -121,7 +122,7 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
         physics = new BulletAppState();
         physics.setDebugEnabled(false);
         stateManager.attach(physics);
-        stateManager.attach(new TogglePhysxDebugState());
+        stateManager.attach(new TogglePhysicsDebugState());
     }
 
     private void initLights() {
@@ -164,6 +165,7 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
 
         PathViewer pathViewer = new PathViewer(assetManager);
         agent = new NavMeshAgentMT(navMesh, pathViewer);
+        agent.setSpeed(5f);
         player.addControl(agent);
 
         player.addControl(new Animator());
@@ -207,10 +209,7 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
 
         if (navMesh != null) {
             System.out.println(ReflectionToStringBuilder.toString(data, ToStringStyle.MULTI_LINE_STYLE));
-
             navMeshRenderer.drawNavMesh(navMesh);
-            Node debugNode = navMeshRenderer.debugNode;
-            //debugNode.setLocalTranslation(0, -127.98f, 0);
 
         } else {
             throw new RuntimeException("NavMesh generation failed!");
@@ -249,8 +248,13 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
     }
     
     private void placeTrees() {
-        TreeGenerator gen = new TreeGenerator(assetManager);
-        Node trees = gen.generateTrees(terrain);
+        if (!renderer.getCaps().contains(Caps.MeshInstancing)) {
+            System.out.println("MeshInstancing not supported!");
+            return;
+        }
+        
+        TreeGenerator generator = new TreeGenerator(assetManager);
+        Node trees = generator.generateTrees(terrain);
         worldNode.attachChild(trees);
         
         CompoundCollisionShape ccs = new CompoundCollisionShape();

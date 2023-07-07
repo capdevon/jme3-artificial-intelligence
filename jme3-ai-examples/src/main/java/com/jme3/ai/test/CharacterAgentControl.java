@@ -34,7 +34,7 @@ public class CharacterAgentControl extends AbstractControl {
         if (agent.remainingDistance() < agent.getStoppingDistance()) {
             animator.setAnimation("Idle");
         } else {
-            animator.setAnimation("Walk");
+            animator.setAnimation("Run");
         }
     }
 
