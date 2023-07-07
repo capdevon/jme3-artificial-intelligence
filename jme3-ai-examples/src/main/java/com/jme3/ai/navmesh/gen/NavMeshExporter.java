@@ -28,6 +28,12 @@ public class NavMeshExporter {
         this.assetManager = assetManager;
     }
     
+    /**
+     * Export the NavMesh to a file.
+     * 
+     * @param mesh The mesh to export
+     * @param file The file to export to
+     */ 
     public void save(Mesh mesh, File file) {
         Geometry geo = new Geometry("NavMesh", mesh);
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -38,12 +44,6 @@ public class NavMeshExporter {
         exportNavMesh(geo, file);
     }
 
-    /**
-     * Exports the NavMesh to user.home so you can load a saved NavMesh
-     *
-     * @param sp
-     * @param file
-     */
     private void exportNavMesh(Spatial sp, File file) {
         try {
             logger.log(Level.INFO, "Saving File={0}", file.getAbsolutePath());
