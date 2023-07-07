@@ -155,7 +155,7 @@ public class NavMeshAgent extends AbstractControl {
         nav.warpInside(targetPos);
         
         hasPath = nav.computePath(targetPos);
-        logger.log(Level.INFO, "Finish Path Finder: {0}", hasPath);
+        logger.log(Level.INFO, "Path found: {0}", hasPath);
 
         if (hasPath) {
             // display motion path
