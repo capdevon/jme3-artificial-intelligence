@@ -1,5 +1,9 @@
 package com.jme3.ai.test;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -9,6 +13,7 @@ import com.jme3.ai.navmesh.gen.GeometryProviderBuilder;
 import com.jme3.ai.navmesh.gen.NavMeshBuildSettings;
 import com.jme3.ai.navmesh.gen.NavMeshBuilder;
 import com.jme3.ai.navmesh.gen.NavMeshDebugRenderer;
+import com.jme3.ai.navmesh.gen.NavMeshExporter;
 import com.jme3.ai.test.terrain.FractalHeightMap;
 import com.jme3.ai.test.terrain.TreeGenerator;
 import com.jme3.ai.test.util.MainCamera;
@@ -102,7 +107,7 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
     private NavMeshAgentMT agent;
     private NavMeshDebugRenderer navMeshRenderer;
     private boolean showNavMesh = true;
-    private boolean bakeNavMesh = false;
+    private boolean bakeNavMesh = true;
 
     @Override
     public void simpleInitApp() {
@@ -204,6 +209,11 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
 
             System.out.println("Generating new navmesh...");
             navMesh = navMeshBuilder.buildNavMesh(provider.build(), nmSettings);
+            
+            Path dir = Paths.get("src/main/resources", "Scenes", "NavMesh");
+            File file = new File(dir.toFile(), "NavMesh.j3o");
+            NavMeshExporter exporter = new NavMeshExporter(assetManager);
+            exporter.save(navMesh, file);
 
         } else {
             System.out.println("Loading navmesh...");
