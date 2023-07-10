@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.jme3.ai.steering.behaviour;
 
 import com.jme3.math.Vector3f;
@@ -35,8 +31,8 @@ public class Separation implements Behaviour {
         
         
         Vector3f steering = new Vector3f();
-        for (Obstacle o : neighbours) {
-            Vector3f loc = o.getLocation().subtract(location);
+        for (Obstacle obstacle : neighbours) {
+            Vector3f loc = obstacle.getLocation().subtract(location);
             float len2 = loc.lengthSquared();
             loc.normalizeLocal();
             steering.addLocal(loc.negate().mult(1f/len2));
