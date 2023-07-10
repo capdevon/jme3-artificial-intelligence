@@ -1,6 +1,7 @@
 package com.jme3.ai.control;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -119,7 +120,7 @@ public class NavMeshAgent extends AbstractControl {
             else if (nav.isAtGoalWaypoint()) {
                 resetPath();
 
-            } // If less than one from current waypoint and not the goal. Go to next waypoint
+            } // If less than one from current waypoint and not the goal, go to next waypoint
             else {
                 nav.goToNextWaypoint();
             }
@@ -209,6 +210,18 @@ public class NavMeshAgent extends AbstractControl {
             pathLength += a.distance(b);
         }
         return pathLength;
+    }
+    
+    /**
+     * @return Corner points of the path. (Read Only)
+     */
+    public List<Vector3f> getCorners() {
+        List<Vector3f> result = new ArrayList<>();
+        for (Waypoint waypoint : nav.getPath().getWaypoints()) {
+            Vector3f v = waypoint.getPosition().clone();
+            result.add(v);
+        }
+        return result;
     }
     
     public float getSpeed() {

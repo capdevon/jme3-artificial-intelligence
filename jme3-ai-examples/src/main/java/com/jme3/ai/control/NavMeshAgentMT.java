@@ -1,6 +1,7 @@
 package com.jme3.ai.control;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,7 +24,6 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 
 /**
- * For the NBM install: Plugins->Downloaded->Add (Choose the nbm there)
  *
  * @author capdevon
  */
@@ -126,7 +126,7 @@ public class NavMeshAgentMT extends AbstractControl {
 
             float remainingDistance = position2D.distance(waypoint2D);
 
-            // move char between waypoints until waypoint reached, then set null
+            // Move the spatial to location while its not there
             if (remainingDistance > stoppingDistance) {
                 Vector3f dir = waypoint2D.subtract(position2D).normalizeLocal();
                 moveTo(dir, tpf);
@@ -135,7 +135,7 @@ public class NavMeshAgentMT extends AbstractControl {
             else if (nav.isAtGoalWaypoint()) {
                 resetPath();
 
-            } // If less than one from current waypoint and not the goal. Go to next waypoint
+            } // If less than one from current waypoint and not the goal, go to next waypoint
             else {
                 nav.goToNextWaypoint();
             }
@@ -227,6 +227,18 @@ public class NavMeshAgentMT extends AbstractControl {
             pathLength += a.distance(b);
         }
         return pathLength;
+    }
+    
+    /**
+     * @return Corner points of the path. (Read Only)
+     */
+    public List<Vector3f> getCorners() {
+        List<Vector3f> result = new ArrayList<>();
+        for (Waypoint waypoint : nav.getPath().getWaypoints()) {
+            Vector3f v = waypoint.getPosition().clone();
+            result.add(v);
+        }
+        return result;
     }
 
     /**
