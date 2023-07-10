@@ -15,6 +15,8 @@ import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.Control;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.shape.Line;
+import com.jme3.system.AppSettings;
+
 import java.util.ArrayList;
 import java.util.List;
 import com.jme3.ai.steering.behaviour.Evade;
@@ -36,22 +38,24 @@ public class TestSteering extends SimpleApplication {
     private Node obstacleNode;
     private Node friendNode;
 
+    /**
+     * 
+     * @param args
+     */
     public static void main(String[] args) {
         TestSteering app = new TestSteering();
+        AppSettings settings = new AppSettings(true);
+        app.setSettings(settings);
+        app.setShowSettings(false);
+        app.setPauseOnLostFocus(false);
         app.start();
     }
 
     @Override
-    public void start() {
-        showSettings = false;
-        super.start();
-    }
-    
-    @Override
     public void simpleInitApp() {
-        getCamera().setLocation(new Vector3f(0,20,0));
-        getCamera().lookAt(Vector3f.ZERO, Vector3f.UNIT_X);
-        getFlyByCamera().setMoveSpeed(50);
+        cam.setLocation(new Vector3f(0,20,0));
+        cam.lookAt(Vector3f.ZERO, Vector3f.UNIT_X);
+        flyCam.setMoveSpeed(50);
         
         // create target
         target = new Vehicle(ColorRGBA.Red);
@@ -66,11 +70,11 @@ public class TestSteering extends SimpleApplication {
         vehicle1 = new Vehicle(ColorRGBA.Blue);
         //vehicle1.addControl(new SeekControl());
         //vehicle1.addControl(new FleeControl());
-        //vehicle1.addControl(new PersuitControl());
+        //vehicle1.addControl(new PursuitControl());
         //vehicle1.addControl(new EvadeControl());
-        //vehicle1.addControl(new PersuitAndAvoidControl());
-        //vehicle1.addControl(new PersuitSeparationControl());
-        vehicle1.addControl(new PersuitAvoidSeparationControl());
+        //vehicle1.addControl(new PursuitAndAvoidControl());
+        //vehicle1.addControl(new PursuitSeparationControl());
+        vehicle1.addControl(new PursuitAvoidSeparationControl());
         rootNode.attachChild(vehicle1);
         
         
@@ -93,7 +97,7 @@ public class TestSteering extends SimpleApplication {
         for (int i=0; i<amount; i++) {
             Vehicle neighbour  = new Vehicle(ColorRGBA.Blue);
             neighbour.setLocalTranslation(((float)Math.random())*5f, 0, ((float)Math.random())*5f);
-            neighbour.addControl(new PersuitAvoidSeparationControl());
+            neighbour.addControl(new PursuitAvoidSeparationControl());
             friendNode.attachChild(neighbour);
         }
     }
@@ -422,7 +426,7 @@ public class TestSteering extends SimpleApplication {
         }
     }
     
-    private class PersuitAvoidSeparationControl extends SimpleControl {
+    private class PursuitAvoidSeparationControl extends SimpleControl {
 
         Pursuit pursuit = new Pursuit();
         ObstacleAvoid avoid = new ObstacleAvoid();
