@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.jme3.ai.steering;
 
 import com.jme3.app.SimpleApplication;
@@ -24,7 +20,7 @@ import java.util.List;
 import com.jme3.ai.steering.behaviour.Evade;
 import com.jme3.ai.steering.behaviour.Flee;
 import com.jme3.ai.steering.behaviour.ObstacleAvoid;
-import com.jme3.ai.steering.behaviour.Persuit;
+import com.jme3.ai.steering.behaviour.Pursuit;
 import com.jme3.ai.steering.behaviour.Seek;
 import com.jme3.ai.steering.behaviour.Separation;
 import com.jme3.ai.steering.utilities.SimpleObstacle;
@@ -103,7 +99,7 @@ public class TestSteering extends SimpleApplication {
     }
     
     /**
-     * Get all obsticals in the scene
+     * Get all obstacles in the scene
      */
     private void fillObstacals(List<Obstacle> obstacles) {
         for (Spatial s : obstacleNode.getChildren()) {
@@ -146,7 +142,7 @@ public class TestSteering extends SimpleApplication {
         Geometry velocityLine;
         
         protected Vehicle(ColorRGBA color) {
-            Box b = new Box(Vector3f.ZERO, 0.1f, 0.1f, 0.2f);
+            Box b = new Box(0.1f, 0.1f, 0.2f);
             Geometry geom = new Geometry("Box", b);
             Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
             mat.setColor("Color", color);
@@ -193,7 +189,7 @@ public class TestSteering extends SimpleApplication {
         /**
          * Gets the predicted position for this 'frame', 
          * taking into account current position and velocity.
-         * @param tpf time per fram
+         * @param tpf time per frame
          */
         protected Vector3f getFuturePosition(float tpf) {
             return getWorldTranslation().add(velocity);
@@ -301,14 +297,14 @@ public class TestSteering extends SimpleApplication {
                     vehicle.velocity, vehicle.speed, 
                     target.getWorldTranslation());
             
-            // add the force to the velicity
+            // add the force to the velocity
             vehicle.updateVelocity(steering, tpf);
         }
     }
     
-    private class PersuitControl extends SimpleControl {
+    private class PursuitControl extends SimpleControl {
 
-        Persuit persuit = new Persuit();
+        Pursuit pursuit = new Pursuit();
         
         @Override
         protected void controlUpdate(float tpf) {
@@ -316,8 +312,8 @@ public class TestSteering extends SimpleApplication {
             if (vehicle == null)
                 return;
             
-            // calculate the steering force from the Persuit routine
-            Vector3f steering = persuit.calculateForce(vehicle.getWorldTranslation(),
+            // calculate the steering force from the Pursuit routine
+            Vector3f steering = pursuit.calculateForce(vehicle.getWorldTranslation(),
                     vehicle.velocity,
                     vehicle.speed, 
                     target.speed, 
@@ -325,7 +321,7 @@ public class TestSteering extends SimpleApplication {
                     target.velocity,
                     target.getFuturePosition(tpf));
             
-            // add the force to the velicity
+            // add the force to the velocity
             vehicle.updateVelocity(steering, tpf);
         }
     }
@@ -340,7 +336,7 @@ public class TestSteering extends SimpleApplication {
             if (vehicle == null)
                 return;
             
-            // calculate the steering force from the Persuit routine
+            // calculate the steering force from the Pursuit routine
             Vector3f steering = evade.calculateForce(vehicle.getWorldTranslation(),
                     vehicle.velocity,
                     vehicle.speed, 
@@ -354,12 +350,12 @@ public class TestSteering extends SimpleApplication {
         }
     }
     
-    private class PersuitAndAvoidControl extends SimpleControl {
+    private class PursuitAndAvoidControl extends SimpleControl {
 
-        Persuit persuit = new Persuit();
+        Pursuit pursuit = new Pursuit();
         ObstacleAvoid avoid = new ObstacleAvoid();
         
-        List<Obstacle> obstacles = new ArrayList<Obstacle>();
+        List<Obstacle> obstacles = new ArrayList<>();
         
         @Override
         protected void controlUpdate(float tpf) {
@@ -370,8 +366,8 @@ public class TestSteering extends SimpleApplication {
             if (obstacles.isEmpty())
                 fillObstacals(obstacles);
             
-            // calculate the steering force from the Persuit routine
-            Vector3f steering = persuit.calculateForce(vehicle.getWorldTranslation(),
+            // calculate the steering force from the Pursuit routine
+            Vector3f steering = pursuit.calculateForce(vehicle.getWorldTranslation(),
                     vehicle.velocity,
                     vehicle.speed, 
                     target.speed, 
@@ -392,12 +388,12 @@ public class TestSteering extends SimpleApplication {
         }
     }
     
-    private class PersuitSeparationControl extends SimpleControl {
+    private class PursuitSeparationControl extends SimpleControl {
 
-        Persuit persuit = new Persuit();
+        Pursuit pursuit = new Pursuit();
         Separation separation = new Separation();
         
-        List<Obstacle> neighbours = new ArrayList<Obstacle>();
+        List<Obstacle> neighbours = new ArrayList<>();
         
         @Override
         protected void controlUpdate(float tpf) {
@@ -408,8 +404,8 @@ public class TestSteering extends SimpleApplication {
             neighbours.clear(); // re-calculate every time
             fillNeighbours(vehicle, neighbours, 5f);
             
-            // calculate the steering force from the Persuit routine
-            Vector3f steering = persuit.calculateForce(vehicle.getWorldTranslation(),
+            // calculate the steering force from the Pursuit routine
+            Vector3f steering = pursuit.calculateForce(vehicle.getWorldTranslation(),
                     vehicle.velocity,
                     vehicle.speed, 
                     target.speed, 
@@ -428,12 +424,12 @@ public class TestSteering extends SimpleApplication {
     
     private class PersuitAvoidSeparationControl extends SimpleControl {
 
-        Persuit persuit = new Persuit();
+        Pursuit pursuit = new Pursuit();
         ObstacleAvoid avoid = new ObstacleAvoid();
         Separation separation = new Separation();
         
-        List<Obstacle> obstacles = new ArrayList<Obstacle>();
-        List<Obstacle> neighbours = new ArrayList<Obstacle>();
+        List<Obstacle> obstacles = new ArrayList<>();
+        List<Obstacle> neighbours = new ArrayList<>();
         
         @Override
         protected void controlUpdate(float tpf) {
@@ -448,8 +444,8 @@ public class TestSteering extends SimpleApplication {
             neighbours.clear(); // re-calculate every time
             fillNeighbours(vehicle, neighbours, 5f);
             
-            // calculate the steering force from the Persuit routine
-            Vector3f steering = persuit.calculateForce(vehicle.getWorldTranslation(),
+            // calculate the steering force from the Pursuit routine
+            Vector3f steering = pursuit.calculateForce(vehicle.getWorldTranslation(),
                     vehicle.velocity,
                     vehicle.speed, 
                     target.speed, 
