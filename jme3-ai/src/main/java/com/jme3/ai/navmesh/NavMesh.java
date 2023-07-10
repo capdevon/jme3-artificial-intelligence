@@ -277,14 +277,16 @@ public class NavMesh implements Savable {
         linkCells();
     }
 
+    @Override
     public void write(JmeExporter e) throws IOException {
         OutputCapsule capsule = e.getCapsule(this);
         capsule.writeSavableArrayList(cellList, "cellarray", null);
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     public void read(JmeImporter e) throws IOException {
         InputCapsule capsule = e.getCapsule(this);
         cellList = (ArrayList<Cell>) capsule.readSavableArrayList("cellarray", new ArrayList<Cell>());
     }
+    
 }
