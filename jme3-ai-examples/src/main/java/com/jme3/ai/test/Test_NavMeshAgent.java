@@ -135,7 +135,7 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
         ColorRGBA skyColor = new ColorRGBA(0.1f, 0.2f, 0.4f, 1f);
         viewPort.setBackgroundColor(skyColor);
 
-        AmbientLight ambient = new AmbientLight(ColorRGBA.White.mult(0.6f));
+        AmbientLight ambient = new AmbientLight();
         rootNode.addLight(ambient);
 
         DirectionalLight light = new DirectionalLight();
