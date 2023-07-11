@@ -156,7 +156,7 @@ public class NavMeshAgentMT extends AbstractControl {
      * parameter t is clamped to the range [0, 1].
      */
     private Vector3f smoothDamp(Quaternion from, Quaternion to, float smoothTime, Vector3f store) {
-    	float changeAmount = FastMath.clamp(smoothTime, 0, 1);
+        float changeAmount = FastMath.clamp(smoothTime, 0, 1);
         from.slerp(to, changeAmount);
         return from.mult(Vector3f.UNIT_Z, store);
     }
@@ -175,7 +175,9 @@ public class NavMeshAgentMT extends AbstractControl {
                     nav.warpInside(targetPos);
 
                     hasPath = nav.computePath(targetPos);
-                    System.out.println("TargetPos: " + targetPos + " Path found: " + hasPath);
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.log(Level.FINE, "Path found: {0}", hasPath);
+                    }
 
                     if (hasPath) {
                         // display motion path
