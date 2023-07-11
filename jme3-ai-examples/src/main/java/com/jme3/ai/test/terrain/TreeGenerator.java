@@ -51,14 +51,11 @@ public class TreeGenerator {
     }
     
     public Node generateTrees(TerrainQuad terrain) {
-        Node treeNode = new Node("Trees-" + terrain.getName());
+        InstancedNode instancedNode = new InstancedNode("Trees-" + terrain.getName());
 
         List<TerrainPatch> patches = new ArrayList<>();
         terrain.getAllTerrainPatches(patches);
         for (TerrainPatch patch : patches) {
-
-            InstancedNode instancedNode = new InstancedNode("Trees-" + patch.getName());
-            System.out.println("(NEW) " + instancedNode);
 
             //just a simple planting algorithm
             Vector3f center = patch.getWorldBound().getCenter();
@@ -76,12 +73,10 @@ public class TreeGenerator {
 
                 spawnObject(location, instancedNode);
             }
-
-            instancedNode.instance();
-            treeNode.attachChild(instancedNode);
         }
-
-        return treeNode;
+        
+        instancedNode.instance();
+        return instancedNode;
     }
     
     private void spawnObject(Vector3f position, Node parent) {
