@@ -13,7 +13,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.renderer.queue.RenderQueue.ShadowMode;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -52,16 +52,17 @@ public class TreeGenerator {
     
     public Node generateTrees(TerrainQuad terrain) {
         InstancedNode instancedNode = new InstancedNode("Trees-" + terrain.getName());
+        instancedNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
 
         List<TerrainPatch> patches = new ArrayList<>();
         terrain.getAllTerrainPatches(patches);
         for (TerrainPatch patch : patches) {
 
-            //just a simple planting algorithm
+            // just a simple planting algorithm
             Vector3f center = patch.getWorldBound().getCenter();
             float radius = 16f;
             int elements = 8;
-            
+
             for (int i = 0; i < elements; i++) {
                 float angle = FastMath.TWO_PI * i / elements;
                 float x = FastMath.cos(angle) * radius;
@@ -74,7 +75,7 @@ public class TreeGenerator {
                 spawnObject(location, instancedNode);
             }
         }
-        
+
         instancedNode.instance();
         return instancedNode;
     }
@@ -95,10 +96,8 @@ public class TreeGenerator {
         Cylinder mesh = new Cylinder(2, 8, radius, height, true);
         Geometry geo = new Geometry(name, mesh);
         Material mat = createPBRLighting(color);
-        mat.setBoolean("UseInstancing", true);
         geo.setMaterial(mat);
         geo.rotate(FastMath.HALF_PI, 0, 0);
-        geo.setShadowMode(ShadowMode.Cast);
         return geo;
     }
     
@@ -108,6 +107,7 @@ public class TreeGenerator {
         mat.setColor("BaseColor", color);
         mat.setFloat("Metallic", 0);
         mat.setFloat("Roughness", 0.4f);
+        mat.setBoolean("UseInstancing", true);
         return mat;
     }
 

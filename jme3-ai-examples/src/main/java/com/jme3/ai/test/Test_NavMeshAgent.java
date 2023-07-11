@@ -60,6 +60,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.SceneGraphVisitor;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
+import com.jme3.shadow.EdgeFilteringMode;
 import com.jme3.system.AppSettings;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
 import com.jme3.terrain.geomipmap.TerrainQuad;
@@ -146,6 +147,7 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
         shadowFilter.setLight(light);
         shadowFilter.setShadowIntensity(0.4f);
         shadowFilter.setShadowZExtend(256);
+        shadowFilter.setEdgeFilteringMode(EdgeFilteringMode.PCFPOISSON);
 
         FXAAFilter fxaa = new FXAAFilter();
 
