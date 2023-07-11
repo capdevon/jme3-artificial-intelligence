@@ -73,7 +73,7 @@ public class NavMeshBuildSettings implements Savable {
         contourMaxDeviation         = ic.readFloat("contourMaxDeviation", 25);
     }
     
-	/**
+    /**
      * @return The height resolution used when sampling the source mesh. Value
      * must be > 0.
      */
