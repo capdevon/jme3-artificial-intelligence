@@ -209,7 +209,7 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
 
             System.out.println("Generating new navmesh...");
             navMesh = navMeshBuilder.buildNavMesh(provider.build(), nmSettings);
-            
+
             Path dir = Paths.get("src/main/resources", "Scenes", "NavMesh");
             File file = new File(dir.toFile(), "NavMesh.j3o");
             NavMeshExporter exporter = new NavMeshExporter(assetManager);
