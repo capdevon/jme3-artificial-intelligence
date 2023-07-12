@@ -34,6 +34,7 @@ public class NavMeshDebugRenderer {
     public NavMeshDebugRenderer(AssetManager assetManager) {
         this.assetManager = assetManager;
         debugNode.setCullHint(CullHint.Never);
+        debugNode.setShadowMode(ShadowMode.Off);
     }
 
     public void drawNavMesh(Mesh mesh) {
@@ -43,7 +44,6 @@ public class NavMeshDebugRenderer {
         m1.setColor("Color", Black);
         m1.getAdditionalRenderState().setWireframe(true);
         g1.setMaterial(m1);
-        g1.setShadowMode(ShadowMode.Off);
         debugNode.attachChild(g1);
 
         Geometry g2 = new Geometry("AlphaMesh", mesh);
@@ -51,7 +51,6 @@ public class NavMeshDebugRenderer {
         m2.setColor("Color", Cyan);
         m2.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         g2.setMaterial(m2);
-        g2.setShadowMode(ShadowMode.Off);
         g2.setQueueBucket(Bucket.Transparent);
         debugNode.attachChild(g2);
     }
