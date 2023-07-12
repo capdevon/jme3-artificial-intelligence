@@ -96,6 +96,13 @@ public class NavMeshBuilder {
         return mesh2;
     }
     
+    /**
+     * Takes a Terrain, which can be composed of numerous meshes, and converts them
+     * into a single mesh.
+     *
+     * @param terrain the terrain to be converted
+     * @return a single mesh consisting of all meshes of a Terrain
+     */
     public static Mesh terrain2mesh(Terrain terrain) {
         float[] heightMap = terrain.getHeightMap();
         int length = heightMap.length;
