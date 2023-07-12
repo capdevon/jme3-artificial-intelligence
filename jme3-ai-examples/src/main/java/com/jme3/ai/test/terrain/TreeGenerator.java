@@ -17,6 +17,7 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.instancing.InstancedGeometry;
 import com.jme3.scene.instancing.InstancedNode;
 import com.jme3.scene.shape.Cylinder;
 import com.jme3.terrain.geomipmap.TerrainPatch;
@@ -77,6 +78,11 @@ public class TreeGenerator {
         }
 
         instancedNode.instance();
+        
+        MyInstanceCullingFunction cullingFunc = new MyInstanceCullingFunction();
+        cullingFunc.setBoundScale(new Vector3f(5, 5, 5));
+        InstancedGeometry.setInstanceCullingFunction(cullingFunc);
+        
         return instancedNode;
     }
     
