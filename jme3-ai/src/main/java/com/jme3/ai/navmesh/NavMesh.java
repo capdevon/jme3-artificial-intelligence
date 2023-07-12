@@ -152,21 +152,21 @@ public class NavMesh implements Savable {
      * Test to see if two points on the mesh can view each other
      * FIXME: EndCell is the last visible cell?
      *
-     * @param StartCell
-     * @param StartPos
-     * @param EndPos
+     * @param startCell
+     * @param startPos
+     * @param endPos
      * @return
      */
-    boolean isInLineOfSight(Cell StartCell, Vector3f StartPos, Vector3f EndPos) {
-        return isInLineOfSight(StartCell, StartPos, EndPos, null);
+    boolean isInLineOfSight(Cell startCell, Vector3f startPos, Vector3f endPos) {
+        return isInLineOfSight(startCell, startPos, endPos, null);
     }
 
-    boolean isInLineOfSight(Cell StartCell, Vector3f StartPos, Vector3f EndPos, DebugInfo debugInfo) {
-        Line2D MotionPath = new Line2D(new Vector2f(StartPos.x, StartPos.z),
-                new Vector2f(EndPos.x, EndPos.z));
+    boolean isInLineOfSight(Cell startCell, Vector3f startPos, Vector3f endPos, DebugInfo debugInfo) {
+        Line2D motionPath = new Line2D(new Vector2f(startPos.x, startPos.z),
+                new Vector2f(endPos.x, endPos.z));
 
-        Cell testCell = StartCell;
-        Cell.ClassifyResult result = testCell.classifyPathToCell(MotionPath);
+        Cell testCell = startCell;
+        Cell.ClassifyResult result = testCell.classifyPathToCell(motionPath);
         Cell.ClassifyResult prevResult = result;
 
         while (result.result == Cell.PathResult.ExitingCell) {
@@ -181,7 +181,7 @@ public class NavMesh implements Savable {
                 debugInfo.addPassedCell(prevResult.cell);
             }
             prevResult = result;
-            result = result.cell.classifyPathToCell(MotionPath);
+            result = result.cell.classifyPathToCell(motionPath);
         }
         if (debugInfo != null) {
             debugInfo.setEndingCell(prevResult.cell);

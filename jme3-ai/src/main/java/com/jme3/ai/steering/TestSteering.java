@@ -86,17 +86,17 @@ public class TestSteering extends SimpleApplication {
         int amount = 10;
         
         // create obstacles
-        for (int i=0; i<amount; i++) {
-            Vehicle obstacle  = new Vehicle(ColorRGBA.Yellow);
-            obstacle.setLocalTranslation(((float)Math.random())*10f, 0, ((float)Math.random())*10f);
+        for (int i = 0; i < amount; i++) {
+            Vehicle obstacle = new Vehicle(ColorRGBA.Yellow);
+            obstacle.setLocalTranslation(((float) Math.random()) * 10f, 0, ((float) Math.random()) * 10f);
             obstacleNode.attachChild(obstacle);
         }
         
         amount = 4;
         // create neighbours
-        for (int i=0; i<amount; i++) {
-            Vehicle neighbour  = new Vehicle(ColorRGBA.Blue);
-            neighbour.setLocalTranslation(((float)Math.random())*5f, 0, ((float)Math.random())*5f);
+        for (int i = 0; i < amount; i++) {
+            Vehicle neighbour = new Vehicle(ColorRGBA.Blue);
+            neighbour.setLocalTranslation(((float) Math.random()) * 5f, 0, ((float) Math.random()) * 5f);
             neighbour.addControl(new PursuitAvoidSeparationControl());
             friendNode.attachChild(neighbour);
         }
@@ -108,7 +108,7 @@ public class TestSteering extends SimpleApplication {
     private void fillObstacals(List<Obstacle> obstacles) {
         for (Spatial s : obstacleNode.getChildren()) {
             if (s instanceof Vehicle) {
-                Vehicle v = (Vehicle)s;
+                Vehicle v = (Vehicle) s;
                 obstacles.add(v.toObstacle());
             }
         }
@@ -118,12 +118,12 @@ public class TestSteering extends SimpleApplication {
      * find all neighbours in the scene, within the radius
      */
     private void fillNeighbours(Vehicle source, List<Obstacle> neighbours, float radius) {
-        float r2 = radius*radius;
+        float r2 = radius * radius;
         for (Spatial s : friendNode.getChildren()) {
             if (s instanceof Vehicle && !s.equals(source)) {
-                Vehicle v = (Vehicle)s;
+                Vehicle v = (Vehicle) s;
                 float d = source.getWorldTranslation().subtract(v.getWorldTranslation()).lengthSquared();
-                if (d<r2) // if it is within the radius
+                if (d < r2) // if it is within the radius
                     neighbours.add(v.toObstacle());
             }
         }
@@ -133,11 +133,16 @@ public class TestSteering extends SimpleApplication {
      * A Vehicle's "forward" is along the local +X axis
      */
     protected class Vehicle extends Node {
-        float speed = 1.5f; // worldUnits/second
-        float maxSpeed = 1.5f; // worldUnits/second
-        float maxTurnForce = 2f; // max steering force per second (perpendicular to velocity)
-                                // if speed is 1 and turn force is 1, then it will turn 45 degrees in a second
-        float mass = 1.0f; // the higher, the slower it turns
+        
+        // worldUnits/second
+        float speed = 1.5f;
+        // worldUnits/second
+        float maxSpeed = 1.5f;
+        // max steering force per second (perpendicular to velocity)
+        // if speed is 1 and turn force is 1, then it will turn 45 degrees in a second
+        float maxTurnForce = 2f;
+        // the higher, the slower it turns
+        float mass = 1.0f;
         float collisionRadius = 0.1f;
         Vector3f velocity = Vector3f.UNIT_Z;
         
@@ -183,7 +188,7 @@ public class TestSteering extends SimpleApplication {
          * truncate the length of the vector to the given limit
          */
         private Vector3f truncate(Vector3f source, float limit) {
-            if (source.lengthSquared() <= limit*limit) {
+            if (source.lengthSquared() <= limit * limit) {
                 return source;
             } else {
                 return source.normalize().scaleAdd(limit, Vector3f.ZERO);
@@ -281,7 +286,7 @@ public class TestSteering extends SimpleApplication {
                     vehicle.velocity, vehicle.speed, 
                     target.getWorldTranslation());
             
-            // add the force to the velicity
+            // add the force to the velocity
             vehicle.updateVelocity(steering, tpf);
         }
     }
@@ -349,7 +354,7 @@ public class TestSteering extends SimpleApplication {
                     target.velocity,
                     target.getFuturePosition(tpf));
             
-            // add the force to the velicity
+            // add the force to the velocity
             vehicle.updateVelocity(steering, tpf);
         }
     }

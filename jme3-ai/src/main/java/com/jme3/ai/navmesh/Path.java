@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 /**
  * NavigationPath is a collection of waypoints that define a movement path for
- * an Actor. This object is ownded by an Actor and filled by
+ * an Actor. This object is owned by an Actor and filled by
  * NavigationMesh::BuildNavigationPath().
  * 
  * Portions Copyright (C) Greg Snook, 2000
@@ -138,7 +138,6 @@ public class Path implements Iterable<Waypoint> {
     public ArrayList<Waypoint> getWaypoints() {
         return waypointList;
     }
-
         
     public Waypoint getFurthestVisibleWayPoint(Waypoint vantagePoint) {
         return getFurthestVisibleWayPoint(vantagePoint, null);
@@ -216,12 +215,11 @@ public class Path implements Iterable<Waypoint> {
         Waypoint visibleWaypoint = testPoint;
         int c = 0;
         while (testPoint != getLast()) {
-            if (!isInLineOfSight(vantagePoint.position,
-                    testPoint.getCell(), testPoint.position)) {
+            if (!isInLineOfSight(vantagePoint.position, testPoint.getCell(), testPoint.position)) {
                 if (c > 1)
-                    System.out.println(" WAY IND jump was:" + (i-1-startI)+", new idx= "+(i-1));
+                    System.out.println(" WAY IND jump was:" + (i - 1 - startI) + ", new idx= " + (i - 1));
                 else if (c == 0)
-                    System.out.println(" WAY IND jump was 0!"); 
+                    System.out.println(" WAY IND jump was 0!");
                 return visibleWaypoint;
             }
             visibleWaypoint = testPoint;
@@ -250,7 +248,7 @@ public class Path implements Iterable<Waypoint> {
     /**
      * Check if C is left of the line AB
      */
-    public boolean isLeft(Vector3f a, Vector3f b, Vector3f c){
-        return ((b.x - a.x)*(c.z - a.z) - (b.z - a.z)*(c.x - a.x)) > 0;
+    public boolean isLeft(Vector3f a, Vector3f b, Vector3f c) {
+        return ((b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x)) > 0;
     }
 }
