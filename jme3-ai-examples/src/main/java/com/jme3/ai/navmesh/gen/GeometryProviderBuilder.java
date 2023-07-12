@@ -56,7 +56,7 @@ public class GeometryProviderBuilder {
     
     /**
      * Gathers all geometries in supplied node into supplied List. Uses
-     * NavMeshGenerator to merge found Terrain meshes into one geometry prior to
+     * NavMeshBuilder to merge found Terrain meshes into one geometry prior to
      * adding. Scales and sets translation of merged geometry.
      *
      * @param node
