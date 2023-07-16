@@ -2,6 +2,7 @@ package com.jme3.ai.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import com.jme3.ai.navmesh.gen.GeometryProviderBuilder;
 import com.jme3.ai.navmesh.gen.NavMeshBuildSettings;
@@ -13,6 +14,7 @@ import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.system.AppSettings;
@@ -85,9 +87,11 @@ public class Test_NavMesh extends SimpleApplication {
         nmSettings.setContourSampleDistance(100);
         nmSettings.setContourMaxDeviation(0.1f);
 
-        GeometryProviderBuilder provider = new GeometryProviderBuilder(scene);
+        List<Geometry> sources = GeometryProviderBuilder.collectSources(scene);
+        sources.forEach(System.out::println);
+        
         NavMeshBuilder builder = new NavMeshBuilder();
-        Mesh navMesh = builder.buildNavMesh(provider.build(), nmSettings);
+        Mesh navMesh = builder.buildNavMesh(sources, nmSettings);
         
         NavMeshDebugRenderer navMeshRenderer = new NavMeshDebugRenderer(assetManager);
         navMeshRenderer.drawNavMesh(navMesh);

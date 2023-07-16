@@ -3,6 +3,7 @@ package com.jme3.ai.test;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -205,12 +206,12 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
             nmSettings.setCellHeight(.8f);
             System.out.println(ReflectionToStringBuilder.toString(nmSettings, ToStringStyle.MULTI_LINE_STYLE));
 
-            GeometryProviderBuilder provider = new GeometryProviderBuilder(worldNode);
+            List<Geometry> sources = GeometryProviderBuilder.collectSources(worldNode);
             NavMeshBuilder navMeshBuilder = new NavMeshBuilder();
             navMeshBuilder.setTimeout(40000);
 
             System.out.println("Generating new navmesh...");
-            navMesh = navMeshBuilder.buildNavMesh(provider.build(), nmSettings);
+            navMesh = navMeshBuilder.buildNavMesh(sources, nmSettings);
 
             Path dir = Paths.get("src/main/resources", "Scenes", "NavMesh");
             File file = new File(dir.toFile(), "NavMesh.j3o");

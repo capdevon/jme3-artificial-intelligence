@@ -3,6 +3,7 @@ package com.jme3.ai.test.states;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,6 +19,7 @@ import com.jme3.ai.navmesh.gen.NavMeshExporter;
 import com.jme3.app.Application;
 import com.jme3.math.Vector2f;
 import com.jme3.renderer.RenderManager;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.simsilica.lemur.Button;
 import com.simsilica.lemur.Container;
@@ -131,13 +133,13 @@ public class NavMeshEditorState extends MyBaseState {
 
         // the data object to use for storing data related to building the navigation mesh.
         IntermediateData data = new IntermediateData();
-        GeometryProviderBuilder provider = new GeometryProviderBuilder(rootNode);
+        List<Geometry> sources = GeometryProviderBuilder.collectSources(rootNode);
         NavMeshBuilder builder = new NavMeshBuilder();
         builder.setIntermediateData(data);
         builder.setTimeout(40000);
         
         System.out.println("Generating new navmesh... please wait");
-        Mesh navMesh = builder.buildNavMesh(provider.build(), nmSettings);
+        Mesh navMesh = builder.buildNavMesh(sources, nmSettings);
 
         if (navMesh != null) {
             logger.log(Level.INFO, ReflectionToStringBuilder.toString(data, ToStringStyle.MULTI_LINE_STYLE));
