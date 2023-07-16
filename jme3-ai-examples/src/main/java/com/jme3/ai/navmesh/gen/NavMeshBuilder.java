@@ -1,6 +1,7 @@
 package com.jme3.ai.navmesh.gen;
 
 import java.nio.FloatBuffer;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,12 +11,15 @@ import org.critterai.nmgen.TriangleMesh;
 
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.scene.mesh.IndexBuffer;
 import com.jme3.terrain.Terrain;
+
+import jme3tools.optimize.GeometryBatchFactory;
 
 /**
  * https://github.com/jMonkeyEngine/sdk/blob/master/jme3-navmesh-gen/src/com/jme3/gde/nmgen/NavMeshGenerator.java
@@ -47,7 +51,7 @@ public class NavMeshBuilder {
      * @param settings
      * @return An optimized Triangle mesh to be used for pathfinding.
      */
-    public Mesh buildNavMesh(Mesh mesh, NavMeshBuildSettings settings) {
+    public Mesh buildNavMesh(List<Geometry> sources, NavMeshBuildSettings settings) {
         nmgen = new NavmeshGenerator(
                 settings.cellSize, 
                 settings.cellHeight, 
@@ -65,6 +69,9 @@ public class NavMeshBuilder {
                 settings.maxVertsPerPoly,
                 settings.contourSampleDistance, 
                 settings.contourMaxDeviation);
+        
+        Mesh mesh = new Mesh();
+        GeometryBatchFactory.mergeGeometries(sources, mesh);
 
         FloatBuffer pb = mesh.getFloatBuffer(VertexBuffer.Type.Position);
         IndexBuffer ib = mesh.getIndexBuffer();
@@ -84,16 +91,13 @@ public class NavMeshBuilder {
             return null;
         }
 
-        int[] indices2 = triMesh.indices;
-        float[] positions2 = triMesh.vertices;
+        Mesh navMesh = new Mesh();
+        navMesh.setBuffer(VertexBuffer.Type.Position, 3, triMesh.vertices);
+        navMesh.setBuffer(VertexBuffer.Type.Index, 3, triMesh.indices);
+        navMesh.updateBound();
+        navMesh.updateCounts();
 
-        Mesh mesh2 = new Mesh();
-        mesh2.setBuffer(VertexBuffer.Type.Position, 3, positions2);
-        mesh2.setBuffer(VertexBuffer.Type.Index, 3, indices2);
-        mesh2.updateBound();
-        mesh2.updateCounts();
-
-        return mesh2;
+        return navMesh;
     }
     
     /**

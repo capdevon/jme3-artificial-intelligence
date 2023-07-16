@@ -10,8 +10,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.Terrain;
 
-import jme3tools.optimize.GeometryBatchFactory;
-
 /**
  *
  * @author capdevon
@@ -20,38 +18,26 @@ public class GeometryProviderBuilder {
 
     public static final String NAVMESH_IGNORE = "ignoreFromBuild";
     private static final Predicate<Spatial> DefaultFilter = sp -> sp.getUserData(NAVMESH_IGNORE) == null;
-
-    private List<Geometry> geometryList;
-    private Mesh mesh;
-
-    /**
-     * Provides this Node to the Builder and performs a search through the
-     * SceneGraph to gather all Geometries This uses the default filter: If
-     * userData "ignoreFromBuild" is set, ignore this spatial
-     *
-     * @param node The Node to use
-     */
-    public GeometryProviderBuilder(Node node) {
-        this(node, DefaultFilter);
-    }
-
-    /**
-     * Provides this Node to the Builder and performs a search through the
-     * SceneGraph to gather all Geometries
-     *
-     * @param node The Node to use
-     * @param filter A Filter which defines when a Spatial should be gathered
-     */
-    public GeometryProviderBuilder(Node node, Predicate<Spatial> filter) {
-        geometryList = findGeometries(node, new ArrayList<>(), filter);
-    }
     
-    public Mesh build() {
-        if (mesh == null) {
-            mesh = new Mesh();
-            GeometryBatchFactory.mergeGeometries(geometryList, mesh);
-        }
-        return mesh;
+    private GeometryProviderBuilder() {}
+
+    /**
+     * Gathers all geometries in supplied node into supplied List.
+     * @param node
+     * @return
+     */
+    public static List<Geometry> collectSources(Node node) {
+        return collectSources(node, new ArrayList<>(), DefaultFilter);
+    }
+
+    /**
+     * Gathers all geometries in supplied node into supplied List.
+     * @param node
+     * @param filter
+     * @return
+     */
+    public static List<Geometry> collectSources(Node node, Predicate<Spatial> filter) {
+        return collectSources(node, new ArrayList<>(), filter);
     }
     
     /**
@@ -64,7 +50,7 @@ public class GeometryProviderBuilder {
      * @param filter
      * @return
      */
-    private List<Geometry> findGeometries(Node node, List<Geometry> results, Predicate<Spatial> filter) {
+    private static List<Geometry> collectSources(Node node, List<Geometry> results, Predicate<Spatial> filter) {
         for (Spatial spatial : node.getChildren()) {
             if (!filter.test(spatial)) {
                 continue;
@@ -80,7 +66,7 @@ public class GeometryProviderBuilder {
                 results.add(geom);
 
             } else if (spatial instanceof Node) {
-                findGeometries((Node) spatial, results, filter);
+                collectSources((Node) spatial, results, filter);
             }
         }
         return results;
