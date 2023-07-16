@@ -22,7 +22,10 @@ public class GeometryProviderBuilder {
     private GeometryProviderBuilder() {}
 
     /**
-     * Gathers all geometries in supplied node into supplied List.
+     * Performs a search in the SceneGraph to collect all geometries of the supplied
+     * node. It uses the default filter: If userData "ignoreFromBuild" is set, it
+     * ignores this space.
+     * 
      * @param node
      * @return
      */
@@ -31,7 +34,9 @@ public class GeometryProviderBuilder {
     }
 
     /**
-     * Gathers all geometries in supplied node into supplied List.
+     * Performs a search in the SceneGraph to collect all geometries of the supplied
+     * node.
+     * 
      * @param node
      * @param filter
      * @return
@@ -42,7 +47,7 @@ public class GeometryProviderBuilder {
     
     /**
      * Gathers all geometries in supplied node into supplied List. Uses
-     * NavMeshBuilder to merge found Terrain meshes into one geometry prior to
+     * {@link com.jme3.ai.navmesh.gen.NavMeshBuilder} to merge found Terrain meshes into one geometry prior to
      * adding. Scales and sets translation of merged geometry.
      *
      * @param node

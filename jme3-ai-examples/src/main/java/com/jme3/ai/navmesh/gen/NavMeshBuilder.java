@@ -22,9 +22,8 @@ import com.jme3.terrain.Terrain;
 import jme3tools.optimize.GeometryBatchFactory;
 
 /**
- * https://github.com/jMonkeyEngine/sdk/blob/master/jme3-navmesh-gen/src/com/jme3/gde/nmgen/NavMeshGenerator.java
- * Generates the navigation mesh using the org.critterai.nmgen.NavmeshGenerator
- * class.
+ * Generates the navigation mesh using the
+ * {@link org.critterai.nmgen.NavmeshGenerator} class.
  */
 public class NavMeshBuilder {
 
@@ -45,9 +44,10 @@ public class NavMeshBuilder {
     }
     
     /**
-     * Takes a normal mesh and optimizes it using CritterAi NavMeshGenerator.
-     *
-     * @param mesh - The mesh to be optimized for pathfinding.
+     * Takes a list of geometries and optimizes them using
+     * {@link org.critterai.nmgen.NavmeshGenerator}
+     * 
+     * @param sources
      * @param settings
      * @return An optimized Triangle mesh to be used for pathfinding.
      */
