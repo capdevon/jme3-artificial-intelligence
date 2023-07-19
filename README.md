@@ -13,5 +13,8 @@
 * [nmgen_study/doc/api/](https://web.archive.org/web/20211227083846/http://critterai.org/projects/nmgen_study/doc/api/)
 * [Archive: Downloads](https://web.archive.org/web/20211227082403/http://critterai.org/projects/dowloads-archive.html)
 
-## YouTube videos
+## YouTube Videos
 - [Bake NavMesh for Terrain Mesh](https://www.youtube.com/watch?v=iaoN6SmZt-8)
+
+## Bug report / feature request
+The best way to report bug or feature request is [github's issues page](https://github.com/capdevon/jme3-artificial-intelligence/issues).
