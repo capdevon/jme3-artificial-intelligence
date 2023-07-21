@@ -28,7 +28,7 @@ public class NavMeshDebugRenderer {
     private static final ColorRGBA Cyan = new ColorRGBA(0f, 1f, 1f, 0.1f);
 
     /**
-     *
+     * Instantiate a <code>NavMeshDebugRenderer</code>
      * @param assetManager
      */
     public NavMeshDebugRenderer(AssetManager assetManager) {

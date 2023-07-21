@@ -75,10 +75,12 @@ public class NavMeshBuilder {
 
         FloatBuffer pb = mesh.getFloatBuffer(VertexBuffer.Type.Position);
         IndexBuffer ib = mesh.getIndexBuffer();
+        
         // copy positions to float array
         float[] positions = new float[pb.capacity()];
         pb.clear();
         pb.get(positions);
+        
         // generate int array of indices
         int[] indices = new int[ib.size()];
         for (int i = 0; i < indices.length; i++) {

@@ -26,6 +26,10 @@ public class NavMeshExporter {
     
     private AssetManager assetManager;
 
+    /**
+     * Instantiate a <code>NavMeshExporter</code>
+     * @param assetManager
+     */
     public NavMeshExporter(AssetManager assetManager) {
         this.assetManager = assetManager;
     }
