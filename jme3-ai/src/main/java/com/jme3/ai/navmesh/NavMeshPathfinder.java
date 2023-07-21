@@ -8,8 +8,11 @@ import com.jme3.ai.navmesh.Cell.PathResult;
 import com.jme3.ai.navmesh.Line2D.LineIntersect;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class NavMeshPathfinder {
+    
+    private static final Logger logger = Logger.getLogger(NavMeshPathfinder.class.getName());
 
     private NavMesh navMesh;
     private Path path = new Path();
@@ -27,6 +30,10 @@ public class NavMeshPathfinder {
     private volatile int sessionID = 0;
     private volatile Heap heap = new Heap();
 
+    /**
+     * 
+     * @param navMesh
+     */
     public NavMeshPathfinder(NavMesh navMesh) {
         this.navMesh = navMesh;
     }
@@ -40,7 +47,7 @@ public class NavMeshPathfinder {
         this.currentPos.set(currentPos3d.x, currentPos3d.z);
 
         // should probably have this here:
-        //currentCell = navMesh.findClosestCell(newPos2d);
+        // currentCell = navMesh.findClosestCell(newPos2d);
     }
 
     public float getEntityRadius() {
@@ -83,12 +90,13 @@ public class NavMeshPathfinder {
 
     /**
      * Test if the position is inside a cell of the navmesh.
+     * 
      * @return false if it falls outside a cell, not in the navmesh.
      */
-    /*public boolean isInsideNavMesh(Vector3f position) {
-    Cell cell = navMesh.findClosestCell(position);
-    return cell != null;
-    }*/
+    public boolean isInsideNavMesh(Vector3f position) {
+        Cell cell = navMesh.findClosestCell(position);
+        return cell != null;
+    }
     
     /**
      * Generate a new Path from the currentPos3d to the supplied goal 
@@ -164,8 +172,8 @@ public class NavMeshPathfinder {
         Vector3f currentPos2d = new Vector3f(currentPos3d);
         currentPos2d.setY(0);
 
-        //Cell nextCell = navMesh.resolveMotionOnMesh(currentPos2d, currentCell, newPos2d, newPos2d);
-        //currentCell = nextCell;
+        // Cell nextCell = navMesh.resolveMotionOnMesh(currentPos2d, currentCell, newPos2d, newPos2d);
+        // currentCell = nextCell;
         newPos2d.setY(currentPos3d.getY());
         return newPos2d;
     }
@@ -185,14 +193,15 @@ public class NavMeshPathfinder {
     public void goToNextWaypoint(DebugInfo debugInfo) {
         int from = getPath().getWaypoints().indexOf(nextWaypoint);
         nextWaypoint = getPath().getWaypoints().get(from + 1);
-        //nextWaypoint = path.getFurthestVisibleWayPoint(nextWaypoint, debugInfo);//path.getOptimalVisibleWayPoint(nextWaypoint);
-        int to = getPath().getWaypoints().indexOf(nextWaypoint);
-        //Vector3f waypt = nextWaypoint.getPosition();
-        //currentPos3d.setX(waypt.getX());
-        //currentPos3d.setZ(waypt.getZ());
-        //currentPos.set(waypt.getX(), waypt.getZ());
+        //nextWaypoint = path.getFurthestVisibleWayPoint(nextWaypoint, debugInfo);
+        //nextWaypoint = path.getOptimalVisibleWayPoint(nextWaypoint);
+//        int to = getPath().getWaypoints().indexOf(nextWaypoint);
+        
+        //Vector3f wp = nextWaypoint.getPosition();
+        //currentPos3d.setX(wp.getX());
+        //currentPos3d.setZ(wp.getZ());
+        //currentPos.set(wp.getX(), wp.getZ());
         currentCell = nextWaypoint.getCell();
-        //System.out.println("Going from WP idx "+from+" to "+to);
     }
 
     public Path getPath() {
@@ -253,24 +262,26 @@ public class NavMeshPathfinder {
 
         // Step through each cell linked by our A* algorithm
         // from StartCell to EndCell
-        Cell currentCell = startCell;
-        while (currentCell != null && currentCell != endCell) {
+        Cell currCell = startCell;
+        while (currCell != null && currCell != endCell) {
 
             if (debugInfo != null) {
-                debugInfo.addPlannedCell(currentCell);
+                debugInfo.addPlannedCell(currCell);
             }
 
             // add the link point of the cell as a way point (the exit
             // wall's center)
-            int linkWall = currentCell.getArrivalWall();
-            Vector3f newWayPoint = currentCell.getWallMidpoint(linkWall).clone();
+            int linkWall = currCell.getArrivalWall();
+            Vector3f newWayPoint = currCell.getWallMidpoint(linkWall).clone();
 
-            Line2D wall = currentCell.getWall(linkWall);
+            Line2D wall = currCell.getWall(linkWall);
             float length = wall.length();
             float distBlend = entityRadius / length;
 
-            Line2D lineToGoal = new Line2D(new Vector2f(lastWayPoint.x, lastWayPoint.z),
+            Line2D lineToGoal = new Line2D(
+                    new Vector2f(lastWayPoint.x, lastWayPoint.z),
                     new Vector2f(endPos.x, endPos.z));
+            
             LineIntersect result = lineToGoal.intersect(wall, intersectionPoint);
             switch (result) {
                 case SegmentsIntersect:
@@ -291,7 +302,7 @@ public class NavMeshPathfinder {
                             newWayPoint = new Vector3f(intersectionPoint.x, 0, intersectionPoint.y);
                         }
                     }
-                    currentCell.computeHeightOnCell(newWayPoint);
+                    currCell.computeHeightOnCell(newWayPoint);
                     break;
                 case LinesIntersect:
                 case ABisectsB:
@@ -311,12 +322,12 @@ public class NavMeshPathfinder {
                         intersectionPoint.interpolateLocal(wall.getPointA(), wall.getPointB(), distBlend);
                         newWayPoint = new Vector3f(intersectionPoint.x, 0, intersectionPoint.y);
                     }
-                    currentCell.computeHeightOnCell(newWayPoint);
+                    currCell.computeHeightOnCell(newWayPoint);
 
                     break;
                 case CoLinear:
                 case Parallel:
-                    System.out.println("## colinear or parallel");
+                    logger.fine("## colinear or parallel");
                     break;
             }
 
@@ -326,18 +337,18 @@ public class NavMeshPathfinder {
             //newWayPoint = snapPointToCell(currentCell, newWayPoint);
             lastWayPoint = newWayPoint.clone();
 
-            navPath.addWaypoint(newWayPoint, currentCell);
+            navPath.addWaypoint(newWayPoint, currCell);
 
             // get the next cell
-            currentCell = currentCell.getLink(linkWall);
+            currCell = currCell.getLink(linkWall);
         }
 
         // cap the end of the path.
         navPath.finishPath();
 
-        //remove optimization so it can be done as the actor moves
+        // remove optimization so it can be done as the actor moves
         // further: optimize the path
-        List<Waypoint> newPath = new ArrayList<Waypoint>();
+        List<Waypoint> newPath = new ArrayList<>();
         Waypoint curWayPoint = navPath.getFirst();
         newPath.add(curWayPoint);
         while (curWayPoint != navPath.getLast()) {
@@ -373,21 +384,23 @@ public class NavMeshPathfinder {
         // these three will hold the results of our tests against the cell walls
         ClassifyResult result = null;
 
-        // TestCell is the cell we are currently examining.
-        Cell currentCell = startCell;
+        // testCell is the cell we are currently examining.
+        Cell testCell = startCell;
 
         do {
             i++;
             // use NavigationCell to determine how our path and cell interact
-            // if(TestCell.IsPointInCellCollumn(MotionPath.EndPointA()))
-            // System.out.println("Start is in cell");
-            // else
-            // System.out.println("Start is NOT in cell");
-            // if(TestCell.IsPointInCellCollumn(MotionPath.EndPointB()))
-            // System.out.println("End is in cell");
-            // else
-            // System.out.println("End is NOT in cell");
-            result = currentCell.classifyPathToCell(motionLine);
+//            if (testCell.IsPointInCellCollumn(MotionPath.EndPointA()))
+//                System.out.println("Start is in cell");
+//            else
+//                System.out.println("Start is NOT in cell");
+//            
+//            if (testCell.IsPointInCellCollumn(MotionPath.EndPointB()))
+//                System.out.println("End is in cell");
+//            else
+//                System.out.println("End is NOT in cell");
+             
+            result = testCell.classifyPathToCell(motionLine);
 
             // if exiting the cell...
             if (result.result == PathResult.ExitingCell) {
@@ -398,21 +411,20 @@ public class NavMeshPathfinder {
                     // intersection with this cell
                     // and continue, using the new cell as our test cell.
                     motionLine.setPointA(result.intersection);
-                    currentCell = result.cell;
+                    testCell = result.cell;
                 } else {
                     // we have hit a solid wall. Resolve the collision and
                     // correct our path.
                     motionLine.setPointA(result.intersection);
-                    currentCell.projectPathOnCellWall(result.side, motionLine);
+                    testCell.projectPathOnCellWall(result.side, motionLine);
 
                     // add some friction to the new MotionPath since we are
                     // scraping against a wall.
-                    // we do this by reducing the magnatude of our motion by 10%
-                    Vector2f Direction = motionLine.getPointB().subtract(
+                    // we do this by reducing the magnitude of our motion by 10%
+                    Vector2f direction = motionLine.getPointB().subtract(
                             motionLine.getPointA()).mult(0.9f);
-                    // Direction.mult(0.9f);
                     motionLine.setPointB(motionLine.getPointA().add(
-                            Direction));
+                            direction));
                 }
             } else if (result.result == Cell.PathResult.NoRelationship) {
                 // Although theoretically we should never encounter this case,
@@ -420,23 +432,22 @@ public class NavMeshPathfinder {
                 // of the cell.
                 // This can be viewed by some routines as being outside the
                 // cell.
-                // To accomodate this rare case, we can force our starting point
+                // To accommodate this rare case, we can force our starting point
                 // to be within
                 // the current cell by nudging it back so we may continue.
-                Vector2f NewOrigin = motionLine.getPointA();
-                // NewOrigin.x -= 0.01f;
-                currentCell.forcePointToCellColumn(NewOrigin);
-                motionLine.setPointA(NewOrigin);
+                Vector2f newOrigin = motionLine.getPointA();
+                // newOrigin.x -= 0.01f;
+                testCell.forcePointToCellColumn(newOrigin);
+                motionLine.setPointA(newOrigin);
             }
-        }//
-        // Keep testing until we find our ending cell or stop moving due to
-        // friction
-        //
+        }
+        
+        // Keep testing until we find our ending cell or stop moving due to friction
         while ((result.result != Cell.PathResult.EndingCell)
                 && (motionLine.getPointA().x != motionLine.getPointB().x && motionLine.getPointA().y != motionLine.getPointB().y) && i < 5000);
         //
         if (i >= 5000) {
-            System.out.println("Loop detected in ResolveMotionOnMesh");
+            logger.warning("Loop detected in ResolveMotionOnMesh");
         }
         // we now have our new host cell
 
@@ -445,8 +456,8 @@ public class NavMeshPathfinder {
         modifiedEndPos.x = motionLine.getPointB().x;
         modifiedEndPos.y = 0.0f;
         modifiedEndPos.z = motionLine.getPointB().y;
-        currentCell.computeHeightOnCell(modifiedEndPos);
+        testCell.computeHeightOnCell(modifiedEndPos);
 
-        return currentCell;
+        return testCell;
     }
 }

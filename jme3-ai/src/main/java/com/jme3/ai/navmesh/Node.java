@@ -30,14 +30,14 @@ class Node implements Comparable<Node> {
     }
 
     /**
-     * To compare two nodes, we compare the cost or `f' value, which is the sum
-     * of the g and h values defined by A*.
+     * To compare two nodes, we compare the cost or `f' value, which is the sum of
+     * the g and h values defined by A*.
      *
-     * @param o
-     *            the Object to be compared.
+     * @param o the Object to be compared.
      * @return a negative integer, zero, or a positive integer as this object is
      *         less than, equal to, or greater than the specified object.
      */
+    @Override
     public int compareTo(Node o) {
         if (this.cost < (o.cost)) {
             return -1;

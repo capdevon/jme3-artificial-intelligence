@@ -1,5 +1,7 @@
 package com.jme3.ai.navmesh;
 
+import java.io.IOException;
+
 import com.jme3.export.InputCapsule;
 import com.jme3.export.JmeExporter;
 import com.jme3.export.JmeImporter;
@@ -9,13 +11,11 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer.Type;
-import java.io.IOException;
-import java.util.Random;
 
 /**
  * A Cell represents a single triangle within a NavigationMesh. It contains
  * functions for testing a path against the cell, and various ways to resolve
- * collisions with the cell walls. Portions of the A* path finding algorythm are
+ * collisions with the cell walls. Portions of the A* path finding algorithm are
  * provided within this class as well, but the path finding process is managed
  * by the parent Navigation Mesh.
  * 
@@ -34,23 +34,19 @@ public class Cell implements Savable {
     static final int SIDE_CA = 2;
 
     public enum PathResult {
-
         /**
          * The path does not cross this cell
          */
         NoRelationship,
-
         /**
          * The path ends in this cell
          */
         EndingCell,
-
         /**
          * The path exits this cell through side X
          */
-        ExitingCell;
-        
-    };
+        ExitingCell
+    }
 
     public class ClassifyResult {
 
@@ -71,10 +67,10 @@ public class Cell implements Savable {
     private Plane cellPlane = new Plane();
 
     /**
-     * pointers to the verticies of this triangle held in the
+     * pointers to the vertices of this triangle held in the
      * NavigationMesh's vertex pool
      */
-    private Vector3f[] verticies = new Vector3f[3];
+    private Vector3f[] vertices = new Vector3f[3];
 
     /**
      * The center of the triangle
@@ -131,14 +127,14 @@ public class Cell implements Savable {
         // guarantee ClockWise order
         if (isLeft(pointA, pointB, pointC)) {
             // CCW
-            verticies[VERT_A] = pointA;
-            verticies[VERT_B] = pointC;
-            verticies[VERT_C] = pointB;
+            vertices[VERT_A] = pointA;
+            vertices[VERT_B] = pointC;
+            vertices[VERT_C] = pointB;
         } else {
             // CW
-            verticies[VERT_A] = pointA;
-            verticies[VERT_B] = pointB;
-            verticies[VERT_C] = pointC;
+            vertices[VERT_A] = pointA;
+            vertices[VERT_B] = pointB;
+            vertices[VERT_C] = pointC;
         }
 
         // object must be re-linked
@@ -152,38 +148,38 @@ public class Cell implements Savable {
     }
 
     void computeCellData() {
-        // create 2D versions of our verticies
-        Vector2f point1 = new Vector2f(verticies[VERT_A].x, verticies[VERT_A].z);
-        Vector2f point2 = new Vector2f(verticies[VERT_B].x, verticies[VERT_B].z);
-        Vector2f point3 = new Vector2f(verticies[VERT_C].x, verticies[VERT_C].z);
+        // create 2D versions of our vertices
+        Vector2f point1 = new Vector2f(vertices[VERT_A].x, vertices[VERT_A].z);
+        Vector2f point2 = new Vector2f(vertices[VERT_B].x, vertices[VERT_B].z);
+        Vector2f point3 = new Vector2f(vertices[VERT_C].x, vertices[VERT_C].z);
 
-        // innitialize our sides
+        // Initialize our sides
         sides[SIDE_AB] = new Line2D(point1, point2); // line AB
         sides[SIDE_BC] = new Line2D(point2, point3); // line BC
         sides[SIDE_CA] = new Line2D(point3, point1); // line CA
 
-        cellPlane.setPlanePoints(verticies[VERT_A], verticies[VERT_B],
-                verticies[VERT_C]);
+        cellPlane.setPlanePoints(vertices[VERT_A], vertices[VERT_B],
+                vertices[VERT_C]);
 
         // compute midpoint as centroid of polygon
-        center.x = ((verticies[VERT_A].x + verticies[VERT_B].x + verticies[VERT_C].x) / 3);
-        center.y = ((verticies[VERT_A].y + verticies[VERT_B].y + verticies[VERT_C].y) / 3);
-        center.z = ((verticies[VERT_A].z + verticies[VERT_B].z + verticies[VERT_C].z) / 3);
+        center.x = ((vertices[VERT_A].x + vertices[VERT_B].x + vertices[VERT_C].x) / 3);
+        center.y = ((vertices[VERT_A].y + vertices[VERT_B].y + vertices[VERT_C].y) / 3);
+        center.z = ((vertices[VERT_A].z + vertices[VERT_B].z + vertices[VERT_C].z) / 3);
 
         // compute the midpoint of each cell wall
         wallMidpoints[0] = new Vector3f(
-                (verticies[VERT_A].x + verticies[VERT_B].x) / 2.0f,
-                (verticies[VERT_A].y + verticies[VERT_B].y) / 2.0f,
-                (verticies[VERT_A].z + verticies[VERT_B].z) / 2.0f);
+                (vertices[VERT_A].x + vertices[VERT_B].x) / 2.0f,
+                (vertices[VERT_A].y + vertices[VERT_B].y) / 2.0f,
+                (vertices[VERT_A].z + vertices[VERT_B].z) / 2.0f);
         wallMidpoints[1] = new Vector3f(
-                (verticies[VERT_C].x + verticies[VERT_B].x) / 2.0f,
-                (verticies[VERT_C].y + verticies[VERT_B].y) / 2.0f,
-                (verticies[VERT_C].z + verticies[VERT_B].z) / 2.0f);
+                (vertices[VERT_C].x + vertices[VERT_B].x) / 2.0f,
+                (vertices[VERT_C].y + vertices[VERT_B].y) / 2.0f,
+                (vertices[VERT_C].z + vertices[VERT_B].z) / 2.0f);
 
         wallMidpoints[2] = new Vector3f(
-                (verticies[VERT_C].x + verticies[VERT_A].x) / 2.0f,
-                (verticies[VERT_C].y + verticies[VERT_A].y) / 2.0f,
-                (verticies[VERT_C].z + verticies[VERT_A].z) / 2.0f);
+                (vertices[VERT_C].x + vertices[VERT_A].x) / 2.0f,
+                (vertices[VERT_C].y + vertices[VERT_A].y) / 2.0f,
+                (vertices[VERT_C].z + vertices[VERT_A].z) / 2.0f);
 
         // compute the distances between the wall midpoints
         Vector3f wallVector;
@@ -195,11 +191,10 @@ public class Cell implements Savable {
 
         wallVector = wallMidpoints[2].subtract(wallMidpoints[0]);
         wallDistances[2] = wallVector.length();
-
     }
     
     public Vector3f[] getTriangle() {
-        return verticies;
+        return vertices;
     }
     
     /**
@@ -221,29 +216,29 @@ public class Cell implements Savable {
      * @return
      */
     boolean requestLink(Vector3f pointA, Vector3f pointB, Cell caller, float epsilon) {
-        // return true if we share the two provided verticies with the calling
+        // return true if we share the two provided vertices with the calling
         // cell.
-        if (verticies[VERT_A].distanceSquared(pointA) <= epsilon) {
-            if (verticies[VERT_B].distanceSquared(pointB) <= epsilon) {
+        if (vertices[VERT_A].distanceSquared(pointA) <= epsilon) {
+            if (vertices[VERT_B].distanceSquared(pointB) <= epsilon) {
                 links[SIDE_AB] = caller;
                 return true;
-            } else if (verticies[VERT_C].distanceSquared(pointB) <= epsilon) {
+            } else if (vertices[VERT_C].distanceSquared(pointB) <= epsilon) {
                 links[SIDE_CA] = caller;
                 return true;
             }
-        } else if (verticies[VERT_B].distanceSquared(pointA) <= epsilon) {
-            if (verticies[VERT_A].equals(pointB)) {
+        } else if (vertices[VERT_B].distanceSquared(pointA) <= epsilon) {
+            if (vertices[VERT_A].equals(pointB)) {
                 links[SIDE_AB] = caller;
                 return true;
-            } else if (verticies[VERT_C].distanceSquared(pointB) <= epsilon) {
+            } else if (vertices[VERT_C].distanceSquared(pointB) <= epsilon) {
                 links[SIDE_BC] = caller;
                 return true;
             }
-        } else if (verticies[VERT_C].distanceSquared(pointA) <= epsilon) {
-            if (verticies[VERT_A].distanceSquared(pointB) <= epsilon) {
+        } else if (vertices[VERT_C].distanceSquared(pointA) <= epsilon) {
+            if (vertices[VERT_A].distanceSquared(pointB) <= epsilon) {
                 links[SIDE_CA] = caller;
                 return true;
-            } else if (verticies[VERT_B].distanceSquared(pointB) <= epsilon) {
+            } else if (vertices[VERT_B].distanceSquared(pointB) <= epsilon) {
                 links[SIDE_BC] = caller;
                 return true;
             }
@@ -256,23 +251,25 @@ public class Cell implements Savable {
     /**
      * Sets a link to the calling cell on the enumerated edge.
      *
-     * @param Side
-     * @param Caller
+     * @param side
+     * @param caller
      */
-    private void setLink(int Side, Cell Caller) {
-        links[Side] = Caller;
+    private void setLink(int side, Cell caller) {
+        links[side] = caller;
     }
 
     /**
      * Uses the X and Z information of the vector to calculate Y on the cell plane
+     * 
      * @param point
      */
-    public float getHeightOnCell(Vector3f point){
+    public float getHeightOnCell(Vector3f point) {
         return cellPlane.solveForY(point.x, point.z);
     }
 
     /**
      * Uses the X and Z information of the vector to calculate Y on the cell plane
+     * 
      * @param point
      */
     public void computeHeightOnCell(Vector3f point) {
@@ -280,8 +277,8 @@ public class Cell implements Savable {
     }
 
     /**
-     * Test to see if a 2D point is within the cell. There are probably better
-     * ways to do this, but this seems plenty fast for the time being.
+     * Test to see if a 2D point is within the cell. There are probably better ways
+     * to do this, but this seems plenty fast for the time being.
      *
      * @param point
      * @return
@@ -289,35 +286,28 @@ public class Cell implements Savable {
     public boolean contains(Vector2f point) {
         // we are "in" the cell if we are on the right hand side of all edge
         // lines of the cell
-        int InteriorCount = 0;
-
+        int interiorCount = 0;
         for (int i = 0; i < 3; i++) {
-            Line2D.PointSide SideResult = sides[i].getSide(
-                    point, 1.0e-6f);
-
-            if (SideResult != Line2D.PointSide.Left) {
-                InteriorCount++;
+            Line2D.PointSide sideResult = sides[i].getSide(point, 1.0e-6f);
+            if (sideResult != Line2D.PointSide.Left) {
+                interiorCount++;
             }
         }
-        // if(InteriorCount == 3)
-        // System.out.println("Point "+TestPoint+" is in Cell:"+this);
-        // else
-        // System.out.println("Point "+TestPoint+" is NOT in Cell:"+this);
-        return (InteriorCount == 3);
+        return (interiorCount == 3);
     }
 
     /**
-     * Test to see if a 3D point is within the cell by projecting it down to 2D
-     * and calling the above method.
+     * Test to see if a 3D point is within the cell by projecting it down to 2D.
+     * 
      * @param point
      * @return
      */
     public boolean contains(Vector3f point) {
-        return (contains(new Vector2f(point.x, point.z)));
+        return contains(new Vector2f(point.x, point.z));
     }
 
-    public Vector3f getVertex(int Vert) {
-        return (verticies[Vert]);
+    public Vector3f getVertex(int index) {
+        return (vertices[index]);
     }
 
     public Vector3f getCenter() {
@@ -371,9 +361,7 @@ public class Cell implements Savable {
      * In either case PointOfIntersection will contain the point where the path
      * intersected with the wall of the cell if it is provided by the caller.
      */
-    public ClassifyResult classifyPathToCell(Line2D MotionPath) {
-        // System.out.println("Cell:"+m_Vertex[0].toString()+" "+m_Vertex[1].toString()+" "+m_Vertex[2].toString());
-        // System.out.println("     Path:"+MotionPath);
+    public ClassifyResult classifyPathToCell(Line2D motionPath) {
         int interiorCount = 0;
         ClassifyResult result = new ClassifyResult();
 
@@ -389,25 +377,23 @@ public class Cell implements Savable {
 
             // If the destination endpoint of the MotionPath
             // is Not on the right side of this wall...
-            Line2D.PointSide end = sides[i].getSide(
-                    MotionPath.getPointB(), 0.0f);
-            if (end == Line2D.PointSide.Left){//(end != Line2D.PointSide.Right) {
+            Line2D.PointSide end = sides[i].getSide(motionPath.getPointB(), 0.0f);
+            if (end == Line2D.PointSide.Left) { //(end != Line2D.PointSide.Right) {
 //					&& end != Line2D.POINT_CLASSIFICATION.ON_LINE) {
                 // ..and the starting endpoint of the MotionPath
                 // is Not on the left side of this wall...
-                if (sides[i].getSide(MotionPath.getPointA(), 0.0f) != Line2D.PointSide.Left) {
+                if (sides[i].getSide(motionPath.getPointA(), 0.0f) != Line2D.PointSide.Left) {
                     // Check to see if we intersect the wall
                     // using the Intersection function of Line2D
-                    Line2D.LineIntersect IntersectResult = MotionPath.intersect(sides[i], result.intersection);
+                    Line2D.LineIntersect intersectResult = motionPath.intersect(sides[i], result.intersection);
 
-                    if (IntersectResult == Line2D.LineIntersect.SegmentsIntersect || IntersectResult == Line2D.LineIntersect.ABisectsB) {
+                    if (intersectResult == Line2D.LineIntersect.SegmentsIntersect || intersectResult == Line2D.LineIntersect.ABisectsB) {
                         // record the link to the next adjacent cell
-                        // (or NULL if no attachement exists)
+                        // (or NULL if no attachment exists)
                         // and the enumerated ID of the side we hit.
                         result.cell = links[i];
                         result.side = i;
                         result.result = PathResult.ExitingCell;
-                        // System.out.println("exits this cell");
                         return result;
 
                         // pNextCell = m_Link[i];
@@ -416,11 +402,9 @@ public class Cell implements Savable {
                     }
                 }
             } else {
-                // The destination endpoint of the MotionPath is on the right
-                // side.
-                // Increment our InteriorCount so we'll know how many walls we
-                // were
-                // to the right of.
+                // The destination endpoint of the MotionPath is on the right side.
+                // Increment our InteriorCount so we'll know how many walls 
+                // we were to the right of.
                 interiorCount++;
             }
         }
@@ -431,12 +415,10 @@ public class Cell implements Savable {
         // That means it is located within this triangle, and this is our ending
         // cell.
         if (interiorCount == 3) {
-            // System.out.println(" ends within this cell");
             result.result = PathResult.EndingCell;
             return result;
             // return (PATH_RESULT.ENDING_CELL);
         }
-        // System.out.println("No intersection with this cell at all");
         // We only reach here is if the MotionPath does not intersect the cell
         // at all.
         return result;
@@ -453,40 +435,37 @@ public class Cell implements Savable {
      */
     void projectPathOnCellWall(int sideNumber, Line2D motionPath) {
         // compute the normalized vector of the cell wall in question
-        Vector2f WallNormal = sides[sideNumber].getPointB().subtract(
-                sides[sideNumber].getPointA());
-        WallNormal = WallNormal.normalize();
+        Vector2f wallNormal = sides[sideNumber].getPointB().subtract(sides[sideNumber].getPointA());
+        wallNormal = wallNormal.normalize();
 
         // determine the vector of our current movement
-        Vector2f MotionVector = motionPath.getPointB().subtract(
-                motionPath.getPointA());
+        Vector2f motionVector = motionPath.getPointB().subtract(motionPath.getPointA());
 
         // compute dot product of our MotionVector and the normalized cell wall
-        // this gives us the magnatude of our motion along the wall
+        // this gives us the magnitude of our motion along the wall
 
-        float DotResult = MotionVector.dot(WallNormal);
+        float dotResult = motionVector.dot(wallNormal);
 
         // our projected vector is then the normalized wall vector times our new
-        // found magnatude
-        MotionVector = WallNormal.mult(DotResult);
+        // found magnitude
+        motionVector = wallNormal.mult(dotResult);
 
         // redirect our motion path along the new reflected direction
-        motionPath.setPointB(motionPath.getPointA().add(MotionVector));
+        motionPath.setPointB(motionPath.getPointA().add(motionVector));
 
         //
         // Make sure starting point of motion path is within the cell
         //
-        Vector2f NewPoint = motionPath.getPointA();
-        forcePointToCellColumn(NewPoint);
-        motionPath.setPointA(NewPoint);
+        Vector2f newPoint = motionPath.getPointA();
+        forcePointToCellColumn(newPoint);
+        motionPath.setPointA(newPoint);
 
         //
         // Make sure destination point does not intersect this wall again
         //
-        NewPoint = motionPath.getPointB();
-        forcePointToWallInterior(sideNumber, NewPoint);
-        motionPath.setPointB(NewPoint);
-
+        newPoint = motionPath.getPointB();
+        forcePointToWallInterior(sideNumber, newPoint);
+        motionPath.setPointB(newPoint);
     }
 
     /**
@@ -497,25 +476,25 @@ public class Cell implements Savable {
      * @return
      */
     boolean forcePointToWallInterior(int sideNumber, Vector2f point) {
-        float Distance = sides[sideNumber].signedDistance(point);
-        float Epsilon = 0.001f;
+        float distance = sides[sideNumber].signedDistance(point);
+        float epsilon = 0.001f;
 
-        if (Distance <= Epsilon) {
-            if (Distance <= 0.0f) {
-                Distance -= Epsilon;
+        if (distance <= epsilon) {
+            if (distance <= 0.0f) {
+                distance -= epsilon;
             }
 
-            Distance = Math.abs(Distance);
-            Distance = (Epsilon > Distance ? Epsilon : Distance);
+            distance = Math.abs(distance);
+            distance = (epsilon > distance ? epsilon : distance);
 
             // this point needs adjustment
-            Vector2f Normal = sides[sideNumber].getNormal();
-            Normal = Normal.mult(Distance);
-            point.x += Normal.x;
-            point.y += Normal.y;
-            return (true);
+            Vector2f normal = sides[sideNumber].getNormal();
+            normal = normal.mult(distance);
+            point.x += normal.x;
+            point.y += normal.y;
+            return true;
         }
-        return (false);
+        return false;
     }
 
     /**
@@ -526,15 +505,15 @@ public class Cell implements Savable {
      * @return
      */
     boolean forcePointToWallInterior(int sideNumber, Vector3f point) {
-        Vector2f TestPoint2D = new Vector2f(point.x, point.z);
-        boolean PointAltered = forcePointToWallInterior(sideNumber, TestPoint2D);
+        Vector2f testPoint2D = new Vector2f(point.x, point.z);
+        boolean pointAltered = forcePointToWallInterior(sideNumber, testPoint2D);
 
-        if (PointAltered) {
-            point.x = TestPoint2D.x;
-            point.z = TestPoint2D.y;
+        if (pointAltered) {
+            point.x = testPoint2D.x;
+            point.z = testPoint2D.y;
         }
 
-        return (PointAltered);
+        return (pointAltered);
     }
 
     /**
@@ -546,21 +525,18 @@ public class Cell implements Savable {
      */
     boolean forcePointToCellColumn(Vector2f point) {
         // create a motion path from the center of the cell to our point
-        Line2D TestPath = new Line2D(new Vector2f(center.x,
-                center.z), point);
+        Line2D testPath = new Line2D(new Vector2f(center.x, center.z), point);
 
-        ClassifyResult result = classifyPathToCell(TestPath);
+        ClassifyResult result = classifyPathToCell(testPath);
         // compare this path to the cell.
 
         if (result.result == PathResult.ExitingCell) {
-            Vector2f PathDirection = new Vector2f(result.intersection.x
-                    - center.x, result.intersection.y - center.z);
-
-            PathDirection = PathDirection.mult(0.9f);
-
-            point.x = center.x + PathDirection.x;
-            point.y = center.z + PathDirection.y;
+            Vector2f pathDirection = new Vector2f(result.intersection.x - center.x, result.intersection.y - center.z);
+            pathDirection = pathDirection.mult(0.9f);
+            point.x = center.x + pathDirection.x;
+            point.y = center.z + pathDirection.y;
             return true;
+            
         } else if (result.result == PathResult.NoRelationship) {
             point.x = center.x;
             point.y = center.z;
@@ -577,14 +553,14 @@ public class Cell implements Savable {
      * @return
      */
     boolean forcePointToCellColumn(Vector3f point) {
-        Vector2f TestPoint2D = new Vector2f(point.x, point.z);
-        boolean PointAltered = forcePointToCellColumn(TestPoint2D);
+        Vector2f testPoint2D = new Vector2f(point.x, point.z);
+        boolean pointAltered = forcePointToCellColumn(testPoint2D);
 
-        if (PointAltered) {
-            point.x = TestPoint2D.x;
-            point.z = TestPoint2D.y;
+        if (pointAltered) {
+            point.x = testPoint2D.x;
+            point.z = testPoint2D.y;
         }
-        return (PointAltered);
+        return (pointAltered);
     }
 
     /**
@@ -687,8 +663,7 @@ public class Cell implements Savable {
      */
     void computeHeuristic(Vector3f goal) {
         // our heuristic is the estimated distance (using the longest axis
-        // delta) between our
-        // cell center and the goal location
+        // delta) between our cell center and the goal location
 
 //        float XDelta = Math.abs(goal.x - center.x);
 //        float YDelta = Math.abs(goal.y - center.y);
@@ -707,22 +682,26 @@ public class Cell implements Savable {
         return this.cellPlane.getNormal();
     }
 
-    public Vector3f getRandomPoint() {
-        Random rand = new Random();
-        Vector2f ret =
-                this.sides[0].getPointA().add(this.sides[0].getDirection().mult(rand.nextFloat()).add(
-                this.sides[1].getDirection().mult(rand.nextFloat())));
-        forcePointToCellColumn(ret);
-        Vector3f vec = new Vector3f(ret.x, 0, ret.y);
-        computeHeightOnCell(vec);
-        return vec;
-    }
+//    public Vector3f getRandomPoint() {
+//        float u1 = FastMath.nextRandomFloat();
+//        float u2 = FastMath.nextRandomFloat();
+//
+//        Vector2f d1 = sides[0].getDirection().mult(u1);
+//        Vector2f d2 = sides[1].getDirection().mult(u2);
+//        Vector2f ret = sides[0].getPointA().add(d1.add(d2));
+//        forcePointToCellColumn(ret);
+//        
+//        Vector3f vec = new Vector3f(ret.x, 0, ret.y);
+//        computeHeightOnCell(vec);
+//        
+//        return vec;
+//    }
 
-    public void write(JmeExporter e) throws IOException {
-        OutputCapsule capsule = e.getCapsule(this);
-//        capsule.write(terrain, "terrain", null);
+    @Override
+    public void write(JmeExporter ex) throws IOException {
+        OutputCapsule capsule = ex.getCapsule(this);
 //        capsule.write(cellPlane, "cellPlane", null);
-        capsule.write(verticies, "verticies", null);
+        capsule.write(vertices, "vertices", null);
 //        capsule.write(center, "center", null);
 //        capsule.write(sides, "sides", null);
         capsule.write(links, "links", null);
@@ -730,17 +709,18 @@ public class Cell implements Savable {
 //        capsule.write(wallDistances, "distances", null);
     }
 
-    public void read(JmeImporter e) throws IOException {
-        InputCapsule capsule = e.getCapsule(this);
+    @Override
+    public void read(JmeImporter im) throws IOException {
+        InputCapsule capsule = im.getCapsule(this);
 
-        Savable[] verts = capsule.readSavableArray("verticies", null);
-        for (int i = 0; i < verts.length; i++){
-            verticies[i] = (Vector3f) verts[i];
+        Savable[] sVertices = capsule.readSavableArray("vertices", null);
+        for (int i = 0; i < sVertices.length; i++){
+            vertices[i] = (Vector3f) sVertices[i];
         }
 
-        Savable[] savLinks = capsule.readSavableArray("links", null);
-        for (int i = 0; i < savLinks.length; i++){
-            links[i] = (Cell) savLinks[i];
+        Savable[] sLinks = capsule.readSavableArray("links", null);
+        for (int i = 0; i < sLinks.length; i++){
+            links[i] = (Cell) sLinks[i];
         }
 
         computeCellData();
@@ -750,8 +730,6 @@ public class Cell implements Savable {
 //        sides = (Line2D[]) capsule.readSavableArray("sides", new Line2D[3]);
 //        wallMidpoints = (Vector3f[]) capsule.readSavableArray("midpoints", new Vector3f[3]);
 //        wallDistances = capsule.readFloatArray("distances", new float[3]);
-
-        
     }
 
     void checkAndLink(Cell other, float epsilon) {
@@ -784,20 +762,26 @@ public class Cell implements Savable {
      * Return a mesh representation of this polygon (triangle)
      */
     public Mesh getDebugMesh() {
-        Mesh m = new Mesh();//(verticies[0], verticies[1], verticies[2]);
-        m.setBuffer(Type.Position, 3, new float[]{  verticies[0].x, verticies[0].y, verticies[0].z,
-                                                    verticies[1].x, verticies[1].y, verticies[1].z,
-                                                    verticies[2].x, verticies[2].y, verticies[2].z});
+        Mesh m = new Mesh();
+        m.setBuffer(Type.Position, 3, new float[] { 
+                vertices[0].x, vertices[0].y, vertices[0].z, 
+                vertices[1].x, vertices[1].y, vertices[1].z, 
+                vertices[2].x, vertices[2].y, vertices[2].z });
         
-        // the tex coords are wrong, but we render wire/unshaded so it doesn't matter
-        m.setBuffer(Type.TexCoord, 2, new float[]{  0,0,
-                                                    0.5f,1,
-                                                    1,1});
-        m.setBuffer(Type.Normal, 3, new float[]{0, 0, 1,
-                                                0, 0, 1,
-                                                0, 0, 1});
+        // the TexCoord are wrong, but we render wire/unshaded so it doesn't matter
+        m.setBuffer(Type.TexCoord, 2, new float[] { 
+                0, 0, 
+                0.5f, 1, 
+                1, 1 });
+        
+        m.setBuffer(Type.Normal, 3, new float[] { 
+                0, 0, 1, 
+                0, 0, 1, 
+                0, 0, 1 });
+        
         m.setBuffer(Type.Index, 3, new short[]{0, 1, 2});
         m.updateBound();
         return m;
     }
+    
 }

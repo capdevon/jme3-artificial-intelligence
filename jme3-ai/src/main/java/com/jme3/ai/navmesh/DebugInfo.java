@@ -10,19 +10,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Debug nformation from a pathfinding search.
+ * Debug information from a pathfinding search.
  * 
  * @author sploreg
  */
 public class DebugInfo {
-    private List<Vector3f> preOptWaypoints = new ArrayList<Vector3f>();
-    private List<Cell> plannedCells = new ArrayList<Cell>();
+    
+    private List<Vector3f> preOptWaypoints = new ArrayList<>();
+    private List<Cell> plannedCells = new ArrayList<>();
     private List<Vector3f> wpPositions;
     private Vector3f startPos, endPos;
     private Waypoint failedVisibleWaypoint;
     private Waypoint farthestTestedWaypoint;
     private Cell failedCell;
-    private List<Cell> passedCells = new ArrayList<Cell>();
+    private List<Cell> passedCells = new ArrayList<>();
     private Cell endingCell;
     private Vector3f startLocation;
 
@@ -43,7 +44,7 @@ public class DebugInfo {
         endingCell = null;
         startLocation = null;
     }
-    
+
     public void setWaypointPositions(List<Vector3f> wpPositions) {
         this.wpPositions = wpPositions;
     }
@@ -67,7 +68,7 @@ public class DebugInfo {
     public void setStartPos(Vector3f startPos) {
         this.startPos = startPos;
     }
-    
+
     public void setFailedVisibleWaypoint(Waypoint testPoint) {
         this.failedVisibleWaypoint = testPoint;
     }
@@ -83,7 +84,7 @@ public class DebugInfo {
     public Waypoint getFarthestTestedWaypoint() {
         return farthestTestedWaypoint;
     }
-    
+
     void setFailedCell(Cell failed) {
         this.failedCell = failed;
     }
@@ -131,5 +132,5 @@ public class DebugInfo {
     public List<Vector3f> getPreOptWaypoints() {
         return preOptWaypoints;
     }
-    
+
 }

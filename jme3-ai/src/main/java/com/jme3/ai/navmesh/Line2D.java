@@ -12,8 +12,8 @@ import com.jme3.math.Vector2f;
 /**
  * 
  * Line2D represents a line in 2D space. Line data is held as a line segment having two 
- * endpoints and as a fictional 3D plane extending verticaly. The Plane is then used for
- * spanning and point clasification tests. A Normal vector is used internally to represent
+ * endpoints and as a fictional 3D plane extending vertically. The Plane is then used for
+ * spanning and point classification tests. A Normal vector is used internally to represent
  * the fictional plane.
  * 
  * Portions Copyright (C) Greg Snook, 2000
@@ -61,7 +61,7 @@ public class Line2D implements Savable {
          */
         BBisectsA,
         /**
-         * the lines are paralell
+         * the lines are parallel
          */
         Parallel;
     }
@@ -140,7 +140,7 @@ public class Line2D implements Savable {
     }
 
     private void computeNormal() {
-        // Get Normailized direction from A to B
+        // Get Normalized direction from A to B
         normal = getDirection();
 
         // Rotate by -90 degrees to get normal of line
@@ -152,7 +152,7 @@ public class Line2D implements Savable {
     /**
      *
     Determines the signed distance from a point to this line. Consider the line as
-    if you were standing on PointA of the line looking towards PointB. Posative distances
+    if you were standing on PointA of the line looking towards PointB. Positive distances
     are to the right of the line, negative distances are to the left.
      */
     public float signedDistance(Vector2f point) {
@@ -165,7 +165,7 @@ public class Line2D implements Savable {
 
     /**
      * Determines where a point lies in relation to this line. Consider the line as
-     * if you were standing on PointA of the line looking towards PointB. The incomming
+     * if you were standing on PointA of the line looking towards PointB. The incoming
      * point is then classified as being on the Left, Right or Centered on the line.
      */
 /*    public PointSide getSide(Vector2f point, float epsilon) {
@@ -249,7 +249,7 @@ public class Line2D implements Savable {
 
     /**
      * Determines if two segments intersect, and if so the point of intersection. The current
-     * member line is considered line AB and the incomming parameter is considered line CD for
+     * member line is considered line AB and the incoming parameter is considered line CD for
      * the purpose of the utilized equations.
      *
      * A = PointA of the member line
@@ -293,7 +293,7 @@ public class Line2D implements Savable {
         float FactorCD = ((Ay_minus_Cy * Bx_minus_Ax) - (Ax_minus_Cx * By_minus_Ay)) / Denominator;
 
         // posting (hitting a vertex exactly) is not allowed, shift the results
-        // if they are within a minute range of the end vertecies
+        // if they are within a minute range of the end vertices
 //		if (fabs(FactorCD) < 1.0e-6f)
 //		{
 //			FactorCD = 1.0e-6f;
@@ -324,8 +324,6 @@ public class Line2D implements Savable {
 
     }
 
-    
-
     public static void selfTest() {
         Line2D a = new Line2D(new Vector2f(-2, 0), new Vector2f(2, 0));
         Line2D b = new Line2D(new Vector2f(-2, 1), new Vector2f(2, -1));
@@ -347,21 +345,25 @@ public class Line2D implements Savable {
         }
     }
 
+    @Override
     public String toString() {
         return "Line:" + pointA.x + "/" + pointA.y + " -> " + pointB.x + "/" + pointB.y;
     }
 
-    public void write(JmeExporter e) throws IOException {
-        OutputCapsule capsule = e.getCapsule(this);
-        capsule.write(pointA, "pointA", null);
-        capsule.write(pointB, "pointB", null);
-        capsule.write(normal, "normal", null);
+    @Override
+    public void write(JmeExporter ex) throws IOException {
+        OutputCapsule oc = ex.getCapsule(this);
+        oc.write(pointA, "pointA", null);
+        oc.write(pointB, "pointB", null);
+        oc.write(normal, "normal", null);
     }
 
-    public void read(JmeImporter e) throws IOException {
-        InputCapsule capsule = e.getCapsule(this);
-        pointA = (Vector2f) capsule.readSavable("pointA", new Vector2f());
-        pointB = (Vector2f) capsule.readSavable("pointB", new Vector2f());
-        normal = (Vector2f) capsule.readSavable("normal", new Vector2f());
+    @Override
+    public void read(JmeImporter im) throws IOException {
+        InputCapsule ic = im.getCapsule(this);
+        pointA = (Vector2f) ic.readSavable("pointA", new Vector2f());
+        pointB = (Vector2f) ic.readSavable("pointB", new Vector2f());
+        normal = (Vector2f) ic.readSavable("normal", new Vector2f());
     }
+    
 }

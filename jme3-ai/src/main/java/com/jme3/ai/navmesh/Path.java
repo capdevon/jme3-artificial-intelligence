@@ -13,7 +13,6 @@ import java.util.Iterator;
  * Portions Copyright (C) Greg Snook, 2000
  * 
  * @author TR
- * 
  */
 public class Path implements Iterable<Waypoint> {
 
@@ -46,15 +45,15 @@ public class Path implements Iterable<Waypoint> {
 
         @Override
         public String toString() {
-            return "Waypoint[position=" + position.x + ", " + position.z + " cell:"
-                    + cell + "]";
+            return "Waypoint[position=" + position.x + ", " + position.z 
+                    + " cell:" + cell + "]";
         }
     }
 
     private NavMesh owner;
     private Waypoint start = new Waypoint();
     private Waypoint end = new Waypoint();
-    private ArrayList<Waypoint> waypointList = new ArrayList<Waypoint>();
+    private ArrayList<Waypoint> waypointList = new ArrayList<>();
 
     /**
      * Sets up a new path from StartPoint to EndPoint. It adds the StartPoint as
