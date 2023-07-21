@@ -24,9 +24,9 @@ class Node implements Comparable<Node> {
     public Node() {
     }
 
-    public Node(Cell c, float costs) {
-        cell = c;
-        cost = costs;
+    public Node(Cell cell, float cost) {
+        this.cell = cell;
+        this.cost = cost;
     }
 
     /**

@@ -31,7 +31,7 @@ public class NavMeshPathfinder {
     private volatile Heap heap = new Heap();
 
     /**
-     * 
+     * Instantiate a <code>NavMeshPathfinder</code>
      * @param navMesh
      */
     public NavMeshPathfinder(NavMesh navMesh) {
@@ -120,17 +120,17 @@ public class NavMeshPathfinder {
      * 
      * @return fail if no path found or start location outside of a cell
      */
-    public boolean computePath(Vector3f goal, DebugInfo debugInfo) {
+    public boolean computePath(Vector3f targetPos, DebugInfo debugInfo) {
         // get the cell that this point is in
-        Vector3f newPos3d = new Vector3f(currentPos3d.x, currentPos3d.y, currentPos3d.z);
-        currentCell = navMesh.findClosestCell(newPos3d);
+        Vector3f currPos3d = new Vector3f(currentPos3d.x, currentPos3d.y, currentPos3d.z);
+        currentCell = navMesh.findClosestCell(currPos3d);
         if (currentCell == null) {
             return false;
         }
 
-        Vector3f goalPos3d = new Vector3f(goal.x, goal.y, goal.z);
-        goalCell = navMesh.findClosestCell(goalPos3d);
-        boolean result = buildNavigationPath(path, currentCell, currentPos3d, goalCell, goalPos3d, entityRadius, debugInfo);
+        Vector3f targetPos3d = new Vector3f(targetPos.x, targetPos.y, targetPos.z);
+        goalCell = navMesh.findClosestCell(targetPos3d);
+        boolean result = buildNavigationPath(path, currentCell, currentPos3d, goalCell, targetPos3d, entityRadius, debugInfo);
         if (!result) {
             goalPos = null;
             goalCell = null;

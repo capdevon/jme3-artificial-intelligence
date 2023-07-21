@@ -123,7 +123,7 @@ public class Cell implements Savable {
      */
     private float[] wallDistances = new float[3];
 
-    void initialize(Vector3f pointA, Vector3f pointB, Vector3f pointC) {
+    public Cell(Vector3f pointA, Vector3f pointB, Vector3f pointC) {
         // guarantee ClockWise order
         if (isLeft(pointA, pointB, pointC)) {
             // CCW
@@ -147,7 +147,7 @@ public class Cell implements Savable {
         computeCellData();
     }
 
-    void computeCellData() {
+    private void computeCellData() {
         // create 2D versions of our vertices
         Vector2f point1 = new Vector2f(vertices[VERT_A].x, vertices[VERT_A].z);
         Vector2f point2 = new Vector2f(vertices[VERT_B].x, vertices[VERT_B].z);
@@ -200,8 +200,8 @@ public class Cell implements Savable {
     /**
      * Check if C is left of the line AB
      */
-    public boolean isLeft(Vector3f a, Vector3f b, Vector3f c){
-        return ((b.x - a.x)*(c.z - a.z) - (b.z - a.z)*(c.x - a.x)) > 0;
+    public boolean isLeft(Vector3f a, Vector3f b, Vector3f c) {
+        return ((b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x)) > 0;
     }
 
     /**
@@ -574,7 +574,7 @@ public class Cell implements Savable {
             // once we have been processed, we are closed
             open = false;
 
-            // querry all our neigbors to see if they need to be added to the
+            // Query all our neighbors to see if they need to be added to the
             // Open heap
             for (int i = 0; i < 3; ++i) {
                 if (links[i] != null) {

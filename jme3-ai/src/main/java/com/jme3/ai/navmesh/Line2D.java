@@ -11,19 +11,19 @@ import com.jme3.math.Vector2f;
 
 /**
  * 
- * Line2D represents a line in 2D space. Line data is held as a line segment having two 
- * endpoints and as a fictional 3D plane extending vertically. The Plane is then used for
- * spanning and point classification tests. A Normal vector is used internally to represent
- * the fictional plane.
+ * Line2D represents a line in 2D space. Line data is held as a line segment
+ * having two endpoints and as a fictional 3D plane extending vertically. The
+ * Plane is then used for spanning and point classification tests. A Normal
+ * vector is used internally to represent the fictional plane.
  * 
  * Portions Copyright (C) Greg Snook, 2000
+ * 
  * @author TR
  *
  */
 public class Line2D implements Savable {
 
     enum PointSide {
-
         /**
          *  The point is on, or very near, the line
          */
@@ -39,7 +39,6 @@ public class Line2D implements Savable {
     }
 
     enum LineIntersect {
-
         /**
          * both lines are parallel and overlap each other
          */
@@ -150,10 +149,10 @@ public class Line2D implements Savable {
     }
 
     /**
-     *
-    Determines the signed distance from a point to this line. Consider the line as
-    if you were standing on PointA of the line looking towards PointB. Positive distances
-    are to the right of the line, negative distances are to the left.
+     * Determines the signed distance from a point to this line. Consider the line
+     * as if you were standing on PointA of the line looking towards PointB.
+     * Positive distances are to the right of the line, negative distances are to
+     * the left.
      */
     public float signedDistance(Vector2f point) {
         if (normal == null) {
@@ -168,19 +167,19 @@ public class Line2D implements Savable {
      * if you were standing on PointA of the line looking towards PointB. The incoming
      * point is then classified as being on the Left, Right or Centered on the line.
      */
-/*    public PointSide getSide(Vector2f point, float epsilon) {
-        PointSide result = PointSide.OnLine;
-        float distance = signedDistance(point);
+//    public PointSide getSide(Vector2f point, float epsilon) {
+//        PointSide result = PointSide.OnLine;
+//        float distance = signedDistance(point);
+//
+//        if (distance > epsilon) {
+//            result = PointSide.Right;
+//        } else if (distance < -epsilon) {
+//            result = PointSide.Left;
+//        }
+//
+//        return result;
+//    }
 
-        if (distance > epsilon) {
-            result = PointSide.Right;
-        } else if (distance < -epsilon) {
-            result = PointSide.Left;
-        }
-
-        return result;
-    }
-*/
     // this works much more correctly
     public PointSide getSide(Vector2f c, float epsilon) {
         Vector2f a = pointA;
@@ -266,7 +265,6 @@ public class Line2D implements Savable {
         float Bx_minus_Ax = pointB.x - pointA.x;
         float By_minus_Ay = pointB.y - pointA.y;
 
-
         java.awt.geom.Line2D l1 = new java.awt.geom.Line2D.Float(this.pointA.x, this.pointA.y, this.pointB.x, this.pointB.y);
         if (l1.intersectsLine(Line.getPointA().x, Line.getPointA().y, Line.getPointB().x, Line.getPointB().y)) //return LINE_CLASSIFICATION.LINES_INTERSECT;
         {
@@ -294,17 +292,14 @@ public class Line2D implements Savable {
 
         // posting (hitting a vertex exactly) is not allowed, shift the results
         // if they are within a minute range of the end vertices
-//		if (fabs(FactorCD) < 1.0e-6f)
-//		{
-//			FactorCD = 1.0e-6f;
-//		}
-//		if (fabs(FactorCD - 1.0f) < 1.0e-6f)
-//		{
-//			FactorCD = 1.0f - 1.0e-6f;
-//		}
+//        if (fabs(FactorCD) < 1.0e-6f) {
+//            FactorCD = 1.0e-6f;
+//        }
+//        if (fabs(FactorCD - 1.0f) < 1.0e-6f) {
+//            FactorCD = 1.0f - 1.0e-6f;
+//        }
 
-
-        // if an interection point was provided, fill it in now
+        // if an intersection point was provided, fill it in now
         if (pIntersectPoint != null) {
             pIntersectPoint.x = (pointA.x + (FactorAB * Bx_minus_Ax));
             pIntersectPoint.y = (pointA.y + (FactorAB * By_minus_Ay));
@@ -321,28 +316,6 @@ public class Line2D implements Savable {
         }
 
         return LineIntersect.LinesIntersect;
-
-    }
-
-    public static void selfTest() {
-        Line2D a = new Line2D(new Vector2f(-2, 0), new Vector2f(2, 0));
-        Line2D b = new Line2D(new Vector2f(-2, 1), new Vector2f(2, -1));
-        Line2D.LineIntersect res = a.intersect(b, null);
-        if (res == LineIntersect.CoLinear || res == LineIntersect.Parallel) {
-            System.out.println("Failed intersection verrification");
-        }
-
-        if (a.getSide(new Vector2f(0, 1), 0.0f) != PointSide.Left) {
-            System.out.println("Failed left test");
-        }
-
-        if (a.getSide(new Vector2f(0, -1), 0.0f) != PointSide.Right) {
-            System.out.println("Failed right test");
-        }
-
-        if (a.getSide(new Vector2f(0, 0), 0.0f) != PointSide.OnLine) {
-            System.out.println("Failed on line test");
-        }
     }
 
     @Override
@@ -365,5 +338,27 @@ public class Line2D implements Savable {
         pointB = (Vector2f) ic.readSavable("pointB", new Vector2f());
         normal = (Vector2f) ic.readSavable("normal", new Vector2f());
     }
+    
+    /**
+     * 
+     * @param args
+     */
+//    public static void main(String[] args) {
+//        Line2D a = new Line2D(new Vector2f(-2, 0), new Vector2f(2, 0));
+//        Line2D b = new Line2D(new Vector2f(-2, 1), new Vector2f(2, -1));
+//        Line2D.LineIntersect res = a.intersect(b, null);
+//        if (res == LineIntersect.CoLinear || res == LineIntersect.Parallel) {
+//            System.out.println("Failed intersection verrification");
+//        }
+//        if (a.getSide(new Vector2f(0, 1), 0.0f) != PointSide.Left) {
+//            System.out.println("Failed left test");
+//        }
+//        if (a.getSide(new Vector2f(0, -1), 0.0f) != PointSide.Right) {
+//            System.out.println("Failed right test");
+//        }
+//        if (a.getSide(new Vector2f(0, 0), 0.0f) != PointSide.OnLine) {
+//            System.out.println("Failed on line test");
+//        }
+//    }
     
 }
