@@ -1,7 +1,9 @@
 package com.jme3.ai.navmesh;
 
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import com.jme3.ai.navmesh.Cell.ClassifyResult;
 import com.jme3.export.InputCapsule;
@@ -12,10 +14,10 @@ import com.jme3.export.Savable;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
+import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.scene.mesh.IndexBuffer;
 import com.jme3.util.BufferUtils;
-import java.nio.FloatBuffer;
 
 /**
  * A NavigationMesh is a collection of NavigationCells used to control object
@@ -25,18 +27,27 @@ import java.nio.FloatBuffer;
  * Portions Copyright (C) Greg Snook, 2000
  * 
  * @author TR
- * 
  */
 public class NavMesh implements Savable {
+    
+    private static final Logger logger = Logger.getLogger(NavMesh.class.getName());
 
     /**
      * the cells that make up this mesh
      */
-    private ArrayList<Cell> cellList = new ArrayList<Cell>();
+    private ArrayList<Cell> cellList = new ArrayList<>();
+    private Mesh mesh;
 
+    /**
+     * For serialization only. Do not use.
+     */
     public NavMesh() {
     }
 
+    /**
+     * Instantiate a <code>NavMesh</code>
+     * @param mesh
+     */
     public NavMesh(Mesh mesh) {
         loadFromMesh(mesh);
     }
@@ -50,20 +61,12 @@ public class NavMesh implements Savable {
      * mesh.
      *
      * @param pointA
-     * @param PointB
-     * @param PointC
+     * @param pointB
+     * @param pointC
      */
-    public void addCell(Vector3f pointA, Vector3f PointB, Vector3f PointC) {
-        Cell newCell = new Cell();
-        newCell.initialize(pointA.clone(), PointB.clone(), PointC.clone());
+    public void addCell(Vector3f pointA, Vector3f pointB, Vector3f pointC) {
+        Cell newCell = new Cell(pointA.clone(), pointB.clone(), pointC.clone());
         cellList.add(newCell);
-    }
-
-    /**
-     * Does noting at this point. Stubbed for future use in animating the mesh
-     * @param elapsedTime
-     */
-    void Update(float elapsedTime) {
     }
 
     public int getNumCells() {
@@ -92,60 +95,63 @@ public class NavMesh implements Savable {
     Vector3f snapPointToMesh(Vector3f point) {
         return snapPointToCell(findClosestCell(point), point);
     }
-
+    
     /**
-     * Find the closest cell on the mesh to the given point
-     * AVOID CALLING! not a fast routine!
+     * Find the closest cell on the mesh to the given point.
      */
-    public Cell findClosestCell(Vector3f point) {
-        float closestDistance = 3.4E+38f;
-        float closestHeight = 3.4E+38f;
-        boolean foundHomeCell = false;
-        float thisDistance;
+    public Cell findClosestCell(Vector3f sourcePos, float maxDistance) {
+
         Cell closestCell = null;
+        float closestDistance = maxDistance;
+        float closestHeight = maxDistance;
+        boolean found = false;
 
-        // oh dear this is not fast
         for (Cell cell : cellList) {
-            if (cell.contains(point)) {
-                thisDistance = Math.abs(cell.getHeightOnCell(point) - point.y);
+            if (cell.contains(sourcePos)) {
+                float distance = Math.abs(cell.getHeightOnCell(sourcePos) - sourcePos.y);
 
-                if (foundHomeCell) {
-                    if (thisDistance < closestHeight) {
+                if (found) {
+                    if (distance < closestHeight) {
                         closestCell = cell;
-                        closestHeight = thisDistance;
+                        closestHeight = distance;
                     }
                 } else {
                     closestCell = cell;
-                    closestHeight = thisDistance;
-                    foundHomeCell = true;
+                    closestHeight = distance;
+                    found = true;
                 }
             }
 
-            if (!foundHomeCell) {
+            if (!found) {
                 Vector2f start = new Vector2f(cell.getCenter().x, cell.getCenter().z);
-                Vector2f end = new Vector2f(point.x, point.z);
+                Vector2f end = new Vector2f(sourcePos.x, sourcePos.z);
                 Line2D motionPath = new Line2D(start, end);
 
-                ClassifyResult Result = cell.classifyPathToCell(motionPath);
+                ClassifyResult cResult = cell.classifyPathToCell(motionPath);
 
-                if (Result.result == Cell.PathResult.ExitingCell) {
-                    Vector3f ClosestPoint3D = new Vector3f(
-                            Result.intersection.x, 0.0f, Result.intersection.y);
-                    cell.computeHeightOnCell(ClosestPoint3D);
+                if (cResult.result == Cell.PathResult.ExitingCell) {
+                    Vector3f closestPoint3D = new Vector3f(cResult.intersection.x, 0.0f, cResult.intersection.y);
+                    cell.computeHeightOnCell(closestPoint3D);
 
-                    ClosestPoint3D = ClosestPoint3D.subtract(point);
+                    float distance = closestPoint3D.distance(sourcePos);
 
-                    thisDistance = ClosestPoint3D.length();
-
-                    if (thisDistance < closestDistance) {
-                        closestDistance = thisDistance;
+                    if (distance < closestDistance) {
                         closestCell = cell;
+                        closestDistance = distance;
                     }
                 }
             }
         }
 
         return closestCell;
+    }
+    
+    /**
+     * Find the closest cell on the mesh to the given point.
+     */
+    public Cell findClosestCell(Vector3f point) {
+        float maxDistance = Float.MAX_VALUE;
+        return findClosestCell(point, maxDistance);
     }
 
     /**
@@ -162,16 +168,15 @@ public class NavMesh implements Savable {
     }
 
     boolean isInLineOfSight(Cell startCell, Vector3f startPos, Vector3f endPos, DebugInfo debugInfo) {
-        Line2D motionPath = new Line2D(new Vector2f(startPos.x, startPos.z),
-                new Vector2f(endPos.x, endPos.z));
+        Line2D motionPath = new Line2D(new Vector2f(startPos.x, startPos.z), new Vector2f(endPos.x, endPos.z));
 
         Cell testCell = startCell;
-        Cell.ClassifyResult result = testCell.classifyPathToCell(motionPath);
-        Cell.ClassifyResult prevResult = result;
+        ClassifyResult result = testCell.classifyPathToCell(motionPath);
+        ClassifyResult prevResult = result;
 
         while (result.result == Cell.PathResult.ExitingCell) {
-            if (result.cell == null)// hit a wall, so the point is not visible
-            {
+            if (result.cell == null) {
+                // hit a wall, so the point is not visible
                 if (debugInfo != null) {
                     debugInfo.setFailedCell(prevResult.cell);
                 }
@@ -186,18 +191,14 @@ public class NavMesh implements Savable {
         if (debugInfo != null) {
             debugInfo.setEndingCell(prevResult.cell);
         }
-        return (result.result == Cell.PathResult.EndingCell || result.result == Cell.PathResult.ExitingCell); //This is messing up the result, I think because of shared borders
+        // This is messing up the result, I think because of shared borders
+        return (result.result == Cell.PathResult.EndingCell || result.result == Cell.PathResult.ExitingCell);
     }
 
     /**
      * Link all the cells that are in our pool
      */
     public void linkCells() {
-//        for (int i = 0; i < cellList.size(); i++){
-//            for (int j = i+1; j < cellList.size(); j++){
-//                cellList.get(i).checkAndLink(cellList.get(j));
-//            }
-//        }
         for (Cell pCellA : cellList) {
             for (Cell pCellB : cellList) {
                 if (pCellA != pCellB) {
@@ -212,38 +213,16 @@ public class NavMesh implements Savable {
         // identical vertices. This creates a poly with no surface area,
         // which will wreak havok on our navigation mesh algorithms.
         // We only except polygons with unique vertices.
-        if ((!vertA.equals(vertB)) && (!vertB.equals(vertC)) && (!vertC.equals(vertA))) {
+        if (!vertA.equals(vertB) && !vertB.equals(vertC) && !vertC.equals(vertA)) {
             addCell(vertA, vertB, vertC);
         } else {
-            System.out.println("Warning, Face winding incorrect");
+            logger.warning("Warning, Face winding incorrect!!!");
         }
     }
-
-    public void loadFromData(Vector3f[] positions, short[][] indices) {
-        Plane up = new Plane();
-        up.setPlanePoints(Vector3f.UNIT_X, Vector3f.ZERO, Vector3f.UNIT_Z);
-        up.getNormal();
-
-        for (int i = 0; i < indices.length / 3; i++) {
-            Vector3f vertA = positions[indices[i][0]];
-            Vector3f vertB = positions[indices[i][1]];
-            Vector3f vertC = positions[indices[i][2]];
-
-            Plane p = new Plane();
-            p.setPlanePoints(vertA, vertB, vertC);
-            if (up.pseudoDistance(p.getNormal()) <= 0.0f) {
-                System.out.println("Warning, normal of the plane faces downward!!!");
-                continue;
-            }
-
-            addFace(vertA, vertB, vertC);
-        }
-
-        linkCells();
-    }
-
+    
     public void loadFromMesh(Mesh mesh) {
         clear();
+        this.mesh = mesh;
 
         Vector3f a = new Vector3f();
         Vector3f b = new Vector3f();
@@ -267,7 +246,7 @@ public class NavMesh implements Savable {
             Plane p = new Plane();
             p.setPlanePoints(a, b, c);
             if (up.pseudoDistance(p.getNormal()) <= 0.0f) {
-                System.out.println("Warning, normal of the plane faces downward!!!");
+                logger.warning("Warning, normal of the plane faces downward!!!");
                 continue;
             }
 
@@ -276,17 +255,38 @@ public class NavMesh implements Savable {
 
         linkCells();
     }
+    
+    /**
+     * Calculates and returns a simple triangulation of the current navmesh.
+     * 
+     * @return NavMeshTriangulation
+     */
+    public NavMeshTriangulation calculateTriangulation() {
+        IndexBuffer ib = mesh.getIndexBuffer();
+        // generate int array of indices
+        int[] indices = new int[ib.size()];
+        for (int i = 0; i < indices.length; i++) {
+            indices[i] = ib.get(i);
+        }
+        
+        FloatBuffer pb = mesh.getFloatBuffer(VertexBuffer.Type.Position);
+        Vector3f[] vertices = BufferUtils.getVector3Array(pb);
 
-    @Override
-    public void write(JmeExporter e) throws IOException {
-        OutputCapsule capsule = e.getCapsule(this);
-        capsule.writeSavableArrayList(cellList, "cellarray", null);
+        return new NavMeshTriangulation(indices, vertices);
     }
 
     @Override
-    public void read(JmeImporter e) throws IOException {
-        InputCapsule capsule = e.getCapsule(this);
-        cellList = (ArrayList<Cell>) capsule.readSavableArrayList("cellarray", new ArrayList<Cell>());
+    public void write(JmeExporter ex) throws IOException {
+        OutputCapsule oc = ex.getCapsule(this);
+        oc.writeSavableArrayList(cellList, "cellList", null);
+        oc.write(mesh, "mesh", null);
+    }
+
+    @Override
+    public void read(JmeImporter im) throws IOException {
+        InputCapsule ic = im.getCapsule(this);
+        cellList = ic.readSavableArrayList("cellList", null);
+        mesh = (Mesh) ic.readSavable("mesh", null);
     }
     
 }
