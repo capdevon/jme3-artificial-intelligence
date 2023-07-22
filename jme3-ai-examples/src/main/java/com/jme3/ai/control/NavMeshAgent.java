@@ -156,7 +156,9 @@ public class NavMeshAgent extends AbstractControl {
         nav.warpInside(targetPos);
         
         hasPath = nav.computePath(targetPos);
-        logger.log(Level.INFO, "Path found: {0}", hasPath);
+        if (logger.isLoggable(Level.FINE)) {
+            logger.log(Level.FINE, "Path found: {0}", hasPath);
+        }
 
         if (hasPath) {
             // display motion path
@@ -216,12 +218,24 @@ public class NavMeshAgent extends AbstractControl {
      * @return Corner points of the path. (Read Only)
      */
     public List<Vector3f> getCorners() {
-        List<Vector3f> result = new ArrayList<>();
+        List<Vector3f> results = new ArrayList<>();
+        getCornersNonAlloc(results);
+        return results;
+    }
+    
+    /**
+     * Calculate the corners for the path.
+     * 
+     * @param results List to store path corners.
+     * @return The number of corners along the path - including start and end points.
+     */
+    public int getCornersNonAlloc(List<Vector3f> results) {
+        results.clear();
         for (Waypoint waypoint : nav.getPath().getWaypoints()) {
             Vector3f v = waypoint.getPosition().clone();
-            result.add(v);
+            results.add(v);
         }
-        return result;
+        return results.size();
     }
     
     public float getSpeed() {
