@@ -160,32 +160,40 @@ public class NavMeshAgentMT extends AbstractControl {
         from.slerp(to, changeAmount);
         return from.mult(Vector3f.UNIT_Z, store);
     }
+    
+    private void calculatePath() {
+        if (targetPos != null) {
+
+            nav.clearPath();
+            pathPending = true;
+
+            nav.setPosition(spatial.getWorldTranslation());
+            nav.warpInside(targetPos);
+
+            hasPath = nav.computePath(targetPos);
+            if (logger.isLoggable(Level.FINE)) {
+                logger.log(Level.FINE, "Path found: {0}", hasPath);
+            }
+
+            if (hasPath) {
+                // display motion path
+                pathChanged = true;
+            }
+
+            targetPos = null;
+            pathPending = false;
+        }
+    }
 
     private void startPathfinder() {
         executor.scheduleWithFixedDelay(new Runnable() {
-
             @Override
             public void run() {
-                if (targetPos != null) {
-
-                    nav.clearPath();
-                    pathPending = true;
-
-                    nav.setPosition(spatial.getWorldTranslation());
-                    nav.warpInside(targetPos);
-
-                    hasPath = nav.computePath(targetPos);
-                    if (logger.isLoggable(Level.FINE)) {
-                        logger.log(Level.FINE, "Path found: {0}", hasPath);
-                    }
-
-                    if (hasPath) {
-                        // display motion path
-                        pathChanged = true;
-                    }
-
-                    targetPos = null;
-                    pathPending = false;
+                try {
+                    calculatePath();
+                    
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         }, 0, 500, TimeUnit.MILLISECONDS);
@@ -235,12 +243,24 @@ public class NavMeshAgentMT extends AbstractControl {
      * @return Corner points of the path. (Read Only)
      */
     public List<Vector3f> getCorners() {
-        List<Vector3f> result = new ArrayList<>();
+        List<Vector3f> results = new ArrayList<>();
+        getCornersNonAlloc(results);
+        return results;
+    }
+    
+    /**
+     * Calculate the corners for the path.
+     * 
+     * @param results List to store path corners.
+     * @return The number of corners along the path - including start and end points.
+     */
+    public int getCornersNonAlloc(List<Vector3f> results) {
+        results.clear();
         for (Waypoint waypoint : nav.getPath().getWaypoints()) {
             Vector3f v = waypoint.getPosition().clone();
-            result.add(v);
+            results.add(v);
         }
-        return result;
+        return results.size();
     }
 
     /**
