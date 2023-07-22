@@ -22,16 +22,15 @@ import com.jme3.scene.VertexBuffer.Type;
  * Portions Copyright (C) Greg Snook, 2000
  * 
  * @author TR
- * 
  */
 public class Cell implements Savable {
 
-    static final int VERT_A = 0;
-    static final int VERT_B = 1;
-    static final int VERT_C = 2;
-    static final int SIDE_AB = 0;
-    static final int SIDE_BC = 1;
-    static final int SIDE_CA = 2;
+    private static final int VERT_A = 0;
+    private static final int VERT_B = 1;
+    private static final int VERT_C = 2;
+    private static final int SIDE_AB = 0;
+    private static final int SIDE_BC = 1;
+    private static final int SIDE_CA = 2;
 
     public enum PathResult {
         /**
@@ -122,6 +121,12 @@ public class Cell implements Savable {
      * the distances between each wall midpoint of sides (0-1, 1-2, 2-0)
      */
     private float[] wallDistances = new float[3];
+    
+    /**
+     * For serialization only. Do not use.
+     */
+    public Cell() {
+    }
 
     public Cell(Vector3f pointA, Vector3f pointB, Vector3f pointC) {
         // guarantee ClockWise order
@@ -213,6 +218,7 @@ public class Cell implements Savable {
      * @param pointA
      * @param pointB
      * @param caller
+     * @param epsilon
      * @return
      */
     boolean requestLink(Vector3f pointA, Vector3f pointB, Cell caller, float epsilon) {
@@ -581,10 +587,8 @@ public class Cell implements Savable {
                     // abs(i-m_ArrivalWall) is a formula to determine which
                     // distance measurement to use.
                     // The Distance measurements between the wall midpoints of
-                    // this cell
-                    // are held in the order ABtoBC, BCtoCA and CAtoAB.
-                    // We add this distance to our known m_ArrivalCost to
-                    // compute
+                    // this cell are held in the order ABtoBC, BCtoCA and CAtoAB.
+                    // We add this distance to our known m_ArrivalCost to compute
                     // the total cost to reach the next adjacent cell.
                     links[i].queryForPath(heap, this, arrivalCost
                             + wallDistances[Math.abs(i - arrivalWall)]);
@@ -655,7 +659,6 @@ public class Cell implements Savable {
         // this cell is closed
         return false;
     }
-
 
     /**
      * Compute the A* Heuristic for this cell given a Goal point
