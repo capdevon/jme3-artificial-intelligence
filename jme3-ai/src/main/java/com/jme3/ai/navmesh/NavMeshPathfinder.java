@@ -1,15 +1,14 @@
 package com.jme3.ai.navmesh;
 
-import com.jme3.ai.navmesh.Path.Waypoint;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
-import com.jme3.ai.navmesh.Cell.ClassifyResult;
-import com.jme3.ai.navmesh.Cell.PathResult;
-import com.jme3.ai.navmesh.Line2D.LineIntersect;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.jme3.ai.navmesh.Line2D.LineIntersect;
+import com.jme3.math.Vector2f;
+import com.jme3.math.Vector3f;
+
+@Deprecated
 public class NavMeshPathfinder {
     
     private static final Logger logger = Logger.getLogger(NavMeshPathfinder.class.getName());
@@ -20,8 +19,6 @@ public class NavMeshPathfinder {
     private Vector2f currentPos = new Vector2f();
     private Vector3f currentPos3d = new Vector3f();
     private Cell currentCell;
-    private Vector2f goalPos;
-    private Vector3f goalPos3d;
     private Cell goalCell;
     private Waypoint nextWaypoint;
     /**
@@ -45,9 +42,6 @@ public class NavMeshPathfinder {
     public void setPosition(Vector3f position) {
         this.currentPos3d.set(position);
         this.currentPos.set(currentPos3d.x, currentPos3d.z);
-
-        // should probably have this here:
-        // currentCell = navMesh.findClosestCell(newPos2d);
     }
 
     public float getEntityRadius() {
@@ -107,8 +101,8 @@ public class NavMeshPathfinder {
      * 
      * @return fail if no path found or start location outside of a cell
      */
-    public boolean computePath(Vector3f goal) {
-        return computePath(goal, null);
+    public boolean computePath(Vector3f targetPos) {
+        return computePath(targetPos, null);
     }
 
     /**
@@ -122,60 +116,28 @@ public class NavMeshPathfinder {
      */
     public boolean computePath(Vector3f targetPos, DebugInfo debugInfo) {
         // get the cell that this point is in
-        Vector3f currPos3d = new Vector3f(currentPos3d.x, currentPos3d.y, currentPos3d.z);
-        currentCell = navMesh.findClosestCell(currPos3d);
+        Vector3f m_spos = new Vector3f(currentPos3d.x, currentPos3d.y, currentPos3d.z);
+        currentCell = navMesh.findClosestCell(m_spos);
         if (currentCell == null) {
             return false;
         }
 
-        Vector3f targetPos3d = new Vector3f(targetPos.x, targetPos.y, targetPos.z);
-        goalCell = navMesh.findClosestCell(targetPos3d);
-        boolean result = buildNavigationPath(path, currentCell, currentPos3d, goalCell, targetPos3d, entityRadius, debugInfo);
+        Vector3f m_epos = new Vector3f(targetPos.x, targetPos.y, targetPos.z);
+        goalCell = navMesh.findClosestCell(m_epos);
+        boolean result = buildNavigationPath(path, currentCell, currentPos3d, goalCell, m_epos, entityRadius, debugInfo);
         if (!result) {
-            goalPos = null;
             goalCell = null;
             return false;
         }
+        
         nextWaypoint = path.getFirst();
         return true;
     }
 
     public void clearPath() {
         path.clear();
-        goalPos = null;
         goalCell = null;
         nextWaypoint = null;
-    }
-
-    public Vector3f getWaypointPosition() {
-        return nextWaypoint.getPosition();
-    }
-
-    public Vector3f getDirectionToWaypoint() {
-        Vector3f waypt = nextWaypoint.getPosition();
-        return waypt.subtract(currentPos3d).normalizeLocal();
-    }
-
-    public float getDistanceToWaypoint() {
-        return currentPos3d.distance(nextWaypoint.getPosition());
-    }
-
-    public Vector3f onMove(Vector3f moveVec) {
-        if (moveVec.equals(Vector3f.ZERO)) {
-            return currentPos3d;
-        }
-
-        Vector3f newPos2d = new Vector3f(currentPos3d);
-        newPos2d.addLocal(moveVec);
-        newPos2d.setY(0);
-
-        Vector3f currentPos2d = new Vector3f(currentPos3d);
-        currentPos2d.setY(0);
-
-        // Cell nextCell = navMesh.resolveMotionOnMesh(currentPos2d, currentCell, newPos2d, newPos2d);
-        // currentCell = nextCell;
-        newPos2d.setY(currentPos3d.getY());
-        return newPos2d;
     }
 
     public boolean isAtGoalWaypoint() {
@@ -191,8 +153,8 @@ public class NavMeshPathfinder {
     }
 
     public void goToNextWaypoint(DebugInfo debugInfo) {
-        int from = getPath().getWaypoints().indexOf(nextWaypoint);
-        nextWaypoint = getPath().getWaypoints().get(from + 1);
+        int from = path.getWaypoints().indexOf(nextWaypoint);
+        nextWaypoint = path.getWaypoints().get(from + 1);
         //nextWaypoint = path.getFurthestVisibleWayPoint(nextWaypoint, debugInfo);
         //nextWaypoint = path.getOptimalVisibleWayPoint(nextWaypoint);
 //        int to = getPath().getWaypoints().indexOf(nextWaypoint);
@@ -364,100 +326,5 @@ public class NavMeshPathfinder {
 
         return true;
     }
-
-    /**
-     * Resolve a movement vector on the mesh
-     *
-     * @param startPos
-     * @param startCell
-     * @param endPos
-     * @return
-     */
-    private Cell resolveMotionOnMesh(Vector3f startPos, Cell startCell, Vector3f endPos, Vector3f modifiedEndPos) {
-        int i = 0;
-        // create a 2D motion path from our Start and End positions, tossing out
-        // their Y values to project them
-        // down to the XZ plane.
-        Line2D motionLine = new Line2D(new Vector2f(startPos.x, startPos.z),
-                new Vector2f(endPos.x, endPos.z));
-
-        // these three will hold the results of our tests against the cell walls
-        ClassifyResult result = null;
-
-        // testCell is the cell we are currently examining.
-        Cell testCell = startCell;
-
-        do {
-            i++;
-            // use NavigationCell to determine how our path and cell interact
-//            if (testCell.IsPointInCellCollumn(MotionPath.EndPointA()))
-//                System.out.println("Start is in cell");
-//            else
-//                System.out.println("Start is NOT in cell");
-//            
-//            if (testCell.IsPointInCellCollumn(MotionPath.EndPointB()))
-//                System.out.println("End is in cell");
-//            else
-//                System.out.println("End is NOT in cell");
-             
-            result = testCell.classifyPathToCell(motionLine);
-
-            // if exiting the cell...
-            if (result.result == PathResult.ExitingCell) {
-                // Set if we are moving to an adjacent cell or we have hit a
-                // solid (unlinked) edge
-                if (result.cell != null) {
-                    // moving on. Set our motion origin to the point of
-                    // intersection with this cell
-                    // and continue, using the new cell as our test cell.
-                    motionLine.setPointA(result.intersection);
-                    testCell = result.cell;
-                } else {
-                    // we have hit a solid wall. Resolve the collision and
-                    // correct our path.
-                    motionLine.setPointA(result.intersection);
-                    testCell.projectPathOnCellWall(result.side, motionLine);
-
-                    // add some friction to the new MotionPath since we are
-                    // scraping against a wall.
-                    // we do this by reducing the magnitude of our motion by 10%
-                    Vector2f direction = motionLine.getPointB().subtract(
-                            motionLine.getPointA()).mult(0.9f);
-                    motionLine.setPointB(motionLine.getPointA().add(
-                            direction));
-                }
-            } else if (result.result == Cell.PathResult.NoRelationship) {
-                // Although theoretically we should never encounter this case,
-                // we do sometimes find ourselves standing directly on a vertex
-                // of the cell.
-                // This can be viewed by some routines as being outside the
-                // cell.
-                // To accommodate this rare case, we can force our starting point
-                // to be within
-                // the current cell by nudging it back so we may continue.
-                Vector2f newOrigin = motionLine.getPointA();
-                // newOrigin.x -= 0.01f;
-                testCell.forcePointToCellColumn(newOrigin);
-                motionLine.setPointA(newOrigin);
-            }
-        }
-        
-        // Keep testing until we find our ending cell or stop moving due to friction
-        while ((result.result != Cell.PathResult.EndingCell)
-                && (motionLine.getPointA().x != motionLine.getPointB().x && motionLine.getPointA().y != motionLine.getPointB().y) && i < 5000);
-        //
-        if (i >= 5000) {
-            logger.warning("Loop detected in ResolveMotionOnMesh");
-        }
-        // we now have our new host cell
-
-        // Update the new control point position,
-        // solving for Y using the Plane member of the NavigationCell
-        modifiedEndPos.x = motionLine.getPointB().x;
-        modifiedEndPos.y = 0.0f;
-        modifiedEndPos.z = motionLine.getPointB().y;
-        testCell.computeHeightOnCell(modifiedEndPos);
-
-        return testCell;
-    }
+    
 }

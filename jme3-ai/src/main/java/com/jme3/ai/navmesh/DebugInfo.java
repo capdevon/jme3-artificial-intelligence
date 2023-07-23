@@ -1,9 +1,9 @@
 package com.jme3.ai.navmesh;
 
-import com.jme3.math.Vector3f;
-import com.jme3.ai.navmesh.Path.Waypoint;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.jme3.math.Vector3f;
 
 /**
  * Debug information from a pathfinding search.
@@ -127,6 +127,21 @@ public class DebugInfo {
 
     public List<Vector3f> getPreOptWaypoints() {
         return preOptWaypoints;
+    }
+
+    @Override
+    public String toString() {
+        return "DebugInfo [preOptWaypoints=" + preOptWaypoints 
+                + ", plannedCells=" + plannedCells 
+                + ", wpPositions=" + wpPositions 
+                + ", startPos=" + startPos 
+                + ", endPos=" + endPos 
+                + ", failedVisibleWaypoint=" + failedVisibleWaypoint 
+                + ", farthestTestedWaypoint=" + farthestTestedWaypoint 
+                + ", failedCell=" + failedCell 
+                + ", passedCells=" + passedCells 
+                + ", endingCell=" + endingCell 
+                + ", startLocation=" + startLocation + "]";
     }
 
 }

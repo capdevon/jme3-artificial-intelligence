@@ -1,9 +1,9 @@
 package com.jme3.ai.navmesh;
 
-import com.jme3.ai.navmesh.Path.Waypoint;
-import com.jme3.math.Vector3f;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
+
+import com.jme3.math.Vector3f;
 
 /**
  * NavigationPath is a collection of waypoints that define a movement path for
@@ -14,65 +14,31 @@ import java.util.Iterator;
  * 
  * @author TR
  */
-public class Path implements Iterable<Waypoint> {
+public class Path {
 
-    public class Waypoint {
-
-        private Vector3f position;
-        private Cell cell;
-
-        /**
-         * The cell which owns the waypoint
-         */
-        public Cell getCell() {
-            return cell;
-        }
-
-        public void setCell(Cell cell) {
-            this.cell = cell;
-        }
-
-        /**
-         * 3D position of waypoint
-         */
-        public Vector3f getPosition() {
-            return position;
-        }
-
-        public void setPosition(Vector3f position) {
-            this.position = position;
-        }
-
-        @Override
-        public String toString() {
-            return "Waypoint[position=" + position.x + ", " + position.z 
-                    + " cell:" + cell + "]";
-        }
-    }
-
-    private NavMesh owner;
+    private NavMesh navMesh;
     private Waypoint start = new Waypoint();
     private Waypoint end = new Waypoint();
-    private ArrayList<Waypoint> waypointList = new ArrayList<>();
+    private List<Waypoint> waypointList = new ArrayList<>();
 
     /**
      * Sets up a new path from StartPoint to EndPoint. It adds the StartPoint as
      * the first waypoint in the list and waits for further calls to AddWayPoint
      * and EndPath to complete the list
      * 
-     * @param parent
+     * @param navMesh
      * @param startPoint
      * @param startCell
      * @param endPoint
      * @param endCell
      */
-    public void initialize(NavMesh parent,
+    public void initialize(NavMesh navMesh,
                            Vector3f startPoint, Cell startCell,
                            Vector3f endPoint, Cell endCell) {
 
         waypointList.clear();
 
-        this.owner = parent;
+        this.navMesh = navMesh;
 
         start.setPosition(startPoint);
         start.setCell(startCell);
@@ -84,16 +50,16 @@ public class Path implements Iterable<Waypoint> {
         waypointList.add(start);
     }
 
+    /**
+     * Caps the end of the waypoint list by adding our final destination point.
+     */
+    void finishPath() {
+        // cap the waypoint path with the last endpoint
+        waypointList.add(end);
+    }
+    
     public void clear() {
         waypointList.clear();
-    }
-
-    public int size(){
-        return waypointList.size();
-    }
-
-    public Iterator<Waypoint> iterator() {
-        return waypointList.iterator();
     }
 
     /**
@@ -106,18 +72,6 @@ public class Path implements Iterable<Waypoint> {
         waypointList.add(newPoint);
     }
 
-    /**
-     * Caps the end of the waypoint list by adding our final destination point.
-     */
-    void finishPath() {
-        // cap the waypoint path with the last endpoint
-        waypointList.add(end);
-    }
-
-    public NavMesh getOwner() {
-        return owner;
-    }
-
     public Waypoint getStart() {
         return start;
     }
@@ -126,30 +80,30 @@ public class Path implements Iterable<Waypoint> {
         return end;
     }
 
-    public Waypoint getFirst(){
+    public Waypoint getFirst() {
         return waypointList.get(0);
     }
 
-    public Waypoint getLast(){
-        return waypointList.get(waypointList.size()-1);
+    public Waypoint getLast() {
+        return waypointList.get(waypointList.size() - 1);
     }
 
-    public ArrayList<Waypoint> getWaypoints() {
+    public List<Waypoint> getWaypoints() {
         return waypointList;
     }
         
-    public Waypoint getFurthestVisibleWayPoint(Waypoint vantagePoint) {
+    protected Waypoint getFurthestVisibleWayPoint(Waypoint vantagePoint) {
         return getFurthestVisibleWayPoint(vantagePoint, null);
     }
     
     /**
-     * Find the furthest visible waypoint from the VantagePoint provided. This
+     * Find the farthest visible waypoint from the VantagePoint provided. This
      * is used to smooth out irregular paths.
      * 
      * @param vantagePoint
      * @return
      */
-    public Waypoint getFurthestVisibleWayPoint(Waypoint vantagePoint, DebugInfo debugInfo) {
+    protected Waypoint getFurthestVisibleWayPoint(Waypoint vantagePoint, DebugInfo debugInfo) {
         // see if we are already talking about the last waypoint
         if (vantagePoint == getLast()) {
             return vantagePoint;
@@ -171,7 +125,7 @@ public class Path implements Iterable<Waypoint> {
         
         Waypoint visibleWaypoint = testPoint;
         while (testPoint != getLast()) {
-            if (!owner.isInLineOfSight(vantagePoint.cell, vantagePoint.position,
+            if (!navMesh.isInLineOfSight(vantagePoint.cell, vantagePoint.position,
                     testPoint.position, debugInfo)) {
                 if (debugInfo != null)
                     debugInfo.setFailedVisibleWaypoint(testPoint);
@@ -184,15 +138,20 @@ public class Path implements Iterable<Waypoint> {
         }
         // if it is the last point, and not visible, return the previous point
         if (testPoint == getLast()) {
-            if (!owner.isInLineOfSight(vantagePoint.cell, vantagePoint.position,
+            if (!navMesh.isInLineOfSight(vantagePoint.cell, vantagePoint.position,
                     testPoint.position, debugInfo))
                 return visibleWaypoint;
         }
         return testPoint;
     }
     
-    // do not use
-    public Waypoint getFurthestVisibleWayPointOptimized(Waypoint vantagePoint) {
+    /**
+     * Do not use!
+     * 
+     * @param vantagePoint
+     * @return
+     */
+    protected Waypoint getFurthestVisibleWayPointOptimized(Waypoint vantagePoint) {
         // see if we are already talking about the last waypoint
         if (vantagePoint == getLast()) {
             return vantagePoint;
@@ -247,7 +206,8 @@ public class Path implements Iterable<Waypoint> {
     /**
      * Check if C is left of the line AB
      */
-    public boolean isLeft(Vector3f a, Vector3f b, Vector3f c) {
+    private boolean isLeft(Vector3f a, Vector3f b, Vector3f c) {
         return ((b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x)) > 0;
     }
+    
 }
