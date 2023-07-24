@@ -6,13 +6,17 @@ import java.util.List;
 import com.jme3.math.Vector3f;
 
 /**
+ * A path as calculated by the navigation system.
  * 
  * @author capdevon
  */
 public class NavMeshPath {
     
-    private Waypoint nextWaypoint;
+    // Status of the path.
+    private NavMeshPathStatus status;
+    // Corner points of the path.
     private final List<Waypoint> waypointList = new ArrayList<>();
+    private Waypoint nextWaypoint;
 
     /**
      * Sets up a new path from StartPoint to EndPoint. It adds the StartPoint as the
@@ -22,7 +26,7 @@ public class NavMeshPath {
      * @param startPoint
      * @param startCell
      */
-    void startPath(Vector3f startPoint, Cell startCell) {
+    protected void startPath(Vector3f startPoint, Cell startCell) {
         Waypoint start = new Waypoint(startPoint, startCell);
         // setup the waypoint list with our start and end points
         waypointList.clear();
@@ -35,27 +39,27 @@ public class NavMeshPath {
      * @param endPoint
      * @param endCell
      */
-    void endPath(Vector3f endPoint, Cell endCell) {
+    protected void endPath(Vector3f endPoint, Cell endCell) {
         Waypoint end = new Waypoint(endPoint, endCell);
         // cap the waypoint path with the last endpoint
         waypointList.add(end);
         nextWaypoint = getFirst();
     }
 
+    protected Waypoint getFirst() {
+        return waypointList.get(0);
+    }
+
+    protected Waypoint getLast() {
+        return waypointList.get(waypointList.size() - 1);
+    }
+    
     /**
      * Adds a new waypoint to the end of the list
      */
     public void addWaypoint(Vector3f point, Cell cell) {
         Waypoint waypoint = new Waypoint(point, cell);
         waypointList.add(waypoint);
-    }
-
-    public Waypoint getFirst() {
-        return waypointList.get(0);
-    }
-
-    public Waypoint getLast() {
-        return waypointList.get(waypointList.size() - 1);
     }
 
     public List<Waypoint> getWaypoints() {
@@ -78,6 +82,17 @@ public class NavMeshPath {
     public void goToNextWaypoint() {
         int from = waypointList.indexOf(nextWaypoint);
         nextWaypoint = waypointList.get(from + 1);
+    }
+    
+    /**
+     * @return Status of the path. (Read Only)
+     */
+    public NavMeshPathStatus getStatus() {
+        return status;
+    }
+    
+    protected void setStatus(NavMeshPathStatus status) {
+        this.status = status;
     }
 
 }

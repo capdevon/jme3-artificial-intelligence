@@ -14,7 +14,6 @@ import com.jme3.math.Vector3f;
 public class NavMeshQuery {
     
     private NavMesh navMesh;
-    private NavMeshPath path = new NavMeshPath();
     private StraightPathOptions straightPathOptions = StraightPathOptions.AreaCrossings;
     private float entityRadius = 1f;
     
@@ -30,10 +29,6 @@ public class NavMeshQuery {
      */
     public NavMeshQuery(NavMesh navMesh) {
         this.navMesh = navMesh;
-    }
-    
-    public NavMeshPath getPath() {
-        return path;
     }
     
     public float getEntityRadius() {
@@ -59,8 +54,8 @@ public class NavMeshQuery {
      * @param endPosition   The final position of the path requested.
      * @return True if a complete path is found. False otherwise.
      */
-    public boolean computePath(Vector3f startPos, Vector3f targetPos) {
-        return computePath(startPos, targetPos, null);
+    public boolean computePath(Vector3f startPos, Vector3f targetPos, NavMeshPath path) {
+        return computePath(startPos, targetPos, path, null);
     }
 
     /**
@@ -71,7 +66,7 @@ public class NavMeshQuery {
      * @param debugInfo     The resulting debugInfo.
      * @return True if a complete path is found. False otherwise.
      */
-    public boolean computePath(Vector3f startPos, Vector3f endPos, DebugInfo debugInfo) {
+    public boolean computePath(Vector3f startPos, Vector3f endPos, NavMeshPath path, DebugInfo debugInfo) {
         
         Vector3f spos = new Vector3f(startPos.x, startPos.y, startPos.z);
         Cell startCell = navMesh.findClosestCell(spos);
@@ -89,12 +84,16 @@ public class NavMeshQuery {
     private boolean buildNavigationPath(NavMeshPath navPath,
             Cell startCell, Vector3f startPos,
             Cell endCell, Vector3f endPos, DebugInfo debugInfo) {
+        
+        // clear navigation path
+        navPath.clear();
 
         boolean foundPath = processHeap(startCell, startPos, endCell, endPos);
 
         // if we found a path, build a waypoint list
         // out of the cells on the path
         if (!foundPath) {
+            navPath.setStatus(NavMeshPathStatus.PathInvalid);
             return false;
         }
 
@@ -206,6 +205,7 @@ public class NavMeshQuery {
             navPath.endPath(endPos, endCell);
         }
 
+        navPath.setStatus(NavMeshPathStatus.PathComplete);
         return true;
     }
     
