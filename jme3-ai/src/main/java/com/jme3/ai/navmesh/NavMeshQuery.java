@@ -24,31 +24,14 @@ public class NavMeshQuery {
     private volatile int sessionID = 0;
     private volatile Heap heap = new Heap();
     
+    /**
+     * Instantiate a <code>NavMeshQuery</code>
+     * @param navMesh
+     */
     public NavMeshQuery(NavMesh navMesh) {
         this.navMesh = navMesh;
     }
-
-    public boolean computePath(Vector3f startPos, Vector3f targetPos) {
-        return computePath(startPos, targetPos, null);
-    }
-
-    public boolean computePath(Vector3f startPos, Vector3f endPos, DebugInfo debugInfo) {
-        
-        Vector3f m_spos = new Vector3f(startPos.x, startPos.y, startPos.z);
-        Cell startCell = navMesh.findClosestCell(m_spos);
-
-        Vector3f m_epos = new Vector3f(endPos.x, endPos.y, endPos.z);
-        Cell endCell = navMesh.findClosestCell(m_epos);
-        navMesh.snapPointToCell(endCell, m_epos);
-        
-        boolean result = buildNavigationPath(path, startCell, startPos, endCell, m_epos, debugInfo);
-        if (!result) {
-            return false;
-        }
-        
-        return true;
-    }
-
+    
     public NavMeshPath getPath() {
         return path;
     }
@@ -70,6 +53,37 @@ public class NavMeshQuery {
     }
 
     /**
+     * Calculate a path between two points and store the resulting path.
+     * 
+     * @param startPosition The initial position of the path requested.
+     * @param endPosition   The final position of the path requested.
+     * @return True if a complete path is found. False otherwise.
+     */
+    public boolean computePath(Vector3f startPos, Vector3f targetPos) {
+        return computePath(startPos, targetPos, null);
+    }
+
+    /**
+     * Calculate a path between two points and store the resulting path.
+     * 
+     * @param startPosition The initial position of the path requested.
+     * @param endPosition   The final position of the path requested.
+     * @param debugInfo     The resulting debugInfo.
+     * @return True if a complete path is found. False otherwise.
+     */
+    public boolean computePath(Vector3f startPos, Vector3f endPos, DebugInfo debugInfo) {
+        
+        Vector3f spos = new Vector3f(startPos.x, startPos.y, startPos.z);
+        Cell startCell = navMesh.findClosestCell(spos);
+
+        Vector3f epos = new Vector3f(endPos.x, endPos.y, endPos.z);
+        Cell endCell = navMesh.findClosestCell(epos);
+        navMesh.snapPointToCell(endCell, epos);
+        
+        return buildNavigationPath(path, startCell, startPos, endCell, epos, debugInfo);
+    }
+
+    /**
      * Build a navigation path using the provided points and the A* method
      */
     private boolean buildNavigationPath(NavMeshPath navPath,
@@ -85,7 +99,7 @@ public class NavMeshQuery {
         }
 
         // Setup the Path object, clearing out any old data
-        navPath.initialize(startPos, startCell, endPos, endCell);
+        navPath.startPath(startPos, startCell);
 
         Vector3f lastWayPoint = startPos;
         Vector2f intersectionPoint = new Vector2f();
@@ -163,7 +177,7 @@ public class NavMeshQuery {
             if (debugInfo != null) {
                 debugInfo.addPreOptWaypoints(newWayPoint.clone());
             }
-            //newWayPoint = snapPointToCell(currentCell, newWayPoint);
+            //newWayPoint = snapPointToCell(currCell, newWayPoint);
             lastWayPoint = newWayPoint.clone();
 
             navPath.addWaypoint(newWayPoint, currCell);
@@ -173,7 +187,7 @@ public class NavMeshQuery {
         }
 
         // cap the end of the path.
-        navPath.finishPath();
+        navPath.endPath(endPos, endCell);
         
         if (straightPathOptions == StraightPathOptions.AreaCrossings) {
             // further: optimize the path
@@ -181,15 +195,15 @@ public class NavMeshQuery {
             Waypoint curWayPoint = navPath.getFirst();
             newPath.add(curWayPoint);
             while (curWayPoint != navPath.getLast()) {
-                curWayPoint = getFurthestVisibleWayPoint(navPath, curWayPoint);
+                curWayPoint = getFurthestVisibleWayPoint(navPath, curWayPoint, debugInfo);
                 newPath.add(curWayPoint);
             }
 
-            navPath.initialize(startPos, startCell, endPos, endCell);
+            navPath.startPath(startPos, startCell);
             for (Waypoint newWayPoint : newPath) {
                 navPath.addWaypoint(newWayPoint.getPosition(), newWayPoint.getCell());
             }
-            navPath.finishPath();
+            navPath.endPath(endPos, endCell);
         }
 
         return true;
@@ -227,10 +241,6 @@ public class NavMeshQuery {
         }
 
         return foundPath;
-    }
-    
-    private Waypoint getFurthestVisibleWayPoint(NavMeshPath navPath, Waypoint vantagePoint) {
-        return getFurthestVisibleWayPoint(navPath, vantagePoint, null);
     }
     
     /**
@@ -328,13 +338,13 @@ public class NavMeshQuery {
         return lineIntersectsTriangle(position, nextPosition, nextCell.getTriangle());
     }
     
-    private boolean lineIntersectsTriangle(Vector3f position, Vector3f nextPosition, Vector3f[] cell) {
+    private boolean lineIntersectsTriangle(Vector3f position, Vector3f nextPosition, Vector3f[] nextCell) {
         
-        if (isLeft(position, nextPosition, cell[0]) ^ isLeft(position, nextPosition, cell[1]))
+        if (isLeft(position, nextPosition, nextCell[0]) ^ isLeft(position, nextPosition, nextCell[1]))
             return true;
-        if (isLeft(position, nextPosition, cell[1]) ^ isLeft(position, nextPosition, cell[2]))
+        if (isLeft(position, nextPosition, nextCell[1]) ^ isLeft(position, nextPosition, nextCell[2]))
             return true;
-        if (isLeft(position, nextPosition, cell[2]) ^ isLeft(position, nextPosition, cell[0]))
+        if (isLeft(position, nextPosition, nextCell[2]) ^ isLeft(position, nextPosition, nextCell[0]))
             return true;
         
         return false;

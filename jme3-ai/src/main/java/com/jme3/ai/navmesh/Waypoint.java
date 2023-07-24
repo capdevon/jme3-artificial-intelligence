@@ -5,29 +5,31 @@ import com.jme3.math.Vector3f;
 public class Waypoint {
 
     // 3D position of waypoint
-    protected Vector3f position;
+    protected final Vector3f position;
     // The cell which owns the waypoint
-    protected Cell cell;
+    protected final Cell cell;
+    
+    /**
+     * 
+     * @param position
+     * @param cell
+     */
+    public Waypoint(Vector3f position, Cell cell) {
+        this.position = position;
+        this.cell = cell;
+    }
 
     public Cell getCell() {
         return cell;
-    }
-
-    public void setCell(Cell cell) {
-        this.cell = cell;
     }
 
     public Vector3f getPosition() {
         return position;
     }
 
-    public void setPosition(Vector3f position) {
-        this.position = position;
-    }
-
     @Override
     public String toString() {
-        return "Waypoint[position=" + position.x + ", " + position.z + " cell:" + cell + "]";
+        return "Waypoint [position=" + position + ", cell=" + cell + "]";
     }
     
 }

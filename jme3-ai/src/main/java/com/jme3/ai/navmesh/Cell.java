@@ -49,10 +49,10 @@ public class Cell implements Savable {
 
     public class ClassifyResult {
 
-        PathResult result = PathResult.NoRelationship;
         int side = 0;
         Cell cell = null;
         Vector2f intersection = new Vector2f();
+        PathResult result = PathResult.NoRelationship;
 
         @Override
         public String toString() {
@@ -163,8 +163,7 @@ public class Cell implements Savable {
         sides[SIDE_BC] = new Line2D(point2, point3); // line BC
         sides[SIDE_CA] = new Line2D(point3, point1); // line CA
 
-        cellPlane.setPlanePoints(vertices[VERT_A], vertices[VERT_B],
-                vertices[VERT_C]);
+        cellPlane.setPlanePoints(vertices[VERT_A], vertices[VERT_B], vertices[VERT_C]);
 
         // compute midpoint as centroid of polygon
         center.x = ((vertices[VERT_A].x + vertices[VERT_B].x + vertices[VERT_C].x) / 3);
@@ -172,30 +171,25 @@ public class Cell implements Savable {
         center.z = ((vertices[VERT_A].z + vertices[VERT_B].z + vertices[VERT_C].z) / 3);
 
         // compute the midpoint of each cell wall
-        wallMidpoints[0] = new Vector3f(
-                (vertices[VERT_A].x + vertices[VERT_B].x) / 2.0f,
-                (vertices[VERT_A].y + vertices[VERT_B].y) / 2.0f,
-                (vertices[VERT_A].z + vertices[VERT_B].z) / 2.0f);
-        wallMidpoints[1] = new Vector3f(
-                (vertices[VERT_C].x + vertices[VERT_B].x) / 2.0f,
-                (vertices[VERT_C].y + vertices[VERT_B].y) / 2.0f,
-                (vertices[VERT_C].z + vertices[VERT_B].z) / 2.0f);
-
-        wallMidpoints[2] = new Vector3f(
-                (vertices[VERT_C].x + vertices[VERT_A].x) / 2.0f,
-                (vertices[VERT_C].y + vertices[VERT_A].y) / 2.0f,
-                (vertices[VERT_C].z + vertices[VERT_A].z) / 2.0f);
+        wallMidpoints[0] = computeWallMidpoint(VERT_A, VERT_B);
+        wallMidpoints[1] = computeWallMidpoint(VERT_C, VERT_B);
+        wallMidpoints[2] = computeWallMidpoint(VERT_C, VERT_A);
 
         // compute the distances between the wall midpoints
-        Vector3f wallVector;
-        wallVector = wallMidpoints[0].subtract(wallMidpoints[1]);
-        wallDistances[0] = wallVector.length();
-
-        wallVector = wallMidpoints[1].subtract(wallMidpoints[2]);
-        wallDistances[1] = wallVector.length();
-
-        wallVector = wallMidpoints[2].subtract(wallMidpoints[0]);
-        wallDistances[2] = wallVector.length();
+        wallDistances[0] = computeWallDistance(0, 1);
+        wallDistances[1] = computeWallDistance(1, 2);
+        wallDistances[2] = computeWallDistance(2, 0);
+    }
+    
+    private Vector3f computeWallMidpoint(int i, int j) {
+        float x = (vertices[i].x + vertices[j].x) / 2.0f;
+        float y = (vertices[i].y + vertices[j].y) / 2.0f;
+        float z = (vertices[i].z + vertices[j].z) / 2.0f;
+        return new Vector3f(x, y, z);
+    }
+    
+    private float computeWallDistance(int i, int j) {
+        return wallMidpoints[i].distance(wallMidpoints[j]);
     }
     
     public Vector3f[] getTriangle() {
@@ -313,15 +307,15 @@ public class Cell implements Savable {
     }
 
     public Vector3f getVertex(int index) {
-        return (vertices[index]);
+        return vertices[index];
     }
 
     public Vector3f getCenter() {
-        return (center);
+        return center;
     }
 
     Cell getLink(int side) {
-        return (links[side]);
+        return links[side];
     }
 
     Line2D getWall(int side){
@@ -329,11 +323,11 @@ public class Cell implements Savable {
     }
 
     float getArrivalCost() {
-        return (arrivalCost);
+        return arrivalCost;
     }
 
     float getHeuristic() {
-        return (heuristic);
+        return heuristic;
     }
 
     float getTotalCost() {
@@ -341,7 +335,7 @@ public class Cell implements Savable {
     }
 
     int getArrivalWall() {
-        return (arrivalWall);
+        return arrivalWall;
     }
 
     public float getWallLength(int side){
@@ -349,7 +343,7 @@ public class Cell implements Savable {
     }
 
     public Vector3f getWallMidpoint(int side) {
-        return (wallMidpoints[side]);
+        return wallMidpoints[side];
     }
 
     /**
@@ -590,8 +584,7 @@ public class Cell implements Savable {
                     // this cell are held in the order ABtoBC, BCtoCA and CAtoAB.
                     // We add this distance to our known m_ArrivalCost to compute
                     // the total cost to reach the next adjacent cell.
-                    links[i].queryForPath(heap, this, arrivalCost
-                            + wallDistances[Math.abs(i - arrivalWall)]);
+                    links[i].queryForPath(heap, this, arrivalCost + wallDistances[Math.abs(i - arrivalWall)]);
                 }
             }
             return true;
@@ -682,7 +675,7 @@ public class Cell implements Savable {
     }
 
     public Vector3f getNormal() {
-        return this.cellPlane.getNormal();
+        return cellPlane.getNormal();
     }
 
 //    public Vector3f getRandomPoint() {

@@ -18,8 +18,8 @@ import com.jme3.math.Vector3f;
 public class Path {
 
     private NavMesh navMesh;
-    private Waypoint start = new Waypoint();
-    private Waypoint end = new Waypoint();
+    private Waypoint start;
+    private Waypoint end;
     private List<Waypoint> waypointList = new ArrayList<>();
 
     /**
@@ -37,17 +37,12 @@ public class Path {
                            Vector3f startPoint, Cell startCell,
                            Vector3f endPoint, Cell endCell) {
 
-        waypointList.clear();
-
         this.navMesh = navMesh;
-
-        start.setPosition(startPoint);
-        start.setCell(startCell);
-
-        end.setPosition(endPoint);
-        end.setCell(endCell);
+        this.start = new Waypoint(startPoint, startCell);
+        this.end = new Waypoint(endPoint, endCell);
 
         // setup the waypoint list with our start and end points
+        waypointList.clear();
         waypointList.add(start);
     }
 
@@ -67,9 +62,7 @@ public class Path {
      * Adds a new waypoint to the end of the list
      */
     public void addWaypoint(Vector3f point, Cell cell) {
-        Waypoint newPoint = new Waypoint();
-        newPoint.setPosition(point);
-        newPoint.setCell(cell);
+        Waypoint newPoint = new Waypoint(point, cell);
         waypointList.add(newPoint);
     }
 

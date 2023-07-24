@@ -12,38 +12,31 @@ import com.jme3.math.Vector3f;
 public class NavMeshPath {
     
     private Waypoint nextWaypoint;
-    private final Waypoint start = new Waypoint();
-    private final Waypoint end = new Waypoint();
     private final List<Waypoint> waypointList = new ArrayList<>();
 
     /**
-     * Sets up a new path from StartPoint to EndPoint. It adds the StartPoint as
-     * the first waypoint in the list and waits for further calls to AddWayPoint
-     * and EndPath to complete the list
+     * Sets up a new path from StartPoint to EndPoint. It adds the StartPoint as the
+     * first waypoint in the list and waits for further calls to AddWayPoint and
+     * EndPath to complete the list
      * 
      * @param startPoint
      * @param startCell
+     */
+    void startPath(Vector3f startPoint, Cell startCell) {
+        Waypoint start = new Waypoint(startPoint, startCell);
+        // setup the waypoint list with our start and end points
+        waypointList.clear();
+        waypointList.add(start);
+    }
+
+    /**
+     * Caps the end of the waypoint list by adding our final destination point.
+     * 
      * @param endPoint
      * @param endCell
      */
-    void initialize(Vector3f startPoint, Cell startCell, Vector3f endPoint, Cell endCell) {
-
-        waypointList.clear();
-
-        start.setPosition(startPoint);
-        start.setCell(startCell);
-        
-        // setup the waypoint list with our start and end points
-        waypointList.add(start);
-        
-        end.setPosition(endPoint);
-        end.setCell(endCell);
-    }
-    
-    /**
-     * Caps the end of the waypoint list by adding our final destination point.
-     */
-    void finishPath() {
+    void endPath(Vector3f endPoint, Cell endCell) {
+        Waypoint end = new Waypoint(endPoint, endCell);
         // cap the waypoint path with the last endpoint
         waypointList.add(end);
         nextWaypoint = getFirst();
@@ -53,10 +46,8 @@ public class NavMeshPath {
      * Adds a new waypoint to the end of the list
      */
     public void addWaypoint(Vector3f point, Cell cell) {
-        Waypoint newPoint = new Waypoint();
-        newPoint.setPosition(point);
-        newPoint.setCell(cell);
-        waypointList.add(newPoint);
+        Waypoint waypoint = new Waypoint(point, cell);
+        waypointList.add(waypoint);
     }
 
     public Waypoint getFirst() {
