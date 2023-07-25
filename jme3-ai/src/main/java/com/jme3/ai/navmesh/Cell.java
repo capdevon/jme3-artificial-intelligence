@@ -192,14 +192,10 @@ public class Cell implements Savable {
         return wallMidpoints[i].distance(wallMidpoints[j]);
     }
     
-    public Vector3f[] getTriangle() {
-        return vertices;
-    }
-    
     /**
      * Check if C is left of the line AB
      */
-    public boolean isLeft(Vector3f a, Vector3f b, Vector3f c) {
+    private boolean isLeft(Vector3f a, Vector3f b, Vector3f c) {
         return ((b.x - a.x) * (c.z - a.z) - (b.z - a.z) * (c.x - a.x)) > 0;
     }
 
@@ -305,6 +301,10 @@ public class Cell implements Savable {
     public boolean contains(Vector3f point) {
         return contains(new Vector2f(point.x, point.z));
     }
+    
+    public Vector3f[] getTriangle() {
+        return vertices;
+    }
 
     public Vector3f getVertex(int index) {
         return vertices[index];
@@ -313,12 +313,16 @@ public class Cell implements Savable {
     public Vector3f getCenter() {
         return center;
     }
+    
+    public Vector3f getNormal() {
+        return cellPlane.getNormal();
+    }
 
     Cell getLink(int side) {
         return links[side];
     }
 
-    Line2D getWall(int side){
+    Line2D getWall(int side) {
         return sides[side];
     }
 
@@ -338,7 +342,7 @@ public class Cell implements Savable {
         return arrivalWall;
     }
 
-    public float getWallLength(int side){
+    public float getWallLength(int side) {
         return wallDistances[side];
     }
 
@@ -547,8 +551,9 @@ public class Cell implements Savable {
     }
 
     /**
-     * Force a 3D point to the interior cell by forcing it to the interior of
-     * each wall
+     * Force a 3D point to the interior cell by forcing 
+     * it to the interior of each wall
+     * 
      * @param point
      * @return
      */
@@ -629,6 +634,7 @@ public class Cell implements Savable {
             // add this cell to the Open heap
             heap.addCell(this);
             return true;
+            
         } else if (open) {
             // m_Open means we are already in the Open Heap.
             // If this new caller provides a better path, adjust our data
@@ -669,15 +675,6 @@ public class Cell implements Savable {
         heuristic = goal.distance(center);
     }
 
-    @Override
-    public String toString() {
-        return "Cell: " + center.x + "," + center.z;
-    }
-
-    public Vector3f getNormal() {
-        return cellPlane.getNormal();
-    }
-
 //    public Vector3f getRandomPoint() {
 //        float u1 = FastMath.nextRandomFloat();
 //        float u2 = FastMath.nextRandomFloat();
@@ -692,42 +689,7 @@ public class Cell implements Savable {
 //        
 //        return vec;
 //    }
-
-    @Override
-    public void write(JmeExporter ex) throws IOException {
-        OutputCapsule capsule = ex.getCapsule(this);
-//        capsule.write(cellPlane, "cellPlane", null);
-        capsule.write(vertices, "vertices", null);
-//        capsule.write(center, "center", null);
-//        capsule.write(sides, "sides", null);
-        capsule.write(links, "links", null);
-//        capsule.write(wallMidpoints, "midpoints", null);
-//        capsule.write(wallDistances, "distances", null);
-    }
-
-    @Override
-    public void read(JmeImporter im) throws IOException {
-        InputCapsule capsule = im.getCapsule(this);
-
-        Savable[] sVertices = capsule.readSavableArray("vertices", null);
-        for (int i = 0; i < sVertices.length; i++){
-            vertices[i] = (Vector3f) sVertices[i];
-        }
-
-        Savable[] sLinks = capsule.readSavableArray("links", null);
-        for (int i = 0; i < sLinks.length; i++){
-            links[i] = (Cell) sLinks[i];
-        }
-
-        computeCellData();
-        
-//        cellPlane = (Plane) capsule.readSavable("cellPlane", new Plane());
-//        center = (Vector3f) capsule.readSavable("center", new Vector3f());
-//        sides = (Line2D[]) capsule.readSavableArray("sides", new Line2D[3]);
-//        wallMidpoints = (Vector3f[]) capsule.readSavableArray("midpoints", new Vector3f[3]);
-//        wallDistances = capsule.readFloatArray("distances", new float[3]);
-    }
-
+    
     void checkAndLink(Cell other, float epsilon) {
         if (getLink(Cell.SIDE_AB) == null
                 && other.requestLink(getVertex(0), getVertex(1), this, epsilon)) {
@@ -778,6 +740,35 @@ public class Cell implements Savable {
         m.setBuffer(Type.Index, 3, new short[]{0, 1, 2});
         m.updateBound();
         return m;
+    }
+    
+    @Override
+    public String toString() {
+        return "Cell [center=" + center + "]";
+    }
+
+    @Override
+    public void write(JmeExporter ex) throws IOException {
+        OutputCapsule oc = ex.getCapsule(this);
+        oc.write(vertices, "vertices", null);
+        oc.write(links, "links", null);
+    }
+
+    @Override
+    public void read(JmeImporter im) throws IOException {
+        InputCapsule ic = im.getCapsule(this);
+
+        Savable[] sVertices = ic.readSavableArray("vertices", null);
+        for (int i = 0; i < sVertices.length; i++){
+            vertices[i] = (Vector3f) sVertices[i];
+        }
+
+        Savable[] sLinks = ic.readSavableArray("links", null);
+        for (int i = 0; i < sLinks.length; i++){
+            links[i] = (Cell) sLinks[i];
+        }
+
+        computeCellData();
     }
     
 }

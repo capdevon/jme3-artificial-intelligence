@@ -95,9 +95,9 @@ public class Line2D implements Savable {
         normal = null;
     }
 
-    public void setPoints(Vector2f PointA, Vector2f PointB) {
-        this.pointA = PointA;
-        this.pointB = PointB;
+    public void setPoints(Vector2f pointA, Vector2f pointB) {
+        this.pointA = pointA;
+        this.pointB = pointB;
         normal = null;
     }
 
@@ -108,11 +108,11 @@ public class Line2D implements Savable {
         return normal;
     }
 
-    public void setPoints(float PointAx, float PointAy, float PointBx, float PointBy) {
-        pointA.x = PointAx;
-        pointA.y = PointAy;
-        pointB.x = PointBx;
-        pointB.y = PointBy;
+    public void setPoints(float pointAx, float pointAy, float pointBx, float pointBy) {
+        pointA.x = pointAx;
+        pointA.y = pointAy;
+        pointB.x = pointBx;
+        pointB.y = pointBy;
         normal = null;
     }
 
@@ -193,10 +193,6 @@ public class Line2D implements Savable {
             return PointSide.Right;
     }
     
-    public boolean isLeft(Vector2f a, Vector2f b, Vector2f c){
-        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
-    }
-    
     /**
      * this line A = x0, y0 and B = x1, y1
      * other is A = x2, y2 and B = x3, y3
@@ -257,16 +253,16 @@ public class Line2D implements Savable {
      * D = PointB of the provided line
      */
     @Deprecated
-    public LineIntersect intersectionOLD(Line2D Line, Vector2f pIntersectPoint) {
-        float Ay_minus_Cy = pointA.y - Line.getPointA().y;
-        float Dx_minus_Cx = Line.getPointB().x - Line.getPointA().x;
-        float Ax_minus_Cx = pointA.x - Line.getPointA().x;
-        float Dy_minus_Cy = Line.getPointB().y - Line.getPointA().y;
+    public LineIntersect intersectionOLD(Line2D line, Vector2f pIntersectPoint) {
+        float Ay_minus_Cy = pointA.y - line.getPointA().y;
+        float Dx_minus_Cx = line.getPointB().x - line.getPointA().x;
+        float Ax_minus_Cx = pointA.x - line.getPointA().x;
+        float Dy_minus_Cy = line.getPointB().y - line.getPointA().y;
         float Bx_minus_Ax = pointB.x - pointA.x;
         float By_minus_Ay = pointB.y - pointA.y;
 
         java.awt.geom.Line2D l1 = new java.awt.geom.Line2D.Float(this.pointA.x, this.pointA.y, this.pointB.x, this.pointB.y);
-        if (l1.intersectsLine(Line.getPointA().x, Line.getPointA().y, Line.getPointB().x, Line.getPointB().y)) //return LINE_CLASSIFICATION.LINES_INTERSECT;
+        if (l1.intersectsLine(line.getPointA().x, line.getPointA().y, line.getPointB().x, line.getPointB().y)) //return LINE_CLASSIFICATION.LINES_INTERSECT;
         {
             System.out.println("They intersect");
         } else //return LINE_CLASSIFICATION.COLLINEAR;
@@ -320,7 +316,7 @@ public class Line2D implements Savable {
 
     @Override
     public String toString() {
-        return "Line:" + pointA.x + "/" + pointA.y + " -> " + pointB.x + "/" + pointB.y;
+        return "Line2D [pointA=" + pointA + ", pointB=" + pointB + "]";
     }
 
     @Override
@@ -348,7 +344,7 @@ public class Line2D implements Savable {
 //        Line2D b = new Line2D(new Vector2f(-2, 1), new Vector2f(2, -1));
 //        Line2D.LineIntersect res = a.intersect(b, null);
 //        if (res == LineIntersect.CoLinear || res == LineIntersect.Parallel) {
-//            System.out.println("Failed intersection verrification");
+//            System.out.println("Failed intersection verification");
 //        }
 //        if (a.getSide(new Vector2f(0, 1), 0.0f) != PointSide.Left) {
 //            System.out.println("Failed left test");

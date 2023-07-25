@@ -52,6 +52,7 @@ public class NavMeshQuery {
      * 
      * @param startPosition The initial position of the path requested.
      * @param endPosition   The final position of the path requested.
+     * @param path          The resulting path.
      * @return True if a complete path is found. False otherwise.
      */
     public boolean computePath(Vector3f startPos, Vector3f targetPos, NavMeshPath path) {
@@ -63,6 +64,7 @@ public class NavMeshQuery {
      * 
      * @param startPosition The initial position of the path requested.
      * @param endPosition   The final position of the path requested.
+     * @param path          The resulting path.
      * @param debugInfo     The resulting debugInfo.
      * @return True if a complete path is found. False otherwise.
      */
@@ -85,8 +87,12 @@ public class NavMeshQuery {
             Cell startCell, Vector3f startPos,
             Cell endCell, Vector3f endPos, DebugInfo debugInfo) {
         
-        // clear navigation path
+        // clear the navigation path
         navPath.clear();
+        
+        if (debugInfo != null) {
+            debugInfo.reset();
+        }
 
         boolean foundPath = processHeap(startCell, startPos, endCell, endPos);
 

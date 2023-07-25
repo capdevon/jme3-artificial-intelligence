@@ -15,7 +15,8 @@ public class DebugInfo {
     private List<Vector3f> preOptWaypoints = new ArrayList<>();
     private List<Cell> plannedCells = new ArrayList<>();
     private List<Vector3f> wpPositions;
-    private Vector3f startPos, endPos;
+    private Vector3f startPos;
+    private Vector3f endPos;
     private Waypoint failedVisibleWaypoint;
     private Waypoint farthestTestedWaypoint;
     private Cell failedCell;
@@ -45,7 +46,7 @@ public class DebugInfo {
         this.wpPositions = wpPositions;
     }
 
-    public List<Vector3f> getWpPositions() {
+    public List<Vector3f> getWaypointPositions() {
         return wpPositions;
     }
 
@@ -141,7 +142,8 @@ public class DebugInfo {
                 + ", failedCell=" + failedCell 
                 + ", passedCells=" + passedCells 
                 + ", endingCell=" + endingCell 
-                + ", startLocation=" + startLocation + "]";
+                + ", startLocation=" + startLocation 
+                + "]";
     }
 
 }

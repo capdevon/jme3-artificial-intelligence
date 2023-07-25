@@ -74,7 +74,15 @@ public class NavMesh implements Savable {
     }
 
     public Cell getCell(int index) {
-        return (cellList.get(index));
+        return cellList.get(index);
+    }
+    
+    /**
+     * Force a point to be inside the nearest cell on the mesh
+     */
+    public Vector3f snapPointToMesh(Vector3f point) {
+        Cell cell = findClosestCell(point);
+        return snapPointToCell(cell, point);
     }
 
     /**
@@ -89,13 +97,6 @@ public class NavMesh implements Savable {
         return point;
     }
 
-    /**
-     * Force a point to be inside the nearest cell on the mesh
-     */
-    Vector3f snapPointToMesh(Vector3f point) {
-        return snapPointToCell(findClosestCell(point), point);
-    }
-    
     /**
      * Find the closest cell on the mesh to the given point.
      */
@@ -156,17 +157,13 @@ public class NavMesh implements Savable {
 
     /**
      * Test to see if two points on the mesh can view each other
-     * FIXME: EndCell is the last visible cell?
      *
      * @param startCell
      * @param startPos
      * @param endPos
+     * @param debugInfo
      * @return
      */
-    boolean isInLineOfSight(Cell startCell, Vector3f startPos, Vector3f endPos) {
-        return isInLineOfSight(startCell, startPos, endPos, null);
-    }
-
     boolean isInLineOfSight(Cell startCell, Vector3f startPos, Vector3f endPos, DebugInfo debugInfo) {
         Line2D motionPath = new Line2D(new Vector2f(startPos.x, startPos.z), new Vector2f(endPos.x, endPos.z));
 
@@ -198,11 +195,11 @@ public class NavMesh implements Savable {
     /**
      * Link all the cells that are in our pool
      */
-    public void linkCells() {
-        for (Cell pCellA : cellList) {
-            for (Cell pCellB : cellList) {
-                if (pCellA != pCellB) {
-                    pCellA.checkAndLink(pCellB, 0.001f);
+    private void linkCells() {
+        for (Cell a : cellList) {
+            for (Cell b : cellList) {
+                if (a != b) {
+                    a.checkAndLink(b, 0.001f);
                 }
             }
         }
