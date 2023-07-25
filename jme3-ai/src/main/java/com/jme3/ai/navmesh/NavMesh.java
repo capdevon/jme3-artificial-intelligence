@@ -52,23 +52,6 @@ public class NavMesh implements Savable {
         loadFromMesh(mesh);
     }
 
-    public void clear() {
-        cellList.clear();
-    }
-
-    /**
-     * Add a new cell, defined by the three vertices in clockwise order, to this
-     * mesh.
-     *
-     * @param pointA
-     * @param pointB
-     * @param pointC
-     */
-    public void addCell(Vector3f pointA, Vector3f pointB, Vector3f pointC) {
-        Cell newCell = new Cell(pointA.clone(), pointB.clone(), pointC.clone());
-        cellList.add(newCell);
-    }
-
     public int getNumCells() {
         return cellList.size();
     }
@@ -156,43 +139,6 @@ public class NavMesh implements Savable {
     }
 
     /**
-     * Test to see if two points on the mesh can view each other
-     *
-     * @param startCell
-     * @param startPos
-     * @param endPos
-     * @param debugInfo
-     * @return
-     */
-    boolean isInLineOfSight(Cell startCell, Vector3f startPos, Vector3f endPos, DebugInfo debugInfo) {
-        Line2D motionPath = new Line2D(new Vector2f(startPos.x, startPos.z), new Vector2f(endPos.x, endPos.z));
-
-        Cell testCell = startCell;
-        ClassifyResult result = testCell.classifyPathToCell(motionPath);
-        ClassifyResult prevResult = result;
-
-        while (result.result == Cell.PathResult.ExitingCell) {
-            if (result.cell == null) {
-                // hit a wall, so the point is not visible
-                if (debugInfo != null) {
-                    debugInfo.setFailedCell(prevResult.cell);
-                }
-                return false;
-            }
-            if (debugInfo != null) {
-                debugInfo.addPassedCell(prevResult.cell);
-            }
-            prevResult = result;
-            result = result.cell.classifyPathToCell(motionPath);
-        }
-        if (debugInfo != null) {
-            debugInfo.setEndingCell(prevResult.cell);
-        }
-        // This is messing up the result, I think because of shared borders
-        return (result.result == Cell.PathResult.EndingCell || result.result == Cell.PathResult.ExitingCell);
-    }
-
-    /**
      * Link all the cells that are in our pool
      */
     private void linkCells() {
@@ -217,10 +163,20 @@ public class NavMesh implements Savable {
         }
     }
     
+    /**
+     * Add a new cell, defined by the three vertices in clockwise order, to this
+     * mesh.
+     */
+    private void addCell(Vector3f vertA, Vector3f vertB, Vector3f vertC) {
+        Cell newCell = new Cell(vertA.clone(), vertB.clone(), vertC.clone());
+        cellList.add(newCell);
+    }
+    
     public void loadFromMesh(Mesh mesh) {
-        clear();
+        
         this.mesh = mesh;
-
+        cellList.clear();
+        
         Vector3f a = new Vector3f();
         Vector3f b = new Vector3f();
         Vector3f c = new Vector3f();
@@ -236,6 +192,7 @@ public class NavMesh implements Savable {
             int i1 = ib.get(i + 0);
             int i2 = ib.get(i + 1);
             int i3 = ib.get(i + 2);
+            
             BufferUtils.populateFromBuffer(a, pb, i1);
             BufferUtils.populateFromBuffer(b, pb, i2);
             BufferUtils.populateFromBuffer(c, pb, i3);

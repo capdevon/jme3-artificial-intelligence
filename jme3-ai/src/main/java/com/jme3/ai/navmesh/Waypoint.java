@@ -29,7 +29,7 @@ public class Waypoint {
 
     @Override
     public String toString() {
-        return "Waypoint [position=" + position + ", cell=" + cell + "]";
+        return "Waypoint [position=" + position + ", " + cell + "]";
     }
     
 }

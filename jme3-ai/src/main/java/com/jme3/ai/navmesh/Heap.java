@@ -72,7 +72,7 @@ class Heap {
 
     /**
      * Search the container for a given cell. May be slow, so don't do this
-     * unless nessesary.
+     * unless necessary.
      */
     Node findNodeIterator(Cell pCell) {
         for (Object n : nodes) {

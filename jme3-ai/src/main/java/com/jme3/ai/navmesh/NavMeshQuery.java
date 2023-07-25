@@ -3,6 +3,7 @@ package com.jme3.ai.navmesh;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jme3.ai.navmesh.Cell.ClassifyResult;
 import com.jme3.ai.navmesh.Line2D.LineIntersect;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
@@ -55,8 +56,8 @@ public class NavMeshQuery {
      * @param path          The resulting path.
      * @return True if a complete path is found. False otherwise.
      */
-    public boolean computePath(Vector3f startPos, Vector3f targetPos, NavMeshPath path) {
-        return computePath(startPos, targetPos, path, null);
+    public boolean calculatePath(Vector3f startPos, Vector3f targetPos, NavMeshPath path) {
+        return calculatePath(startPos, targetPos, path, null);
     }
 
     /**
@@ -68,7 +69,7 @@ public class NavMeshQuery {
      * @param debugInfo     The resulting debugInfo.
      * @return True if a complete path is found. False otherwise.
      */
-    public boolean computePath(Vector3f startPos, Vector3f endPos, NavMeshPath path, DebugInfo debugInfo) {
+    public boolean calculatePath(Vector3f startPos, Vector3f endPos, NavMeshPath path, DebugInfo debugInfo) {
         
         Vector3f spos = new Vector3f(startPos.x, startPos.y, startPos.z);
         Cell startCell = navMesh.findClosestCell(spos);
@@ -252,9 +253,6 @@ public class NavMeshQuery {
     /**
      * Find the farthest visible waypoint from the VantagePoint provided. This
      * is used to smooth out irregular paths.
-     * 
-     * @param vantagePoint
-     * @return
      */
     private Waypoint getFurthestVisibleWayPoint(NavMeshPath navPath, Waypoint vantagePoint, DebugInfo debugInfo) {
         // see if we are already talking about the last waypoint
@@ -278,20 +276,23 @@ public class NavMeshQuery {
         
         Waypoint visibleWaypoint = testPoint;
         while (testPoint != navPath.getLast()) {
-            if (!navMesh.isInLineOfSight(vantagePoint.cell, vantagePoint.position,
+            if (!isInLineOfSight(vantagePoint.cell, vantagePoint.position,
                     testPoint.position, debugInfo)) {
+                
                 if (debugInfo != null)
                     debugInfo.setFailedVisibleWaypoint(testPoint);
+                
                 return visibleWaypoint;
             }
             visibleWaypoint = testPoint;
             testPoint = navPath.getWaypoints().get(++i);
+            
             if (debugInfo != null)
                 debugInfo.setFarthestTestedWaypoint(testPoint);
         }
         // if it is the last point, and not visible, return the previous point
         if (testPoint == navPath.getLast()) {
-            if (!navMesh.isInLineOfSight(vantagePoint.cell, vantagePoint.position,
+            if (!isInLineOfSight(vantagePoint.cell, vantagePoint.position,
                     testPoint.position, debugInfo))
                 return visibleWaypoint;
         }
@@ -299,10 +300,44 @@ public class NavMeshQuery {
     }
     
     /**
+     * Test to see if two points on the mesh can view each other
+     */
+    private boolean isInLineOfSight(Cell startCell, Vector3f startPos, Vector3f endPos, DebugInfo debugInfo) {
+
+        Vector2f pointA = new Vector2f(startPos.x, startPos.z);
+        Vector2f pointB = new Vector2f(endPos.x, endPos.z);
+        Line2D motionPath = new Line2D(pointA, pointB);
+
+        Cell testCell = startCell;
+        ClassifyResult pathResult = testCell.classifyPathToCell(motionPath);
+        ClassifyResult prevResult = pathResult;
+
+        while (pathResult.result == Cell.PathResult.ExitingCell) {
+            if (pathResult.cell == null) {
+                // hit a wall, so the point is not visible
+                if (debugInfo != null) {
+                    debugInfo.setFailedCell(prevResult.cell);
+                }
+                return false;
+            }
+            if (debugInfo != null) {
+                debugInfo.addPassedCell(prevResult.cell);
+            }
+            prevResult = pathResult;
+            pathResult = pathResult.cell.classifyPathToCell(motionPath);
+        }
+        
+        if (debugInfo != null) {
+            debugInfo.setEndingCell(prevResult.cell);
+        }
+        
+        // This is messing up the result, I think because of shared borders
+        return (pathResult.result == Cell.PathResult.EndingCell 
+                || pathResult.result == Cell.PathResult.ExitingCell);
+    }
+    
+    /**
      * Do not use!
-     * 
-     * @param vantagePoint
-     * @return
      */
     private Waypoint getFurthestVisibleWayPointOptimized(NavMeshPath navPath, Waypoint vantagePoint) {
         // see if we are already talking about the last waypoint

@@ -3,6 +3,8 @@ package com.jme3.ai.navmesh;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.jme3.ai.navmesh.Cell.ClassifyResult;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 
 /**
@@ -119,7 +121,7 @@ public class Path {
         
         Waypoint visibleWaypoint = testPoint;
         while (testPoint != getLast()) {
-            if (!navMesh.isInLineOfSight(vantagePoint.cell, vantagePoint.position,
+            if (!isInLineOfSight(vantagePoint.cell, vantagePoint.position,
                     testPoint.position, debugInfo)) {
                 if (debugInfo != null)
                     debugInfo.setFailedVisibleWaypoint(testPoint);
@@ -132,11 +134,42 @@ public class Path {
         }
         // if it is the last point, and not visible, return the previous point
         if (testPoint == getLast()) {
-            if (!navMesh.isInLineOfSight(vantagePoint.cell, vantagePoint.position,
+            if (!isInLineOfSight(vantagePoint.cell, vantagePoint.position,
                     testPoint.position, debugInfo))
                 return visibleWaypoint;
         }
         return testPoint;
+    }
+    
+    /**
+     * Test to see if two points on the mesh can view each other
+     */
+    private boolean isInLineOfSight(Cell startCell, Vector3f startPos, Vector3f endPos, DebugInfo debugInfo) {
+        Line2D motionPath = new Line2D(new Vector2f(startPos.x, startPos.z), new Vector2f(endPos.x, endPos.z));
+
+        Cell testCell = startCell;
+        ClassifyResult result = testCell.classifyPathToCell(motionPath);
+        ClassifyResult prevResult = result;
+
+        while (result.result == Cell.PathResult.ExitingCell) {
+            if (result.cell == null) {
+                // hit a wall, so the point is not visible
+                if (debugInfo != null) {
+                    debugInfo.setFailedCell(prevResult.cell);
+                }
+                return false;
+            }
+            if (debugInfo != null) {
+                debugInfo.addPassedCell(prevResult.cell);
+            }
+            prevResult = result;
+            result = result.cell.classifyPathToCell(motionPath);
+        }
+        if (debugInfo != null) {
+            debugInfo.setEndingCell(prevResult.cell);
+        }
+        // This is messing up the result, I think because of shared borders
+        return (result.result == Cell.PathResult.EndingCell || result.result == Cell.PathResult.ExitingCell);
     }
     
     /**
