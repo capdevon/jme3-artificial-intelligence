@@ -166,7 +166,7 @@ public class Path {
             result = result.cell.classifyPathToCell(motionPath);
         }
         if (debugInfo != null) {
-            debugInfo.setEndingCell(prevResult.cell);
+            debugInfo.setEndCell(prevResult.cell);
         }
         // This is messing up the result, I think because of shared borders
         return (result.result == Cell.PathResult.EndingCell || result.result == Cell.PathResult.ExitingCell);

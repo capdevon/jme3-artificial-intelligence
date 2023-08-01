@@ -12,49 +12,53 @@ import com.jme3.math.Vector3f;
  */
 public class DebugInfo {
     
-    private List<Vector3f> preOptWaypoints = new ArrayList<>();
-    private List<Cell> plannedCells = new ArrayList<>();
-    private List<Vector3f> wpPositions;
     private Vector3f startPos;
     private Vector3f endPos;
+    private Cell startCell;
+    private Cell endCell;
+    
+    private List<Vector3f> preOptWaypoints = new ArrayList<>();
+    private List<Cell> plannedCells = new ArrayList<>();
+    
     private Waypoint failedVisibleWaypoint;
     private Waypoint farthestTestedWaypoint;
     private Cell failedCell;
     private List<Cell> passedCells = new ArrayList<>();
-    private Cell endingCell;
-    private Vector3f startLocation;
 
     public void reset() {
-        if (preOptWaypoints != null)
-            preOptWaypoints.clear();
-        if (plannedCells != null)
-            plannedCells.clear();
-        if (wpPositions != null)
-            wpPositions.clear();
         startPos = null;
         endPos = null;
+        startCell = null;
+        endCell = null;
+        preOptWaypoints.clear();
+        plannedCells.clear();
+        passedCells.clear();
         failedVisibleWaypoint = null;
         farthestTestedWaypoint = null;
         failedCell = null;
-        if (passedCells != null)
-            passedCells.clear();
-        endingCell = null;
-        startLocation = null;
+    }
+    
+    public Cell getStartCell() {
+        return startCell;
     }
 
-    public void setWaypointPositions(List<Vector3f> wpPositions) {
-        this.wpPositions = wpPositions;
+    protected void setStartCell(Cell startCell) {
+        this.startCell = startCell;
     }
 
-    public List<Vector3f> getWaypointPositions() {
-        return wpPositions;
+    public Cell getEndCell() {
+        return endCell;
+    }
+
+    protected void setEndCell(Cell endCell) {
+        this.endCell = endCell;
     }
 
     public Vector3f getEndPos() {
         return endPos;
     }
 
-    public void setEndPos(Vector3f endPos) {
+    protected void setEndPos(Vector3f endPos) {
         this.endPos = endPos;
     }
 
@@ -62,59 +66,43 @@ public class DebugInfo {
         return startPos;
     }
 
-    public void setStartPos(Vector3f startPos) {
+    protected void setStartPos(Vector3f startPos) {
         this.startPos = startPos;
-    }
-
-    public void setFailedVisibleWaypoint(Waypoint testPoint) {
-        this.failedVisibleWaypoint = testPoint;
     }
 
     public Waypoint getFailedVisibleWaypoint() {
         return failedVisibleWaypoint;
     }
-
-    public void setFarthestTestedWaypoint(Waypoint farthest) {
-        this.farthestTestedWaypoint = farthest;
+    
+    protected void setFailedVisibleWaypoint(Waypoint testPoint) {
+        this.failedVisibleWaypoint = testPoint;
     }
 
     public Waypoint getFarthestTestedWaypoint() {
         return farthestTestedWaypoint;
     }
-
-    void setFailedCell(Cell failed) {
+    
+    protected void setFarthestTestedWaypoint(Waypoint farthest) {
+        this.farthestTestedWaypoint = farthest;
+    }
+    
+    public Cell getFailedCell() {
+        return failedCell;
+    }
+    
+    protected void setFailedCell(Cell failed) {
         this.failedCell = failed;
     }
 
-    void addPassedCell(Cell passed) {
+    protected void addPassedCell(Cell passed) {
         this.passedCells.add(passed);
-    }
-
-    void setEndingCell(Cell ending) {
-        this.endingCell = ending;
-    }
-
-    public Cell getEndingCell() {
-        return endingCell;
-    }
-
-    public Cell getFailedCell() {
-        return failedCell;
     }
 
     public List<Cell> getPassedCells() {
         return passedCells;
     }
 
-    public void setStartLocation(Vector3f loc) {
-        this.startLocation = loc;
-    }
-
-    public Vector3f getStartLocation() {
-        return startLocation;
-    }
-
-    void addPlannedCell(Cell cell) {
+    protected void addPlannedCell(Cell cell) {
         plannedCells.add(cell);
     }
 
@@ -122,7 +110,7 @@ public class DebugInfo {
         return plannedCells;
     }
 
-    void addPreOptWaypoints(Vector3f wp) {
+    protected void addPreOptWaypoints(Vector3f wp) {
         preOptWaypoints.add(wp);
     }
 
@@ -134,15 +122,14 @@ public class DebugInfo {
     public String toString() {
         return "DebugInfo [preOptWaypoints=" + preOptWaypoints 
                 + ", plannedCells=" + plannedCells 
-                + ", wpPositions=" + wpPositions 
                 + ", startPos=" + startPos 
                 + ", endPos=" + endPos 
+                + ", startCell=" + startCell 
+                + ", endCell=" + endCell 
                 + ", failedVisibleWaypoint=" + failedVisibleWaypoint 
                 + ", farthestTestedWaypoint=" + farthestTestedWaypoint 
                 + ", failedCell=" + failedCell 
                 + ", passedCells=" + passedCells 
-                + ", endingCell=" + endingCell 
-                + ", startLocation=" + startLocation 
                 + "]";
     }
 

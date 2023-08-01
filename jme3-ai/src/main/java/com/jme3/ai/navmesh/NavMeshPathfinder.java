@@ -149,20 +149,8 @@ public class NavMeshPathfinder {
     }
 
     public void goToNextWaypoint() {
-        goToNextWaypoint(null);
-    }
-
-    public void goToNextWaypoint(DebugInfo debugInfo) {
         int from = path.getWaypoints().indexOf(nextWaypoint);
         nextWaypoint = path.getWaypoints().get(from + 1);
-        //nextWaypoint = path.getFurthestVisibleWayPoint(nextWaypoint, debugInfo);
-        //nextWaypoint = path.getOptimalVisibleWayPoint(nextWaypoint);
-//        int to = getPath().getWaypoints().indexOf(nextWaypoint);
-        
-        //Vector3f wp = nextWaypoint.getPosition();
-        //currentPos3d.setX(wp.getX());
-        //currentPos3d.setZ(wp.getZ());
-        //currentPos.set(wp.getX(), wp.getZ());
         currentCell = nextWaypoint.getCell();
     }
 

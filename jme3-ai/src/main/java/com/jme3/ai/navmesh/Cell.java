@@ -248,10 +248,10 @@ public class Cell implements Savable {
      * Sets a link to the calling cell on the enumerated edge.
      *
      * @param side
-     * @param caller
+     * @param cell
      */
-    private void setLink(int side, Cell caller) {
-        links[side] = caller;
+    private void setLink(int side, Cell cell) {
+        links[side] = cell;
     }
 
     /**
@@ -391,7 +391,8 @@ public class Cell implements Savable {
                     // using the Intersection function of Line2D
                     Line2D.LineIntersect intersectResult = motionPath.intersect(sides[i], result.intersection);
 
-                    if (intersectResult == Line2D.LineIntersect.SegmentsIntersect || intersectResult == Line2D.LineIntersect.ABisectsB) {
+                    if (intersectResult == Line2D.LineIntersect.SegmentsIntersect 
+                            || intersectResult == Line2D.LineIntersect.ABisectsB) {
                         // record the link to the next adjacent cell
                         // (or NULL if no attachment exists)
                         // and the enumerated ID of the side we hit.
@@ -535,7 +536,9 @@ public class Cell implements Savable {
         // compare this path to the cell.
 
         if (result.result == PathResult.ExitingCell) {
-            Vector2f pathDirection = new Vector2f(result.intersection.x - center.x, result.intersection.y - center.z);
+            Vector2f pathDirection = new Vector2f(
+                    result.intersection.x - center.x, 
+                    result.intersection.y - center.z);
             pathDirection = pathDirection.mult(0.9f);
             point.x = center.x + pathDirection.x;
             point.y = center.z + pathDirection.y;
@@ -601,26 +604,26 @@ public class Cell implements Savable {
      * Process this cell using the A* heuristic
      *
      * @param heap
-     * @param caller
+     * @param cell
      * @param arrivalCost
      * @return
      */
-    boolean queryForPath(Heap heap, Cell caller, float arrivalCost) {
+    boolean queryForPath(Heap heap, Cell cell, float arrivalCost) {
         if (sessionID != heap.getSessionID()) {
             // this is a new session, reset our internal data
             sessionID = heap.getSessionID();
 
-            if (caller != null) {
+            if (cell != null) {
                 open = true;
                 computeHeuristic(heap.getGoal());
                 this.arrivalCost = arrivalCost;
 
                 // remember the side this caller is entering from
-                if (caller.equals(links[0])) {
+                if (cell.equals(links[0])) {
                     arrivalWall = 0;
-                } else if (caller.equals(links[1])) {
+                } else if (cell.equals(links[1])) {
                     arrivalWall = 1;
-                } else if (caller.equals(links[2])) {
+                } else if (cell.equals(links[2])) {
                     arrivalWall = 2;
                 }
             } else {
@@ -643,11 +646,11 @@ public class Cell implements Savable {
                 this.arrivalCost = arrivalCost;
 
                 // remember the side this caller is entering from
-                if (caller.equals(links[0])) {
+                if (cell.equals(links[0])) {
                     arrivalWall = 0;
-                } else if (caller.equals(links[1])) {
+                } else if (cell.equals(links[1])) {
                     arrivalWall = 1;
-                } else if (caller.equals(links[2])) {
+                } else if (cell.equals(links[2])) {
                     arrivalWall = 2;
                 }
                 // ask the heap to resort our position in the priority heap

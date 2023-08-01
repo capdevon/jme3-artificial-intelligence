@@ -93,6 +93,10 @@ public class NavMeshQuery {
         
         if (debugInfo != null) {
             debugInfo.reset();
+            debugInfo.setStartPos(startPos);
+            debugInfo.setStartCell(startCell);
+            debugInfo.setEndPos(endPos);
+            debugInfo.setEndCell(endCell);
         }
 
         boolean foundPath = processHeap(startCell, startPos, endCell, endPos);
@@ -103,7 +107,7 @@ public class NavMeshQuery {
             navPath.setStatus(NavMeshPathStatus.PathInvalid);
             return false;
         }
-
+        
         // Setup the Path object, clearing out any old data
         navPath.startPath(startPos, startCell);
 
@@ -201,7 +205,7 @@ public class NavMeshQuery {
             Waypoint curWayPoint = navPath.getFirst();
             newPath.add(curWayPoint);
             while (curWayPoint != navPath.getLast()) {
-                curWayPoint = getFurthestVisibleWayPoint(navPath, curWayPoint, debugInfo);
+                curWayPoint = getFarthestVisibleWayPoint(navPath, curWayPoint, debugInfo);
                 newPath.add(curWayPoint);
             }
 
@@ -211,7 +215,7 @@ public class NavMeshQuery {
             }
             navPath.endPath(endPos, endCell);
         }
-
+        
         navPath.setStatus(NavMeshPathStatus.PathComplete);
         return true;
     }
@@ -254,7 +258,7 @@ public class NavMeshQuery {
      * Find the farthest visible waypoint from the VantagePoint provided. This
      * is used to smooth out irregular paths.
      */
-    private Waypoint getFurthestVisibleWayPoint(NavMeshPath navPath, Waypoint vantagePoint, DebugInfo debugInfo) {
+    private Waypoint getFarthestVisibleWayPoint(NavMeshPath navPath, Waypoint vantagePoint, DebugInfo debugInfo) {
         // see if we are already talking about the last waypoint
         if (vantagePoint == navPath.getLast()) {
             return vantagePoint;
@@ -328,7 +332,7 @@ public class NavMeshQuery {
         }
         
         if (debugInfo != null) {
-            debugInfo.setEndingCell(prevResult.cell);
+            debugInfo.setEndCell(prevResult.cell);
         }
         
         // This is messing up the result, I think because of shared borders
@@ -339,7 +343,7 @@ public class NavMeshQuery {
     /**
      * Do not use!
      */
-    private Waypoint getFurthestVisibleWayPointOptimized(NavMeshPath navPath, Waypoint vantagePoint) {
+    private Waypoint getFarthestVisibleWayPointOptimized(NavMeshPath navPath, Waypoint vantagePoint) {
         // see if we are already talking about the last waypoint
         if (vantagePoint == navPath.getLast()) {
             return vantagePoint;

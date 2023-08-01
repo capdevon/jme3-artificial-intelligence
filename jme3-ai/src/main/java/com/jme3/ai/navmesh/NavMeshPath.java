@@ -46,11 +46,11 @@ public class NavMeshPath {
         nextWaypoint = getFirst();
     }
 
-    protected Waypoint getFirst() {
+    public Waypoint getFirst() {
         return waypointList.get(0);
     }
 
-    protected Waypoint getLast() {
+    public Waypoint getLast() {
         return waypointList.get(waypointList.size() - 1);
     }
     
