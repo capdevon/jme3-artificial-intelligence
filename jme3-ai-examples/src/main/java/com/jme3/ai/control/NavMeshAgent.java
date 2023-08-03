@@ -101,8 +101,6 @@ public class NavMeshAgent extends AbstractControl {
         Waypoint wayPoint = nav.getNextWaypoint();
 
         if (wayPoint != null) {
-            nav.warp(spatial.getWorldTranslation());
-
             // Gets the movement direction
             position2D.set(spatial.getWorldTranslation()).setY(0);
             waypoint2D.set(wayPoint.getPosition()).setY(0);
