@@ -1,19 +1,19 @@
 package com.jme3.ai.control;
 
-import java.util.ArrayList;
-
 import com.jme3.ai.navmesh.Path;
 import com.jme3.ai.navmesh.Path.Waypoint;
 import com.jme3.asset.AssetManager;
 import com.jme3.environment.util.BoundingSphereDebug;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Spline;
+import com.jme3.math.Spline.SplineType;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.shape.Line;
+import com.jme3.scene.shape.Curve;
 
 /**
  *
@@ -29,10 +29,12 @@ public class PathViewer {
     private Material lineMat;
     private Material sphereMat;
     private BoundingSphereDebug sphere = new BoundingSphereDebug();
+    private Spline spline = new Spline();
     private float pointSize = 0.2f;
 
     public PathViewer(AssetManager assetManager) {
         this.assetManager = assetManager;
+        spline.setType(SplineType.Linear);
         setupMaterial();
     }
     
@@ -55,17 +57,15 @@ public class PathViewer {
      */
     public void drawPath(Path path) {
         clearPath();
-        
-        ArrayList<Waypoint> waypoints = path.getWaypoints();
-        for (int j = 0; j < waypoints.size() - 1; j++) {
-            Vector3f a = waypoints.get(j).getPosition();
-            Vector3f b = waypoints.get(j + 1).getPosition();
-            drawLine(a, b);
-            drawSphere(a, pointSize);
+        for (Waypoint wp : path.getWaypoints()) {
+            spline.addControlPoint(wp.getPosition());
+            drawSphere(wp.getPosition(), pointSize);
         }
+        drawCurve();
     }
 
     public void clearPath() {
+        spline.clearControlPoints();
         debugNode.detachAllChildren();
     }
 
@@ -78,9 +78,9 @@ public class PathViewer {
         rm.renderScene(debugNode, vp);
     }
     
-    private void drawLine(Vector3f start, Vector3f end) {
-        Line line = new Line(start, end);
-        Geometry geo = new Geometry("PathLine", line);
+    private void drawCurve() {
+        int nbSubSegments = 0;
+        Geometry geo = new Geometry("PathCurve", new Curve(spline, nbSubSegments));
         geo.setMaterial(lineMat);
         debugNode.attachChild(geo);
     }
