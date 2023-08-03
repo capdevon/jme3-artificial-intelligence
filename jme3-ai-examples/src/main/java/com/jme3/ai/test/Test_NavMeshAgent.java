@@ -163,6 +163,7 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
         player = new Node("Player");
         Node model = (Node) assetManager.loadModel("Models/Jaime/Jaime.j3o");
         model.setName("jaime");
+        model.setShadowMode(ShadowMode.CastAndReceive);
         AnimMigrationUtils.migrate(model);
         player.attachChild(model);
 
