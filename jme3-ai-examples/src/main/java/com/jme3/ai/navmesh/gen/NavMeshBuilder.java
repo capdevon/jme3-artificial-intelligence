@@ -29,7 +29,7 @@ public class NavMeshBuilder {
 
     private static final Logger logger = Logger.getLogger(NavMeshBuilder.class.getName());
 
-    private org.critterai.nmgen.NavmeshGenerator nmgen;
+    private NavmeshGenerator nmgen;
     private IntermediateData intermediateData;
     private int timeout = 60000;
     
@@ -37,7 +37,7 @@ public class NavMeshBuilder {
      * The data object to use for storing data related to building the 
      * navigation mesh.
      * 
-     * @param intermediateData
+     * @param {@link org.critterai.nmgen.IntermediateData}
      */
     public void setIntermediateData(IntermediateData intermediateData) {
         this.intermediateData = intermediateData;
