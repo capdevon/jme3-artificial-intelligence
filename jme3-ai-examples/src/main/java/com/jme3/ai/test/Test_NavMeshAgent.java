@@ -331,7 +331,7 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
 
     private void initKeys() {
         addMapping("toggleWireframe", new KeyTrigger(KeyInput.KEY_T));
-        addMapping("stopAgent", new KeyTrigger(KeyInput.KEY_ESCAPE));
+        addMapping("stopAgent", new KeyTrigger(KeyInput.KEY_RETURN));
         addMapping("LMB", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
     }
 
@@ -378,8 +378,8 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
 
     @Override
     public void stop() {
-        super.stop();
         player.removeControl(NavMeshAgentMT.class);
+        stop(true);
     }
 
     @Override
