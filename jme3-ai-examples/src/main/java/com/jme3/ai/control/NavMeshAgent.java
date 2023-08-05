@@ -161,6 +161,9 @@ public class NavMeshAgent extends AbstractControl {
         if (hasPath) {
             // display motion path
             pathChanged = true;
+        } else {
+            clearPath();
+            bcc.setWalkDirection(Vector3f.ZERO);
         }
     }
 
