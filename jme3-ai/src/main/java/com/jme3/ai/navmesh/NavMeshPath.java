@@ -67,6 +67,7 @@ public class NavMeshPath {
     }
     
     public void clear() {
+        status = NavMeshPathStatus.PathInvalid;
         waypointList.clear();
         nextWaypoint = null;
     }
@@ -80,8 +81,9 @@ public class NavMeshPath {
     }
 
     public void goToNextWaypoint() {
-        int from = waypointList.indexOf(nextWaypoint);
-        nextWaypoint = waypointList.get(from + 1);
+        int index = waypointList.indexOf(nextWaypoint);
+        nextWaypoint = waypointList.get(index + 1);
+        waypointList.remove(index);
     }
     
     /**
