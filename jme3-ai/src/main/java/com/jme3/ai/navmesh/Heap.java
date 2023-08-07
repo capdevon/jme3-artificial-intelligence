@@ -21,21 +21,21 @@ class Heap {
     private int sessionID;
     private Vector3f goal;
 
-    int getSessionID() {
+    protected int getSessionID() {
         return sessionID;
     }
 
-    Vector3f getGoal() {
+    protected Vector3f getGoal() {
         return goal;
     }
 
-    void initialize(int sessionID, Vector3f goal) {
+    protected void initialize(int sessionID, Vector3f goal) {
         this.goal = goal;
         this.sessionID = sessionID;
         nodes.clear();
     }
 
-    void addCell(Cell pCell) {
+    protected void addCell(Cell pCell) {
         Node newNode = new Node(pCell, pCell.getTotalCost());
         nodes.add(newNode);
     }
@@ -44,7 +44,7 @@ class Heap {
      * Adjust a cell in the heap to reflect it's updated cost value. NOTE: Cells
      * may only sort up in the heap.
      */
-    void adjustCell(Cell pCell) {
+    protected void adjustCell(Cell pCell) {
         Node n = findNodeIterator(pCell);
 
         if (n != nodes.lastElement()) {
@@ -59,14 +59,14 @@ class Heap {
     /**
      * @return true if the heap is not empty
      */
-    boolean isNotEmpty() {
+    protected boolean isNotEmpty() {
         return !nodes.isEmpty();
     }
 
     /**
      * Pop the top off the heap and remove the best value for processing.
      */
-    Node getTop() {
+    protected Node getTop() {
         return (Node) nodes.deleteMin();
     }
 
@@ -74,7 +74,7 @@ class Heap {
      * Search the container for a given cell. May be slow, so don't do this
      * unless necessary.
      */
-    Node findNodeIterator(Cell pCell) {
+    protected Node findNodeIterator(Cell pCell) {
         for (Object n : nodes) {
 
             if (((Node) n).cell.equals(pCell)) {
