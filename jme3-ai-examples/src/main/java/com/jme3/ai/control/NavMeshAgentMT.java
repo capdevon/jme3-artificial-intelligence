@@ -231,16 +231,16 @@ public class NavMeshAgentMT extends AbstractControl {
      * @return The distance between the agent's position and the destination on
      * the current path. (Read Only)
      */
-    public float remainingDistance() {
-        float pathLength = 0f;
-        ArrayList<Waypoint> corners = nav.getPath().getWaypoints();
-        for (int j = 0; j < corners.size(); j++) {
-            Vector3f a = (j == 0) ? spatial.getWorldTranslation() : corners.get(j - 1).getPosition();
-            Vector3f b = corners.get(j).getPosition();
-            pathLength += a.distance(b);
-        }
-        return pathLength;
-    }
+//    public float remainingDistance() {
+//        float pathLength = 0f;
+//        ArrayList<Waypoint> corners = nav.getPath().getWaypoints();
+//        for (int j = 0; j < corners.size(); j++) {
+//            Vector3f a = (j == 0) ? spatial.getWorldTranslation() : corners.get(j - 1).getPosition();
+//            Vector3f b = corners.get(j).getPosition();
+//            pathLength += a.distance(b);
+//        }
+//        return pathLength;
+//    }
     
     /**
      * @return Corner points of the path. (Read Only)
