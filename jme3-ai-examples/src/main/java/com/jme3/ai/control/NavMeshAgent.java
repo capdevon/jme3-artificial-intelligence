@@ -57,25 +57,16 @@ public class NavMeshAgent extends AbstractControl {
      * @param mesh
      */
     public NavMeshAgent(Mesh mesh) {
-        this(mesh, null);
-    }
-    
-    /**
-     * Instantiate a NavMeshAgent.
-     * @param mesh
-     * @param pathViewer
-     */
-    public NavMeshAgent(Mesh mesh, PathViewer pathViewer) {
         this.navMesh = new NavMesh(mesh);
         this.nav = new NavMeshPathfinder(navMesh);
         this.nav.setEntityRadius(radius);
-        this.pathViewer = pathViewer;
     }
 
     @Override
     public void setSpatial(Spatial sp) {
         super.setSpatial(sp);
         if (spatial != null) {
+            this.pathViewer = spatial.getControl(PathViewer.class);
             this.bcc = spatial.getControl(BetterCharacterControl.class);
             Objects.requireNonNull(bcc, "BetterCharacterControl not found: " + spatial);
         }
@@ -179,9 +170,6 @@ public class NavMeshAgent extends AbstractControl {
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        if (pathViewer != null) {
-            pathViewer.show(rm, vp);
-        }
     }
     
     /**

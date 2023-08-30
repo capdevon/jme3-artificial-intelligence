@@ -13,13 +13,14 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.shape.Curve;
 
 /**
  *
  * @author capdevon
  */
-public class PathViewer {
+public class PathViewer extends AbstractControl {
 
     // Asset manager
     private AssetManager assetManager;
@@ -68,11 +69,14 @@ public class PathViewer {
         spline.clearControlPoints();
         debugNode.detachAllChildren();
     }
-
-    /**
-     * Render all the debug geometries to the specified view port.
-     */
-    public void show(RenderManager rm, ViewPort vp) {
+    
+    @Override
+    protected void controlUpdate(float tpf) {
+    }
+    
+    @Override
+    protected void controlRender(RenderManager rm, ViewPort vp) {
+        // Render all the debug geometries to the specified view port.
         debugNode.updateLogicalState(0f);
         debugNode.updateGeometricState();
         rm.renderScene(debugNode, vp);
