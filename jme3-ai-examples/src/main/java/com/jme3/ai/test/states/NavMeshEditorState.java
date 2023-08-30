@@ -1,6 +1,7 @@
 package com.jme3.ai.test.states;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -16,6 +17,7 @@ import com.jme3.ai.navmesh.gen.NavMeshBuildSettings;
 import com.jme3.ai.navmesh.gen.NavMeshBuilder;
 import com.jme3.ai.navmesh.gen.NavMeshDebugRenderer;
 import com.jme3.ai.navmesh.gen.NavMeshExporter;
+import com.jme3.ai.navmesh.gen.NavMeshProperties;
 import com.jme3.app.Application;
 import com.jme3.math.Vector2f;
 import com.jme3.renderer.RenderManager;
@@ -78,14 +80,6 @@ public class NavMeshEditorState extends MyBaseState {
         NavMeshBuildSettings nmSettings = new NavMeshBuildSettings();
         nmSettings.setCellSize(.5f);
         nmSettings.setCellHeight(.8f);
-//        try {
-//            String dirName = System.getProperty("user.dir") + "/src/main/resources/Scenes";
-//            String fileName = "navmesh.properties";
-//            nmSettings = NavMeshProperties.fromFile(new File(dirName, fileName));
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
 
         container = new Container();
         container.setLocalTranslation(10, screenSize.y - 10, 1);
@@ -118,7 +112,11 @@ public class NavMeshEditorState extends MyBaseState {
         
         Button button = container.addChild(new Button("Bake NavMesh"));
         button.addClickCommands(source -> {
-            generateNavMesh(nmSettings);
+            try {
+                generateNavMesh(nmSettings);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         });
         
         return container;
@@ -126,8 +124,9 @@ public class NavMeshEditorState extends MyBaseState {
 
     /**
      * creates the NavMesh
+     * @throws IOException 
      */
-    public void generateNavMesh(NavMeshBuildSettings nmSettings) {
+    public void generateNavMesh(NavMeshBuildSettings nmSettings) throws IOException {
 
         navMeshRenderer.clear();
 
@@ -145,10 +144,10 @@ public class NavMeshEditorState extends MyBaseState {
             logger.log(Level.INFO, ReflectionToStringBuilder.toString(data, ToStringStyle.MULTI_LINE_STYLE));
             
             if (autoSave) {
-                Path dir = Paths.get("src/main/resources", "Scenes", "NavMesh");
-                File file = new File(dir.toFile(), "NavMesh.j3o");
                 NavMeshExporter exporter = new NavMeshExporter(assetManager);
-                exporter.save(navMesh, file);
+                exporter.save(navMesh, makeFile("NavMesh.j3o"));
+                
+                NavMeshProperties.save(nmSettings, makeFile("NavMeshBuildSettings.properties"));
             }
 
             navMeshRenderer.drawNavMesh(navMesh);
@@ -156,6 +155,11 @@ public class NavMeshEditorState extends MyBaseState {
         } else {
             logger.log(Level.SEVERE, "NavMesh generation failed!");
         }
+    }
+    
+    private File makeFile(String fileName) {
+        Path dir = Paths.get("src/main/resources", "Scenes", "NavMesh");
+        return new File(dir.toFile(), fileName);
     }
     
     @Override

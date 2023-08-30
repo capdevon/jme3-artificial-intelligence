@@ -173,7 +173,9 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
         rootNode.attachChild(player);
         
         PathViewer pathViewer = new PathViewer(assetManager);
-        agent = new NavMeshAgentMT(navMesh, pathViewer);
+        player.addControl(pathViewer);
+        
+        agent = new NavMeshAgentMT(navMesh);
         agent.setSpeed(5f);
         player.addControl(agent);
 

@@ -59,15 +59,15 @@ public class Test_NavMesh extends SimpleApplication {
 
         Node scene = (Node) assetManager.loadModel("Models/navtest.j3o");
 
-        NavMeshBuildSettings nmSettings = null;
+        NavMeshBuildSettings nmSettings = new NavMeshBuildSettings();
         try {
             String dirName = "src/main/resources/Scenes";
             String fileName = "navmesh.properties";
             File file = new File(dirName, fileName);
-            nmSettings = NavMeshProperties.fromFile(file);
+            nmSettings = NavMeshProperties.load(file);
 
         } catch (IOException ex) {
-            throw new RuntimeException(ex);
+            ex.printStackTrace();
         }
 
         nmSettings.setCellSize(0.15f);
