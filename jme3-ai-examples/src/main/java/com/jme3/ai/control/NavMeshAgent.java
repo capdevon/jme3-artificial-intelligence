@@ -287,6 +287,18 @@ public class NavMeshAgent extends AbstractControl {
     public void setStopped(boolean stopped) {
         this.stopped = stopped;
     }
+    
+    public boolean isUpdateRotation() {
+        return updateRotation;
+    }
+
+    /**
+     * Should the agent update the transform orientation?
+     * @param updateRotation
+     */
+    public void setUpdateRotation(boolean updateRotation) {
+        this.updateRotation = updateRotation;
+    }
 
     public boolean hasPath() {
         return hasPath;
