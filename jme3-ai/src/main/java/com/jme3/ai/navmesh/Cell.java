@@ -125,7 +125,7 @@ public class Cell implements Savable {
     /**
      * For serialization only. Do not use.
      */
-    public Cell() {
+    protected Cell() {
     }
 
     public Cell(Vector3f pointA, Vector3f pointB, Vector3f pointC) {
@@ -723,26 +723,26 @@ public class Cell implements Savable {
      * Return a mesh representation of this polygon (triangle)
      */
     public Mesh getDebugMesh() {
-        Mesh m = new Mesh();
-        m.setBuffer(Type.Position, 3, new float[] { 
+        Mesh mesh = new Mesh();
+        mesh.setBuffer(Type.Position, 3, new float[] { 
                 vertices[0].x, vertices[0].y, vertices[0].z, 
                 vertices[1].x, vertices[1].y, vertices[1].z, 
                 vertices[2].x, vertices[2].y, vertices[2].z });
         
         // the TexCoord are wrong, but we render wire/unshaded so it doesn't matter
-        m.setBuffer(Type.TexCoord, 2, new float[] { 
+        mesh.setBuffer(Type.TexCoord, 2, new float[] { 
                 0, 0, 
                 0.5f, 1, 
                 1, 1 });
         
-        m.setBuffer(Type.Normal, 3, new float[] { 
+        mesh.setBuffer(Type.Normal, 3, new float[] { 
                 0, 0, 1, 
                 0, 0, 1, 
                 0, 0, 1 });
         
-        m.setBuffer(Type.Index, 3, new short[]{0, 1, 2});
-        m.updateBound();
-        return m;
+        mesh.setBuffer(Type.Index, 3, new short[]{0, 1, 2});
+        mesh.updateBound();
+        return mesh;
     }
     
     @Override
