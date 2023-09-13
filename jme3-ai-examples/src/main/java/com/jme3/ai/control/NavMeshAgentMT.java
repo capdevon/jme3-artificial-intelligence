@@ -44,12 +44,6 @@ public class NavMeshAgentMT extends AbstractControl {
     private final Quaternion lookRotation = new Quaternion();
     private float radius = 1f;
 
-    private boolean hasPath;
-    // Is a path in the process of being computed but not yet ready? (Read Only)
-    private boolean pathPending;
-    private boolean pathChanged;
-    private boolean stopped = false;
-
     // Stop within this distance from the target position.
     private float stoppingDistance = .25f;
     // Maximum movement speed when following a path.
@@ -58,6 +52,12 @@ public class NavMeshAgentMT extends AbstractControl {
     private float angularSpeed = 6;
     // Should the agent update the transform orientation?
     private boolean updateRotation = true;
+    
+    // Is a path in the process of being computed but not yet ready? (Read Only)
+    private boolean pathPending;
+    private boolean pathChanged;
+    private boolean hasPath;
+    private boolean stopped = false;
 
     /**
      * Instantiate a NavMeshAgent.
@@ -101,10 +101,12 @@ public class NavMeshAgentMT extends AbstractControl {
             return;
         }
 
-        /**
-         * getNextWayPoint will return always the same waypoint until we
-         * manually advance to the next
-         */
+        updateMovement(tpf);
+    }
+
+    private void updateMovement(float tpf) {
+        // getNextWayPoint will return always the same waypoint until we
+        // manually advance to the next
         Path.Waypoint wayPoint = nav.getNextWaypoint();
 
         if (wayPoint != null) {
@@ -154,10 +156,9 @@ public class NavMeshAgentMT extends AbstractControl {
     
     private void calculatePath() {
         if (targetPos != null) {
-
-            nav.clearPath();
             pathPending = true;
-
+            
+            nav.clearPath();
             nav.setPosition(spatial.getWorldTranslation());
             nav.warpInside(targetPos);
 

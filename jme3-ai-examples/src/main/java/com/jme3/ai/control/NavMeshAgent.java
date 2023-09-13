@@ -39,10 +39,6 @@ public class NavMeshAgent extends AbstractControl {
     private NavMeshPathfinder nav;
     private PathViewer pathViewer;
     
-    private boolean hasPath;
-    private boolean pathChanged;
-    private boolean stopped = false;
-    
     // Stop within this distance from the target position.
     private float stoppingDistance = .25f;
     // Maximum movement speed when following a path.
@@ -52,6 +48,10 @@ public class NavMeshAgent extends AbstractControl {
     // Should the agent update the transform orientation?
     private boolean updateRotation = true;
 
+    private boolean pathChanged;
+    private boolean hasPath;
+    private boolean stopped = false;
+    
     /**
      * Instantiate a NavMeshAgent.
      * @param mesh
@@ -85,10 +85,12 @@ public class NavMeshAgent extends AbstractControl {
             return;
         }
 
-        /**
-         * getNextWayPoint will return always the same waypoint until we manually
-         * advance to the next
-         */
+        updateMovement(tpf);
+    }
+
+    private void updateMovement(float tpf) {
+        // getNextWayPoint will return always the same waypoint until we
+        // manually advance to the next
         Waypoint wayPoint = nav.getNextWaypoint();
 
         if (wayPoint != null) {
