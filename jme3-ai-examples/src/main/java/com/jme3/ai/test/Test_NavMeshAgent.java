@@ -23,6 +23,8 @@ import com.jme3.anim.util.AnimMigrationUtils;
 import com.jme3.app.DebugKeysAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
+import com.jme3.app.state.ConstantVerifierState;
+import com.jme3.audio.AudioListenerState;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.CollisionShape;
@@ -94,7 +96,9 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
 
     public Test_NavMeshAgent() {
         super(new StatsAppState(),
-                new DebugKeysAppState());
+                new AudioListenerState(),
+                new DebugKeysAppState(),
+                new ConstantVerifierState());
     }
 
     private BulletAppState physics;
