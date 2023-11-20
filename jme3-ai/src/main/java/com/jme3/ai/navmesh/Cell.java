@@ -28,11 +28,12 @@ public class Cell implements Savable {
     private static final int VERT_A = 0;
     private static final int VERT_B = 1;
     private static final int VERT_C = 2;
+    
     private static final int SIDE_AB = 0;
     private static final int SIDE_BC = 1;
     private static final int SIDE_CA = 2;
 
-    public enum PathResult {
+    enum PathResult {
         /**
          * The path does not cross this cell
          */
@@ -47,7 +48,7 @@ public class Cell implements Savable {
         ExitingCell
     }
 
-    public class ClassifyResult {
+    class ClassifyResult {
 
         int side = 0;
         Cell cell = null;
@@ -200,61 +201,6 @@ public class Cell implements Savable {
     }
 
     /**
-     * Navigation Mesh is created as a pool of raw cells. The cells are then
-     * compared against each other to find common edges and create links.
-     * This routine is called from a potentially adjacent cell to test if
-     * a link should exist between the two.
-     *
-     * @param pointA
-     * @param pointB
-     * @param caller
-     * @param epsilon
-     * @return
-     */
-    boolean requestLink(Vector3f pointA, Vector3f pointB, Cell caller, float epsilon) {
-        // return true if we share the two provided vertices with the calling
-        // cell.
-        if (vertices[VERT_A].distanceSquared(pointA) <= epsilon) {
-            if (vertices[VERT_B].distanceSquared(pointB) <= epsilon) {
-                links[SIDE_AB] = caller;
-                return true;
-            } else if (vertices[VERT_C].distanceSquared(pointB) <= epsilon) {
-                links[SIDE_CA] = caller;
-                return true;
-            }
-        } else if (vertices[VERT_B].distanceSquared(pointA) <= epsilon) {
-            if (vertices[VERT_A].equals(pointB)) {
-                links[SIDE_AB] = caller;
-                return true;
-            } else if (vertices[VERT_C].distanceSquared(pointB) <= epsilon) {
-                links[SIDE_BC] = caller;
-                return true;
-            }
-        } else if (vertices[VERT_C].distanceSquared(pointA) <= epsilon) {
-            if (vertices[VERT_A].distanceSquared(pointB) <= epsilon) {
-                links[SIDE_CA] = caller;
-                return true;
-            } else if (vertices[VERT_B].distanceSquared(pointB) <= epsilon) {
-                links[SIDE_BC] = caller;
-                return true;
-            }
-        }
-
-        // we are not adjacent to the calling cell
-        return false;
-    }
-
-    /**
-     * Sets a link to the calling cell on the enumerated edge.
-     *
-     * @param side
-     * @param cell
-     */
-    private void setLink(int side, Cell cell) {
-        links[side] = cell;
-    }
-
-    /**
      * Uses the X and Z information of the vector to calculate Y on the cell plane
      * 
      * @param point
@@ -318,7 +264,7 @@ public class Cell implements Savable {
         return cellPlane.getNormal();
     }
 
-    Cell getLink(int side) {
+    public Cell getLink(int side) {
         return links[side];
     }
 
@@ -342,11 +288,11 @@ public class Cell implements Savable {
         return arrivalWall;
     }
 
-    public float getWallLength(int side) {
+    float getWallLength(int side) {
         return wallDistances[side];
     }
 
-    public Vector3f getWallMidpoint(int side) {
+    Vector3f getWallMidpoint(int side) {
         return wallMidpoints[side];
     }
 
@@ -365,9 +311,9 @@ public class Cell implements Savable {
      * In either case PointOfIntersection will contain the point where the path
      * intersected with the wall of the cell if it is provided by the caller.
      */
-    public ClassifyResult classifyPathToCell(Line2D motionPath) {
+    ClassifyResult classifyPathToCell(Line2D motionPath) {
         int interiorCount = 0;
-        ClassifyResult result = new ClassifyResult();
+        ClassifyResult cResult = new ClassifyResult();
 
         // Check our MotionPath against each of the three cell walls
         for (int i = 0; i < 3; ++i) {
@@ -389,17 +335,17 @@ public class Cell implements Savable {
                 if (sides[i].getSide(motionPath.getPointA(), 0.0f) != Line2D.PointSide.Left) {
                     // Check to see if we intersect the wall
                     // using the Intersection function of Line2D
-                    Line2D.LineIntersect intersectResult = motionPath.intersect(sides[i], result.intersection);
+                    Line2D.LineIntersect intersectResult = motionPath.intersect(sides[i], cResult.intersection);
 
                     if (intersectResult == Line2D.LineIntersect.SegmentsIntersect 
                             || intersectResult == Line2D.LineIntersect.ABisectsB) {
                         // record the link to the next adjacent cell
                         // (or NULL if no attachment exists)
                         // and the enumerated ID of the side we hit.
-                        result.cell = links[i];
-                        result.side = i;
-                        result.result = PathResult.ExitingCell;
-                        return result;
+                        cResult.cell = links[i];
+                        cResult.side = i;
+                        cResult.result = PathResult.ExitingCell;
+                        return cResult;
 
                         // pNextCell = m_Link[i];
                         // Side = i;
@@ -420,13 +366,13 @@ public class Cell implements Savable {
         // That means it is located within this triangle, and this is our ending
         // cell.
         if (interiorCount == 3) {
-            result.result = PathResult.EndingCell;
-            return result;
+            cResult.result = PathResult.EndingCell;
+            return cResult;
             // return (PATH_RESULT.ENDING_CELL);
         }
         // We only reach here is if the MotionPath does not intersect the cell
         // at all.
-        return result;
+        return cResult;
         // return (PATH_RESULT.NO_RELATIONSHIP);
     }
 
@@ -490,7 +436,7 @@ public class Cell implements Savable {
             }
 
             distance = Math.abs(distance);
-            distance = (epsilon > distance ? epsilon : distance);
+            distance = (epsilon > distance) ? epsilon : distance;
 
             // this point needs adjustment
             Vector2f normal = sides[sideNumber].getNormal();
@@ -532,19 +478,19 @@ public class Cell implements Savable {
         // create a motion path from the center of the cell to our point
         Line2D testPath = new Line2D(new Vector2f(center.x, center.z), point);
 
-        ClassifyResult result = classifyPathToCell(testPath);
+        ClassifyResult cResult = classifyPathToCell(testPath);
         // compare this path to the cell.
 
-        if (result.result == PathResult.ExitingCell) {
+        if (cResult.result == PathResult.ExitingCell) {
             Vector2f pathDirection = new Vector2f(
-                    result.intersection.x - center.x, 
-                    result.intersection.y - center.z);
+                    cResult.intersection.x - center.x, 
+                    cResult.intersection.y - center.z);
             pathDirection = pathDirection.mult(0.9f);
             point.x = center.x + pathDirection.x;
             point.y = center.z + pathDirection.y;
             return true;
             
-        } else if (result.result == PathResult.NoRelationship) {
+        } else if (cResult.result == PathResult.NoRelationship) {
             point.x = center.x;
             point.y = center.z;
             return true;
@@ -693,6 +639,61 @@ public class Cell implements Savable {
 //        return vec;
 //    }
     
+    /**
+     * Navigation Mesh is created as a pool of raw cells. The cells are then
+     * compared against each other to find common edges and create links.
+     * This routine is called from a potentially adjacent cell to test if
+     * a link should exist between the two.
+     *
+     * @param pointA
+     * @param pointB
+     * @param caller
+     * @param epsilon
+     * @return
+     */
+    private boolean requestLink(Vector3f pointA, Vector3f pointB, Cell caller, float epsilon) {
+        // return true if we share the two provided vertices with the calling
+        // cell.
+        if (vertices[VERT_A].distanceSquared(pointA) <= epsilon) {
+            if (vertices[VERT_B].distanceSquared(pointB) <= epsilon) {
+                links[SIDE_AB] = caller;
+                return true;
+            } else if (vertices[VERT_C].distanceSquared(pointB) <= epsilon) {
+                links[SIDE_CA] = caller;
+                return true;
+            }
+        } else if (vertices[VERT_B].distanceSquared(pointA) <= epsilon) {
+            if (vertices[VERT_A].equals(pointB)) {
+                links[SIDE_AB] = caller;
+                return true;
+            } else if (vertices[VERT_C].distanceSquared(pointB) <= epsilon) {
+                links[SIDE_BC] = caller;
+                return true;
+            }
+        } else if (vertices[VERT_C].distanceSquared(pointA) <= epsilon) {
+            if (vertices[VERT_A].distanceSquared(pointB) <= epsilon) {
+                links[SIDE_CA] = caller;
+                return true;
+            } else if (vertices[VERT_B].distanceSquared(pointB) <= epsilon) {
+                links[SIDE_BC] = caller;
+                return true;
+            }
+        }
+
+        // we are not adjacent to the calling cell
+        return false;
+    }
+
+    /**
+     * Sets a link to the calling cell on the enumerated edge.
+     *
+     * @param side
+     * @param cell
+     */
+    private void setLink(int side, Cell cell) {
+        links[side] = cell;
+    }
+    
     void checkAndLink(Cell other, float epsilon) {
         if (getLink(Cell.SIDE_AB) == null
                 && other.requestLink(getVertex(0), getVertex(1), this, epsilon)) {
@@ -705,8 +706,22 @@ public class Cell implements Savable {
             setLink(Cell.SIDE_CA, other);
         }
     }
+    
+    /**
+     * Remove links from neighbor cells to this cell so
+     * path finder will never find path trough this cell.
+     * (Remove this cell from Navigation Mesh).
+     */
+    public void unLink() {
+        for (int i = 0; i < links.length; i++) {
+            Cell neighbor = links[i];
+            if (neighbor != null) {
+                neighbor.unLink(this);
+            }
+        }
+    }
 
-    void unLink(Cell c) {
+    private void unLink(Cell c) {
         if (c == links[0]) {
             links[0] = null;
             c.unLink(this);
