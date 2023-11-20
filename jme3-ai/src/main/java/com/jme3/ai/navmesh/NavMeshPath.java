@@ -26,7 +26,7 @@ public class NavMeshPath {
      * @param startPoint
      * @param startCell
      */
-    protected void startPath(Vector3f startPoint, Cell startCell) {
+    void startPath(Vector3f startPoint, Cell startCell) {
         Waypoint start = new Waypoint(startPoint, startCell);
         // setup the waypoint list with our start and end points
         waypointList.clear();
@@ -39,27 +39,27 @@ public class NavMeshPath {
      * @param endPoint
      * @param endCell
      */
-    protected void endPath(Vector3f endPoint, Cell endCell) {
+    void endPath(Vector3f endPoint, Cell endCell) {
         Waypoint end = new Waypoint(endPoint, endCell);
         // cap the waypoint path with the last endpoint
         waypointList.add(end);
         nextWaypoint = getFirst();
     }
-
-    public Waypoint getFirst() {
-        return waypointList.get(0);
-    }
-
-    public Waypoint getLast() {
-        return waypointList.get(waypointList.size() - 1);
-    }
     
     /**
      * Adds a new waypoint to the end of the list
      */
-    public void addWaypoint(Vector3f point, Cell cell) {
+    void addWaypoint(Vector3f point, Cell cell) {
         Waypoint waypoint = new Waypoint(point, cell);
         waypointList.add(waypoint);
+    }
+
+    protected Waypoint getFirst() {
+        return waypointList.get(0);
+    }
+
+    protected Waypoint getLast() {
+        return waypointList.get(waypointList.size() - 1);
     }
 
     public List<Waypoint> getWaypoints() {
