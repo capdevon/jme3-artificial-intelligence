@@ -79,9 +79,45 @@ public class NavMesh implements Savable {
         cell.computeHeightOnCell(point);
         return point;
     }
+    
+    /**
+     * Finds the nearest point based on the NavMesh within a specified range.
+     * 
+     * @param sourcePos   The origin of the sample query.
+     * @param result      Holds the properties of the resulting location
+     * @param maxDistance Sample within this distance from sourcePosition.
+     * @return bool True if the nearest point is found.
+     */
+    public boolean samplePosition(Vector3f sourcePos, Vector3f result, float maxDistance) {
+        
+        result.set(Vector3f.NAN);
+        boolean found = false;
+        
+        Cell cell = findClosestCell(sourcePos, maxDistance);
+        if (cell != null) {
+            //snapPointToCell(cell, sourcePos);
+            cell.computeHeightOnCell(sourcePos);
+            result.set(sourcePos);
+            found = true;
+        }
+        
+        return found;
+    }
+    
+    /**
+     * Find the closest cell on the mesh to the given point.
+     */
+    public Cell findClosestCell(Vector3f point) {
+        float maxDistance = Float.MAX_VALUE;
+        return findClosestCell(point, maxDistance);
+    }
 
     /**
      * Find the closest cell on the mesh to the given point.
+     * 
+     * @param sourcePos
+     * @param maxDistance
+     * @return
      */
     public Cell findClosestCell(Vector3f sourcePos, float maxDistance) {
 
@@ -130,14 +166,6 @@ public class NavMesh implements Savable {
         return closestCell;
     }
     
-    /**
-     * Find the closest cell on the mesh to the given point.
-     */
-    public Cell findClosestCell(Vector3f point) {
-        float maxDistance = Float.MAX_VALUE;
-        return findClosestCell(point, maxDistance);
-    }
-
     /**
      * Link all the cells that are in our pool
      */
