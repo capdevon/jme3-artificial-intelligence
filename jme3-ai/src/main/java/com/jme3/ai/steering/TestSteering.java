@@ -497,6 +497,7 @@ public class TestSteering extends SimpleApplication {
      * Just implements some of the required methods to make this test case easier.
      */
     private abstract class SimpleControl extends AbstractControl {
+
         @Override
         protected void controlRender(RenderManager rm, ViewPort vp) {
         }
