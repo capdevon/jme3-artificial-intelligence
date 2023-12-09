@@ -21,11 +21,11 @@ public class Pursuit implements Behaviour {
         
         // calculate speed difference to see how far ahead we need to leed
         float speedDiff = targetSpeed - speed;
-        float desiredSpeed = (targetSpeed + speedDiff)*tpf;
+        float desiredSpeed = (targetSpeed + speedDiff) * tpf;
         Vector3f projectedLocation = targetLocation.add(targetVelocity.mult(desiredSpeed));
-        Vector3f desierdVel = projectedLocation.subtract(location).normalize().mult(speed);
-        Vector3f steering = desierdVel.subtract(velocity);
-        
+        Vector3f desiredVel = projectedLocation.subtract(location).normalize().mult(speed);
+        Vector3f steering = desiredVel.subtract(velocity);
+
         return steering;
     }
 }

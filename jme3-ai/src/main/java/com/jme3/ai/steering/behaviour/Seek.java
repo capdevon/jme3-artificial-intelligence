@@ -14,8 +14,8 @@ public class Seek implements Behaviour {
     public Vector3f calculateForce(Vector3f location, Vector3f velocity, 
                                     float speed, Vector3f target) {
         
-        Vector3f desierdVel = target.subtract(location).normalize().mult(speed);
-        Vector3f steering = desierdVel.subtract(velocity);
+        Vector3f desiredVel = target.subtract(location).normalize().mult(speed);
+        Vector3f steering = desiredVel.subtract(velocity);
         
         return steering;
     }

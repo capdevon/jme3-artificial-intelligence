@@ -31,9 +31,9 @@ public class Separation implements Behaviour {
         Vector3f steering = new Vector3f();
         for (Obstacle obstacle : neighbours) {
             Vector3f loc = obstacle.getLocation().subtract(location);
-            float len2 = loc.lengthSquared();
+            float sqDistance = loc.lengthSquared();
             loc.normalizeLocal();
-            steering.addLocal(loc.negate().mult(1f / len2));
+            steering.addLocal(loc.negate().mult(1f / sqDistance));
         }
 
         return steering;

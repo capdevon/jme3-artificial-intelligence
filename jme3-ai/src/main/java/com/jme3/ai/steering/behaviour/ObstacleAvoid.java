@@ -32,34 +32,36 @@ import com.jme3.ai.steering.Obstacle;
  */
 public class ObstacleAvoid implements Behaviour {
     
-    public Vector3f calculateForce(Vector3f location, Vector3f velocity, float collisionRadius,
-                                    float speed, float turnSpeed, float tpf,
-                                    List<Obstacle> obstacles) {
+    public Vector3f calculateForce(Vector3f location, Vector3f velocity, 
+            float collisionRadius, float speed,
+            float turnSpeed, float tpf, 
+            List<Obstacle> obstacles) {
         
         // a turn force less than the speed will increase the range of the
-        // collision cylinder. If the turn force is larger than the speed, 
+        // collision cylinder. If the turn force is larger than the speed,
         // then the cylinder. This is just a rough, linear, approximation
         // of the distance needed to avoid a collision.
-        float cautionRange = speed/turnSpeed * tpf;
-        
+        float cautionRange = speed / turnSpeed * tpf;
+
         Plane plane = new Plane(velocity, 1);
-        
+
         float r1 = cautionRange + collisionRadius;
         // assuming obstacles are ordered from closest to farthest
         for (Obstacle obstacle : obstacles) {
             Vector3f loc = obstacle.getLocation().subtract(location);
-            
+
             if (plane.whichSide(loc) != Side.Positive)
                 continue; // if it is behind, ignore it
-            
+
             // if it is at least in the radius of the collision cylinder
-            if (loc.lengthSquared() < (r1+obstacle.getRadius())*(r1+obstacle.getRadius()) ) {
+            if (loc.lengthSquared() < (r1 + obstacle.getRadius()) * (r1 + obstacle.getRadius())) {
                 // check cylinder collision
-                
-                // Project onto the back-plane(defined using the velocity vector as the normal for the plane)
+
+                // Project onto the back-plane(defined using the velocity vector as the normal
+                // for the plane)
                 // and test the radius width intersection
                 Vector3f projPoint = plane.getClosestPoint(loc);
-                if (projPoint.lengthSquared() < (collisionRadius+obstacle.getRadius())*(collisionRadius+obstacle.getRadius())) {
+                if (projPoint.lengthSquared() < (collisionRadius + obstacle.getRadius()) * (collisionRadius + obstacle.getRadius())) {
                     // we have a collision.
                     // negate the side-up projection we used to check the collision
                     // and use that for steering

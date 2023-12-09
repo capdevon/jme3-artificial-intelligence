@@ -12,11 +12,11 @@ import com.jme3.math.Vector3f;
 public class Flee implements Behaviour {
     
     public Vector3f calculateForce(Vector3f location, Vector3f velocity, 
-                                    float speed, Vector3f target) {
-        
-        Vector3f desierdVel = target.subtract(location).normalize().mult(speed);
-        Vector3f steering = desierdVel.subtract(velocity).negate(); // negate flee
-        
+            float speed, Vector3f target) {
+
+        Vector3f desiredVel = target.subtract(location).normalize().mult(speed);
+        Vector3f steering = desiredVel.subtract(velocity).negate(); // negate flee
+
         return steering;
     }
 }
