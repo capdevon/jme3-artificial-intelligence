@@ -54,7 +54,7 @@ dependencies {
     runtimeOnly    'org.jmonkeyengine:jme3-plugins:' + jmeVersion
     
     // Physics Engine
-    implementation 'com.github.stephengold:Minie:7.7.0+big3'
+    implementation 'com.github.stephengold:Minie:7.8.1+big3'
 
     // select one version of LWJGL
     //runtimeOnly 'org.jmonkeyengine:jme3-lwjgl:' + jmeVersion  // LWJGL 2.x
@@ -74,7 +74,6 @@ dependencies {
         
     compile files("libs/jME3-ai.jar")
     compile files("libs/cai-nmgen-0.2.0.jar")
-    
 }
 
 // cleanup tasks
