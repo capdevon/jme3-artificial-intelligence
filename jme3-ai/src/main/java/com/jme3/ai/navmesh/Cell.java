@@ -1,12 +1,15 @@
 package com.jme3.ai.navmesh;
 
 import java.io.IOException;
+import java.util.Objects;
+import java.util.UUID;
 
 import com.jme3.export.InputCapsule;
 import com.jme3.export.JmeExporter;
 import com.jme3.export.JmeImporter;
 import com.jme3.export.OutputCapsule;
 import com.jme3.export.Savable;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
@@ -122,6 +125,11 @@ public class Cell implements Savable {
      * the distances between each wall midpoint of sides (0-1, 1-2, 2-0)
      */
     private float[] wallDistances = new float[3];
+    
+    /**
+     * a universally unique identifier.
+     */
+    private UUID uuid = UUID.randomUUID();
     
     /**
      * For serialization only. Do not use.
@@ -320,8 +328,7 @@ public class Cell implements Savable {
             // Classify the MotionPath endpoints as being either ON_LINE,
             // or to its LEFT_SIDE or RIGHT_SIDE.
             // Since our triangle vertices are in clockwise order,
-            // we know that points to the right of each line are inside the
-            // cell.
+            // we know that points to the right of each line are inside the cell.
             // Points to the left are outside.
             // We do this test using the ClassifyPoint function of Line2D
 
@@ -404,16 +411,12 @@ public class Cell implements Savable {
         // redirect our motion path along the new reflected direction
         motionPath.setPointB(motionPath.getPointA().add(motionVector));
 
-        //
         // Make sure starting point of motion path is within the cell
-        //
         Vector2f newPoint = motionPath.getPointA();
         forcePointToCellColumn(newPoint);
         motionPath.setPointA(newPoint);
 
-        //
         // Make sure destination point does not intersect this wall again
-        //
         newPoint = motionPath.getPointB();
         forcePointToWallInterior(sideNumber, newPoint);
         motionPath.setPointB(newPoint);
@@ -523,7 +526,7 @@ public class Cell implements Savable {
      * @param heap
      * @return
      */
-    boolean processCell(Heap heap) {
+    boolean processCell(NavHeap heap) {
         if (sessionID == heap.getSessionID()) {
             // once we have been processed, we are closed
             open = false;
@@ -554,7 +557,7 @@ public class Cell implements Savable {
      * @param arrivalCost
      * @return
      */
-    boolean queryForPath(Heap heap, Cell cell, float arrivalCost) {
+    boolean queryForPath(NavHeap heap, Cell cell, float arrivalCost) {
         if (sessionID != heap.getSessionID()) {
             // this is a new session, reset our internal data
             sessionID = heap.getSessionID();
@@ -624,20 +627,20 @@ public class Cell implements Savable {
         heuristic = goal.distance(center);
     }
 
-//    public Vector3f getRandomPoint() {
-//        float u1 = FastMath.nextRandomFloat();
-//        float u2 = FastMath.nextRandomFloat();
-//
-//        Vector2f d1 = sides[0].getDirection().mult(u1);
-//        Vector2f d2 = sides[1].getDirection().mult(u2);
-//        Vector2f ret = sides[0].getPointA().add(d1.add(d2));
-//        forcePointToCellColumn(ret);
-//        
-//        Vector3f vec = new Vector3f(ret.x, 0, ret.y);
-//        computeHeightOnCell(vec);
-//        
-//        return vec;
-//    }
+    public Vector3f getRandomPoint() {
+        float u1 = FastMath.nextRandomFloat();
+        float u2 = FastMath.nextRandomFloat();
+
+        Vector2f d1 = sides[0].getDirection().mult(u1);
+        Vector2f d2 = sides[1].getDirection().mult(u2);
+        Vector2f ret = sides[0].getPointA().add(d1.add(d2));
+        forcePointToCellColumn(ret);
+        
+        Vector3f vec = new Vector3f(ret.x, 0, ret.y);
+        computeHeightOnCell(vec);
+        
+        return vec;
+    }
     
     /**
      * Navigation Mesh is created as a pool of raw cells. The cells are then
@@ -763,6 +766,23 @@ public class Cell implements Savable {
     @Override
     public String toString() {
         return "Cell [center=" + center + "]";
+    }
+    
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Cell) {
+            Cell other = (Cell) obj;
+            return Objects.equals(this.uuid, other.uuid);
+        }
+        return false;
     }
 
     @Override
