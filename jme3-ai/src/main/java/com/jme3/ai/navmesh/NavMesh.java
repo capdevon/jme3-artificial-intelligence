@@ -179,25 +179,25 @@ public class NavMesh implements Savable {
         }
     }
 
-    private void addFace(Vector3f vertA, Vector3f vertB, Vector3f vertC) {
-        // some art programs can create linear polygons which have two or more
-        // identical vertices. This creates a poly with no surface area,
-        // which will wreak havok on our navigation mesh algorithms.
-        // We only except polygons with unique vertices.
-        if (!vertA.equals(vertB) && !vertB.equals(vertC) && !vertC.equals(vertA)) {
-            addCell(vertA, vertB, vertC);
-        } else {
-            logger.warning("Warning, Face winding incorrect!!!");
-        }
-    }
-    
     /**
      * Add a new cell, defined by the three vertices in clockwise order, to this
      * mesh.
      */
     private void addCell(Vector3f vertA, Vector3f vertB, Vector3f vertC) {
-        Cell newCell = new Cell(vertA.clone(), vertB.clone(), vertC.clone());
-        cellList.add(newCell);
+        /**
+         * Some art programs can create linear polygons with two or more identical
+         * vertices. This creates a polygon with no surface area, which interferes with
+         * navigation mesh algorithms. Only polygons with unique vertices are allowed.
+         */
+        if (!vertA.equals(vertB) && !vertB.equals(vertC) && !vertC.equals(vertA)) {
+            Vector3f a = vertA.clone();
+            Vector3f b = vertB.clone();
+            Vector3f c = vertC.clone();
+            Cell newCell = new Cell(a, b, c);
+            cellList.add(newCell);
+        } else {
+            logger.warning("Warning, incorrect face winding!");
+        }
     }
     
     public void loadFromMesh(Mesh mesh) {
@@ -211,11 +211,11 @@ public class NavMesh implements Savable {
 
         Plane up = new Plane();
         up.setPlanePoints(Vector3f.UNIT_X, Vector3f.ZERO, Vector3f.UNIT_Z);
-        up.getNormal();
 
         IndexBuffer ib = mesh.getIndexBuffer();
         FloatBuffer pb = mesh.getFloatBuffer(Type.Position);
         pb.clear();
+        
         for (int i = 0; i < mesh.getTriangleCount() * 3; i += 3) {
             int i1 = ib.get(i + 0);
             int i2 = ib.get(i + 1);
@@ -228,11 +228,11 @@ public class NavMesh implements Savable {
             Plane p = new Plane();
             p.setPlanePoints(a, b, c);
             if (up.pseudoDistance(p.getNormal()) <= 0.0f) {
-                logger.warning("Warning, normal of the plane faces downward!!!");
+                logger.warning("Warning, the normal of the plane faces downward!");
                 continue;
             }
 
-            addFace(a, b, c);
+            addCell(a, b, c);
         }
 
         linkCells();
