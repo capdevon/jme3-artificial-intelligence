@@ -10,7 +10,7 @@ package com.jme3.ai.navmesh;
  * @author TR
  * 
  */
-class Node implements Comparable<Node> {
+class NavNode implements Comparable<NavNode> {
 
     /**
      * pointer to the cell in question
@@ -21,10 +21,10 @@ class Node implements Comparable<Node> {
      */
     float cost = 0.0f;
 
-    public Node() {
+    public NavNode() {
     }
 
-    public Node(Cell cell, float cost) {
+    public NavNode(Cell cell, float cost) {
         this.cell = cell;
         this.cost = cost;
     }
@@ -38,7 +38,7 @@ class Node implements Comparable<Node> {
      *         less than, equal to, or greater than the specified object.
      */
     @Override
-    public int compareTo(Node o) {
+    public int compareTo(NavNode o) {
         if (this.cost < (o.cost)) {
             return -1;
         } else if ((this.cost > (o.cost))) {
