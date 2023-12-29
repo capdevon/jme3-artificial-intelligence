@@ -15,7 +15,7 @@ import com.jme3.ai.navmesh.util.MinHeap;
  * @author TR
  * 
  */
-class Heap {
+class NavHeap {
 
     private MinHeap nodes = new MinHeap();
     private int sessionID;
@@ -36,7 +36,7 @@ class Heap {
     }
 
     protected void addCell(Cell pCell) {
-        Node newNode = new Node(pCell, pCell.getTotalCost());
+        NavNode newNode = new NavNode(pCell, pCell.getTotalCost());
         nodes.add(newNode);
     }
 
@@ -45,7 +45,7 @@ class Heap {
      * may only sort up in the heap.
      */
     protected void adjustCell(Cell pCell) {
-        Node n = findNodeIterator(pCell);
+        NavNode n = findNodeIterator(pCell);
 
         if (n != nodes.lastElement()) {
             // update the node data
@@ -66,21 +66,21 @@ class Heap {
     /**
      * Pop the top off the heap and remove the best value for processing.
      */
-    protected Node getTop() {
-        return (Node) nodes.deleteMin();
+    protected NavNode getTop() {
+        return (NavNode) nodes.deleteMin();
     }
 
     /**
      * Search the container for a given cell. May be slow, so don't do this
      * unless necessary.
      */
-    protected Node findNodeIterator(Cell pCell) {
+    protected NavNode findNodeIterator(Cell pCell) {
         for (Object n : nodes) {
 
-            if (((Node) n).cell.equals(pCell)) {
-                return ((Node) n);
+            if (((NavNode) n).cell.equals(pCell)) {
+                return ((NavNode) n);
             }
         }
-        return (Node) nodes.lastElement();
+        return (NavNode) nodes.lastElement();
     }
 }
