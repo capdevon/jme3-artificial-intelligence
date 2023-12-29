@@ -25,7 +25,7 @@ public class NavMeshPathfinder {
      * path finding data...
      */
     private volatile int sessionID = 0;
-    private volatile Heap heap = new Heap();
+    private volatile NavHeap heap = new NavHeap();
 
     /**
      * Instantiate a <code>NavMeshPathfinder</code>
@@ -186,7 +186,7 @@ public class NavMeshPathfinder {
 
             // pop the top cell (the open cell with the lowest cost) off the
             // Heap
-            Node currentNode = heap.getTop();
+            NavNode currentNode = heap.getTop();
 
             // if this cell is our StartCell, we are done
             if (currentNode.cell.equals(startCell)) {
