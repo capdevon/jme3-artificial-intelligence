@@ -22,7 +22,7 @@ public class NavMeshQuery {
      * path finding data...
      */
     private volatile int sessionID = 0;
-    private volatile Heap heap = new Heap();
+    private volatile NavHeap heap = new NavHeap();
     
     /**
      * Instantiate a <code>NavMeshQuery</code>
@@ -192,6 +192,7 @@ public class NavMeshQuery {
                     }
                     currCell.computeHeightOnCell(newWayPoint);
                     break;
+                    
                 case LinesIntersect:
                 case ABisectsB:
                 case BBisectsA:
@@ -211,8 +212,8 @@ public class NavMeshQuery {
                         newWayPoint = new Vector3f(intersectionPoint.x, 0, intersectionPoint.y);
                     }
                     currCell.computeHeightOnCell(newWayPoint);
-
                     break;
+                    
                 case CoLinear:
                 case Parallel:
                     break;
@@ -255,7 +256,7 @@ public class NavMeshQuery {
         boolean foundPath = false;
         while (heap.isNotEmpty() && !foundPath) {
             // pop the top cell (the open cell with the lowest cost) off the Heap
-            Node currentNode = heap.getTop();
+            NavNode currentNode = heap.getTop();
             // if this cell is our StartCell, we are done
             if (currentNode.cell.equals(startCell)) {
                 foundPath = true;
@@ -311,8 +312,9 @@ public class NavMeshQuery {
         // if it is the last point, and not visible, return the previous point
         if (testPoint == navPath.getLast()) {
             if (!isInLineOfSight(vantagePoint.cell, vantagePoint.position,
-                    testPoint.position, debugInfo))
+                    testPoint.position, debugInfo)) {
                 return visibleWaypoint;
+            }
         }
         return testPoint;
     }
