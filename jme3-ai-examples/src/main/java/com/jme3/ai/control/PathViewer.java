@@ -59,8 +59,9 @@ public class PathViewer extends AbstractControl {
     public void drawPath(Path path) {
         clearPath();
         for (Waypoint wp : path.getWaypoints()) {
-            spline.addControlPoint(wp.getPosition());
-            drawSphere(wp.getPosition(), pointSize);
+            Vector3f position = wp.getPosition();
+            spline.addControlPoint(position);
+            drawSphere(position, pointSize);
         }
         drawCurve();
     }
