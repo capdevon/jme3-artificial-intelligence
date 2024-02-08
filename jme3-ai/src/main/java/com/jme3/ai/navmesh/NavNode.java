@@ -15,22 +15,19 @@ class NavNode implements Comparable<NavNode> {
     /**
      * pointer to the cell in question
      */
-    Cell cell = null;
+    protected Cell cell = null;
     /**
      * (g + h) in A* represents the cost of traveling through this cell
      */
-    float cost = 0.0f;
+    protected float cost = 0.0f;
 
-    public NavNode() {
-    }
-
-    public NavNode(Cell cell, float cost) {
+    NavNode(Cell cell, float cost) {
         this.cell = cell;
         this.cost = cost;
     }
 
     /**
-     * To compare two nodes, we compare the cost or `f' value, which is the sum of
+     * To compare two nodes, we compare the cost or 'f' value, which is the sum of
      * the g and h values defined by A*.
      *
      * @param o the Object to be compared.
