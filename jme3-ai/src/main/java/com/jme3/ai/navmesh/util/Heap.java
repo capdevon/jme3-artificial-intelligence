@@ -132,7 +132,6 @@ public abstract class Heap<T> extends Vector<T> {
         boolean b = super.add(o);
 
         for (int node = size() - 1; node > 0;) {
-            int cmp;
             int parent = (int) ((node - 1) / 2);
 
             if (cmp(node, parent) < 0) {
@@ -144,11 +143,6 @@ public abstract class Heap<T> extends Vector<T> {
 
             node = parent;
         }
-
-        //System.out.print("\nContents: ");
-        //for(int x = 0; x < size(); x++)
-        //    System.out.print(get(x) + " ");
-        //System.out.println();
 
         return b;
     }
@@ -195,7 +189,7 @@ public abstract class Heap<T> extends Vector<T> {
 
         elementData = a;
 
-        // there is some wierdo off by one error here that I cannot find...
+        // there is some weird off by one error here that I cannot find...
         //for(int x = size()-1; x > 0; x--)
         //{
         //    // swap end of heap with the root, then heapify whats

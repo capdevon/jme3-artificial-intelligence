@@ -33,7 +33,7 @@ import java.util.Comparator;
  *
  * @author Ron Weiss (ronw@ee.columbia.edu)
  */
-public class MaxHeap extends Heap
+public class MaxHeap<T> extends Heap<T>
 {
     /**
      * Creates an empty MaxHeap.
@@ -48,7 +48,7 @@ public class MaxHeap extends Heap
      *  this MaxHeap.  Otherwise rely on compareTo methods and
      *  Comparable Objects.
      */
-    public MaxHeap(Comparator c)
+    public MaxHeap(Comparator<T> c)
     {
         super(c);
     }
@@ -65,7 +65,7 @@ public class MaxHeap extends Heap
      * Create a new MaxHeap containing the elements of the given
      * Collection.
      */
-    public MaxHeap(Collection c)
+    public MaxHeap(Collection<T> c)
     {
         super(c);
     }

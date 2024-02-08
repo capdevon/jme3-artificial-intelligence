@@ -30,7 +30,7 @@ import java.util.Comparator;
  *
  * @author Ron Weiss (ronw@ee.columbia.edu)
  */
-public class MinHeap extends Heap
+public class MinHeap<T> extends Heap<T>
 {
     /**
      * Creates an empty MinHeap.
@@ -45,7 +45,7 @@ public class MinHeap extends Heap
      *  this MinHeap.  Otherwise rely on compareTo methods and
      *  Comparable Objects.
      */
-    public MinHeap(Comparator c)
+    public MinHeap(Comparator<T> c)
     {
         super(c);
     }
@@ -62,7 +62,7 @@ public class MinHeap extends Heap
      * Create a new MinHeap containing the elements of the given
      * Collection.
      */
-    public MinHeap(Collection c)
+    public MinHeap(Collection<T> c)
     {
         super(c);
     }
@@ -70,7 +70,7 @@ public class MinHeap extends Heap
     /**
      * Delete the smallest element of this MinHeap.
      */
-    public Object deleteMin()
+    public T deleteMin()
     {
         return remove(0);
     }
@@ -81,6 +81,7 @@ public class MinHeap extends Heap
      * iterate through the data stored in the heap in sorted order.
      * This is not a stable sort.
      */
+    @Override
     public void sort()
     {
         super.sort();
