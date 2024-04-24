@@ -18,6 +18,7 @@ Updated version of the jME3-ai library.
 
 ## YouTube Videos
 - [Bake NavMesh for Terrain Mesh](https://www.youtube.com/watch?v=iaoN6SmZt-8)
+- [NavMeshes, NavMeshAgents, Pathfinding](https://www.youtube.com/watch?v=uMq6LeqKwqI)
 
 ## Bug report / feature request
 The best way to report bug or feature request is [github's issues page](https://github.com/capdevon/jme3-artificial-intelligence/issues).
