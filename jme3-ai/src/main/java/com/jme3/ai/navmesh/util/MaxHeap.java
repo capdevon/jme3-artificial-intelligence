@@ -33,48 +33,45 @@ import java.util.Comparator;
  *
  * @author Ron Weiss (ronw@ee.columbia.edu)
  */
-public class MaxHeap<T> extends Heap<T>
-{
+public class MaxHeap<T> extends Heap<T> {
+    
+    /**
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates an empty MaxHeap.
      */
-    public MaxHeap()
-    {
+    public MaxHeap() {
         super();
     }
 
     /**
-     *  Use given Comparator for all comparisons between elements in
-     *  this MaxHeap.  Otherwise rely on compareTo methods and
-     *  Comparable Objects.
+     * Use given Comparator for all comparisons between elements in this MaxHeap.
+     * Otherwise rely on compareTo methods and Comparable Objects.
      */
-    public MaxHeap(Comparator<T> c)
-    {
+    public MaxHeap(Comparator<T> c) {
         super(c);
     }
 
     /**
      * Creates an empty MaxHeap with the given capacity.
      */
-    public MaxHeap(int capacity)
-    {
+    public MaxHeap(int capacity) {
         super(capacity);
     }
 
     /**
-     * Create a new MaxHeap containing the elements of the given
-     * Collection.
+     * Create a new MaxHeap containing the elements of the given Collection.
      */
-    public MaxHeap(Collection<T> c)
-    {
+    public MaxHeap(Collection<T> c) {
         super(c);
     }
 
     /**
      * Delete the largest element of this MaxHeap.
      */
-    public Object deleteMax()
-    {
+    public Object deleteMax() {
         return remove(0);
     }
 
@@ -82,8 +79,8 @@ public class MaxHeap<T> extends Heap<T>
      * Compare two Objects in this heap - wrapper around
      * compareTo/Comparator.compare
      */
-    protected int cmp(int node1, int node2)
-    {
+    @Override
+    protected int cmp(int node1, int node2) {
         return -super.cmp(node1, node2);
     }
 }
