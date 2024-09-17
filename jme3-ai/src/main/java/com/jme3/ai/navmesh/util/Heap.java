@@ -39,14 +39,21 @@ import java.util.Vector;
  * @author Ron Weiss (ronw@ee.columbia.edu)
  */
 public abstract class Heap<T> extends Vector<T> {
-    // Comparator to use to compare two elements in this Heap (if this
-    // is null, assume that all elements are Comparable)
-
+    
+    /**
+     */
+    private static final long serialVersionUID = 1L;
+    
+    /**
+     * Comparator to use to compare two elements in this Heap (if this is null,
+     * assume that all elements are Comparable)
+     */
     private Comparator<T> comp = null;
-    // Does the current instance obey the heap property?
-    // (all operations aside from sort() are guaranteed to maintain
-    // the heap property, this is just to keep track of whether or not
-    // sort() has screwed stuff up).
+    /**
+     * Does the current instance obey the heap property? (all operations aside from
+     * sort() are guaranteed to maintain the heap property, this is just to keep
+     * track of whether or not sort() has screwed stuff up).
+     */
     protected boolean isHeap = true;
 
     /**
@@ -57,9 +64,8 @@ public abstract class Heap<T> extends Vector<T> {
     }
 
     /**
-     *  Use given Comparator for all comparisons between elements in
-     *  this Heap.  Otherwise rely on compareTo methods and Comparable
-     *  Objects.
+     * Use given Comparator for all comparisons between elements in this Heap.
+     * Otherwise rely on compareTo methods and Comparable Objects.
      */
     public Heap(Comparator<T> c) {
         super();
@@ -74,8 +80,7 @@ public abstract class Heap<T> extends Vector<T> {
     }
 
     /**
-     * Create a new Heap containing the elements of the given
-     * Collection.
+     * Create a new Heap containing the elements of the given Collection.
      */
     public Heap(Collection<T> c) {
         super();
@@ -102,8 +107,8 @@ public abstract class Heap<T> extends Vector<T> {
     }
 
     /**
-     * Remove the Object o from the Heap and return true.  Returns
-     * false if o is not in the Heap (as measured by o.equals()).
+     * Remove the Object o from the Heap and return true. 
+     * Returns false if o is not in the Heap (as measured by o.equals()).
      */
     @Override
     public boolean remove(Object o) {
@@ -151,7 +156,7 @@ public abstract class Heap<T> extends Vector<T> {
      *  Add the contents of a Collection to the Heap.
      */
     @Override
-    public boolean addAll(Collection c) {
+    public boolean addAll(Collection<? extends T> c) {
         boolean b = super.addAll(c);
         rebuildHeap();
         return (b);
@@ -166,7 +171,7 @@ public abstract class Heap<T> extends Vector<T> {
      */
     public void rebuildHeap() {
         // do the whole linear time build-heap thing
-        for (int i = (int) (size() / 2); i >= 0; i--) {
+        for (int i = (size() / 2); i >= 0; i--) {
             heapify(i);
         }
 
@@ -174,17 +179,18 @@ public abstract class Heap<T> extends Vector<T> {
     }
 
     /**
-     * Perform an in place heap sort on the data stored in this heap.
-     * After calling sort, a call to this objects iterator() method
-     * will iterate through the data stored in the heap in ascending
-     * sorted order.  This is not a stable sort.
+     * Perform an in place heap sort on the data stored in this heap. After calling
+     * sort, a call to this objects iterator() method will iterate through the data
+     * stored in the heap in ascending sorted order. 
+     * This is not a stable sort.
      */
+    @SuppressWarnings("unchecked")
     public void sort() {
         Object[] a = toArray();
         if (comp == null) {
             Arrays.sort(a);
         } else {
-            Arrays.sort((T[])a, comp);
+            Arrays.sort((T[]) a, comp);
         }
 
         elementData = a;
@@ -214,6 +220,7 @@ public abstract class Heap<T> extends Vector<T> {
      * Compare two Objects in this heap - wrapper around
      * compareTo/Comparator.compare.
      */
+    @SuppressWarnings("unchecked")
     protected int cmp(int node1, int node2) {
         int c = 0;
         if (comp != null) {
