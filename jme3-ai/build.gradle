@@ -1,22 +1,28 @@
+
 plugins {
-	id 'application'
-    id 'java-library'
+    id 'java-library'  // to build JVM libraries
+    id 'maven-publish' // to publish artifacts to Maven repositories
 }
 
-description = 'jme3-ai'
+group = 'com.github.capdevon'
+version = '0.1.0'
 
 // select one source-code (JDK) option
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-// select one version of the Engine:
-ext.jmeVersion = '3.6.1-stable'
+ext {
+    jmeVersion = '3.6.1-stable'
+    
+    artifact = 'jme3-ai'
+    baseName = "${artifact}-${version}" // for artifacts
+}
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) { // compile-time options:
         options.compilerArgs << '-Xdiags:verbose'
         options.compilerArgs << '-Xlint:unchecked'
-        options.deprecation = true
+        //options.deprecation = true
         options.encoding = 'UTF-8'
     }
     tasks.withType(JavaExec) { // runtime options:
@@ -42,7 +48,6 @@ dependencies {
     implementation 'org.jmonkeyengine:jme3-core:' + jmeVersion
     implementation 'org.jmonkeyengine:jme3-desktop:' + jmeVersion
     runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmeVersion // LWJGL 3.x
-    
 }
 
 // cleanup tasks
@@ -58,4 +63,29 @@ task cleanLogs(type: Delete) {
 }
 task cleanSOs(type: Delete) {
     delete fileTree(dir: '.', include: '*.so')
+}
+
+jar {
+    archiveBaseName = project.ext.baseName
+    doLast {
+        println "using Java ${JavaVersion.current()} (${System.getProperty("java.vendor")})"
+    }
+    manifest {
+        attributes 'Created-By': "${JavaVersion.current()} (${System.getProperty("java.vendor")})"
+    }
+}
+java.withJavadocJar()
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = project.ext.artifact
+            groupId = "${group}"
+            version = "${version}"
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
 }
