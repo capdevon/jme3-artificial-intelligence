@@ -51,33 +51,33 @@ public class NavMeshQuery {
     /**
      * Calculate a path between two points and store the resulting path.
      * 
-     * @param startPosition The initial position of the path requested.
-     * @param endPosition   The final position of the path requested.
-     * @param path          The resulting path.
+     * @param sourcePos The initial position of the path requested.
+     * @param targetPos The final position of the path requested.
+     * @param path      The resulting path.
      * @return True if a complete path is found. False otherwise.
      */
-    public boolean calculatePath(Vector3f startPos, Vector3f targetPos, NavMeshPath path) {
-        return calculatePath(startPos, targetPos, path, null);
+    public boolean calculatePath(Vector3f sourcePos, Vector3f targetPos, NavMeshPath path) {
+        return calculatePath(sourcePos, targetPos, path, null);
     }
 
     /**
      * Calculate a path between two points and store the resulting path.
      * 
-     * @param startPosition The initial position of the path requested.
-     * @param endPosition   The final position of the path requested.
-     * @param path          The resulting path.
-     * @param debugInfo     The resulting debugInfo.
+     * @param sourcePos The initial position of the path requested.
+     * @param targetPos The final position of the path requested.
+     * @param path      The resulting path.
+     * @param debugInfo The resulting debugInfo.
      * @return True if a complete path is found. False otherwise.
      */
-    public boolean calculatePath(Vector3f startPos, Vector3f endPos, NavMeshPath path, DebugInfo debugInfo) {
-        
-        Vector3f spos = new Vector3f(startPos);
+    public boolean calculatePath(Vector3f sourcePos, Vector3f targetPos, NavMeshPath path, DebugInfo debugInfo) {
+
+        Vector3f spos = new Vector3f(sourcePos);
         Cell startCell = navMesh.findClosestCell(spos);
 
-        Vector3f epos = new Vector3f(endPos);
+        Vector3f epos = new Vector3f(targetPos);
         Cell endCell = navMesh.findClosestCell(epos);
         navMesh.snapPointToCell(endCell, epos);
-        
+
         return buildNavigationPath(path, startCell, spos, endCell, epos, debugInfo);
     }
 
