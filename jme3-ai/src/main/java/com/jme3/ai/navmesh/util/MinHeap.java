@@ -30,62 +30,56 @@ import java.util.Comparator;
  *
  * @author Ron Weiss (ronw@ee.columbia.edu)
  */
-public class MinHeap<T> extends Heap<T>
-{
+public class MinHeap<T> extends Heap<T> {
+    
+    /**
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * Creates an empty MinHeap.
      */
-    public MinHeap()
-    {
+    public MinHeap() {
         super();
     }
 
     /**
-     *  Use given Comparator for all comparisons between elements in
-     *  this MinHeap.  Otherwise rely on compareTo methods and
-     *  Comparable Objects.
+     * Use given Comparator for all comparisons between elements in this MinHeap.
+     * Otherwise rely on compareTo methods and Comparable Objects.
      */
-    public MinHeap(Comparator<T> c)
-    {
+    public MinHeap(Comparator<T> c) {
         super(c);
     }
 
     /**
      * Creates an empty MinHeap with the given capacity.
      */
-    public MinHeap(int capacity)
-    {
+    public MinHeap(int capacity) {
         super(capacity);
     }
 
     /**
-     * Create a new MinHeap containing the elements of the given
-     * Collection.
+     * Create a new MinHeap containing the elements of the given Collection.
      */
-    public MinHeap(Collection<T> c)
-    {
+    public MinHeap(Collection<T> c) {
         super(c);
     }
 
     /**
      * Delete the smallest element of this MinHeap.
      */
-    public T deleteMin()
-    {
+    public T deleteMin() {
         return remove(0);
     }
 
     /**
-     * Perform heap sort on the data stored in this heap.  After
-     * calling sort, a call to this objects iterator() method will
-     * iterate through the data stored in the heap in sorted order.
-     * This is not a stable sort.
+     * Perform heap sort on the data stored in this heap. After calling sort, a call
+     * to this objects iterator() method will iterate through the data stored in the
+     * heap in sorted order. This is not a stable sort.
      */
     @Override
-    public void sort()
-    {
+    public void sort() {
         super.sort();
-
         // this just so happens to maintain the min-heap property
         isHeap = true;
     }
