@@ -62,6 +62,9 @@ public class Path {
 
     /**
      * Adds a new waypoint to the end of the list
+     * 
+     * @param point
+     * @param cell
      */
     public void addWaypoint(Vector3f point, Cell cell) {
         Waypoint newPoint = new Waypoint(point, cell);
@@ -97,6 +100,7 @@ public class Path {
      * is used to smooth out irregular paths.
      * 
      * @param vantagePoint
+     * @param debugInfo
      * @return
      */
     protected Waypoint getFurthestVisibleWayPoint(Waypoint vantagePoint, DebugInfo debugInfo) {
