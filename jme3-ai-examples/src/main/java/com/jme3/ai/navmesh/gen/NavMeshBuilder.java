@@ -44,6 +44,16 @@ public class NavMeshBuilder {
     }
     
     /**
+     * Sets the timeout duration for the navigation mesh generation process.
+     * 
+     * @param timeout the length of time in milliseconds before the generation process ends.
+     *                If the process exceeds this duration, it will be terminated.
+     */
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+    
+    /**
      * Takes a list of geometries and optimizes them using
      * {@link org.critterai.nmgen.NavmeshGenerator}
      * 
@@ -87,7 +97,7 @@ public class NavMeshBuilder {
             indices[i] = ib.get(i);
         }
 
-        TriangleMesh triMesh = buildNavMeshData(positions, indices, intermediateData);
+        TriangleMesh triMesh = generateNavMesh(positions, indices, intermediateData);
         if (triMesh == null) {
             logger.log(Level.WARNING, "TriangleMesh is null.");
             return null;
@@ -109,7 +119,7 @@ public class NavMeshBuilder {
      * @param terrain the terrain to be converted
      * @return a single mesh consisting of all meshes of a Terrain
      */
-    public static Mesh terrain2mesh(Terrain terrain) {
+    static Mesh terrain2mesh(Terrain terrain) {
         float[] heightMap = terrain.getHeightMap();
         int length = heightMap.length;
         int size = (int) FastMath.sqrt(heightMap.length);
@@ -157,80 +167,76 @@ public class NavMeshBuilder {
         return mesh2;
     }
 
-    private TriangleMesh buildNavMeshData(float[] positions, int[] indices, IntermediateData intermediateData) {
-        MeshBuildRunnable runnable = new MeshBuildRunnable(positions, indices, intermediateData);
+    /**
+     * Generates a navigation mesh (TriangleMesh) using the provided vertex
+     * positions, mesh indices, and intermediate data.
+     */
+    private TriangleMesh generateNavMesh(float[] positions, int[] indices, IntermediateData navMeshData) {
+        NavMeshBuildRunnable meshBuilder = new NavMeshBuildRunnable(positions, indices, navMeshData);
         try {
-            execute(runnable, timeout);
-        } catch (TimeoutException ex) {
-            logger.log(Level.SEVERE, "NavMesh Generation timed out.", ex);
+            execute(meshBuilder, timeout);
+        } catch (NavMeshTimeoutException ex) {
+            logger.log(Level.SEVERE, "NavMesh generation timed out.", ex);
         }
         
-        return runnable.getTriMesh();
+        return meshBuilder.getTriangleMesh();
     }
     
-    private void execute(Runnable task, long timeout) throws TimeoutException {
-        Thread t = new Thread(task, "Timeout guard");
+    /**
+     * Executes a given task with a specified timeout.
+     */
+    private void execute(Runnable task, long timeout) throws NavMeshTimeoutException {
+        Thread t = new Thread(task, "TimeoutGuard");
         t.setDaemon(true);
         execute(t, timeout);
     }
 
-    private void execute(Thread task, long timeout) throws TimeoutException {
+    private void execute(Thread task, long timeout) throws NavMeshTimeoutException {
         task.start();
         try {
             task.join(timeout);
+            if (task.isAlive()) {
+                task.interrupt();
+                throw new NavMeshTimeoutException("Task timed out after " + timeout + " milliseconds.");
+            }
         } catch (InterruptedException ex) {
-            logger.log(Level.SEVERE, "NavMesh Generation interrupted.", ex);
-        }
-        if (task.isAlive()) {
-            task.interrupt();
-            throw new TimeoutException();
+            Thread.currentThread().interrupt();
+            logger.log(Level.SEVERE, "Task execution interrupted.", ex);
+            throw new NavMeshTimeoutException("Task was interrupted.");
         }
     }
 
     /**
-     * @return the time in milliseconds before the generation process fails
+     * Runnable for the navigation mesh build process.
      */
-    public int getTimeout() {
-        return timeout;
-    }
-
-    /**
-     * @param timeout length of time in milliseconds before the generation process ends
-     */
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
-    /**
-     * the runnable for the build process
-     */
-    private class MeshBuildRunnable implements Runnable {
+    private class NavMeshBuildRunnable implements Runnable {
 
         private final float[] positions;
         private final int[] indices;
-        private final IntermediateData intermediateData;
-        private TriangleMesh triMesh;
+        private final IntermediateData navMeshData;
+        private TriangleMesh triangleMesh;
 
-        public MeshBuildRunnable(float[] positions, int[] indices, IntermediateData intermediateData) {
+        public NavMeshBuildRunnable(float[] positions, int[] indices, IntermediateData navMeshData) {
             this.positions = positions;
             this.indices = indices;
-            this.intermediateData = intermediateData;
+            this.navMeshData = navMeshData;
         }
 
         @Override
         public void run() {
-            triMesh = nmgen.build(positions, indices, intermediateData);
+            triangleMesh = nmgen.build(positions, indices, navMeshData);
         }
 
-        public TriangleMesh getTriMesh() {
-            return triMesh;
+        public TriangleMesh getTriangleMesh() {
+            return triangleMesh;
         }
     }
 
-    private class TimeoutException extends Exception {
-
+    private class NavMeshTimeoutException extends RuntimeException {
         private static final long serialVersionUID = 1L;
 
-        public TimeoutException() {}
+        public NavMeshTimeoutException(String message) {
+            super(message);
+        }
     }
 }
