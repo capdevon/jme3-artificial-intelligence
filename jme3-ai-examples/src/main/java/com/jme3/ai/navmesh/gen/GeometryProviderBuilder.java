@@ -16,8 +16,8 @@ import com.jme3.terrain.Terrain;
  */
 public class GeometryProviderBuilder {
 
-    public static final String NAVMESH_IGNORE = "ignoreFromBuild";
-    private static final Predicate<Spatial> DefaultFilter = sp -> sp.getUserData(NAVMESH_IGNORE) == null;
+    private static final Predicate<Spatial> DefaultFilter = 
+            sp -> sp.getUserData(NavMeshUserData.JME_NAVMESH_IGNORE) == null;
     
     private GeometryProviderBuilder() {}
 
@@ -46,14 +46,11 @@ public class GeometryProviderBuilder {
     }
     
     /**
-     * Gathers all geometries in supplied node into supplied List. Uses
-     * {@link com.jme3.ai.navmesh.gen.NavMeshBuilder} to merge found Terrain meshes into one geometry prior to
-     * adding. Scales and sets translation of merged geometry.
-     *
-     * @param node
-     * @param results
-     * @param filter
-     * @return
+     * Gathers all geometries in supplied node into supplied List.
+     * 
+     * Uses {@link com.jme3.ai.navmesh.gen.TerrainMeshConverter} to merge found
+     * Terrain meshes into one geometry prior to adding. Scales and sets translation
+     * of merged geometry.
      */
     private static List<Geometry> collectSources(Node node, List<Geometry> results, Predicate<Spatial> filter) {
         for (Spatial spatial : node.getChildren()) {
@@ -65,7 +62,7 @@ public class GeometryProviderBuilder {
                 results.add((Geometry) spatial);
 
             } else if (spatial instanceof Terrain) {
-                Mesh merged = NavMeshBuilder.terrain2mesh((Terrain) spatial);
+                Mesh merged = TerrainMeshConverter.convert((Terrain) spatial);
                 Geometry geom = new Geometry("mergedTerrain");
                 geom.setMesh(merged);
                 results.add(geom);
