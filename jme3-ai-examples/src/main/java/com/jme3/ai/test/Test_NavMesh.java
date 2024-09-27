@@ -2,7 +2,9 @@ package com.jme3.ai.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import com.jme3.ai.navmesh.gen.GeometryProviderBuilder;
 import com.jme3.ai.navmesh.gen.NavMeshBuildSettings;
@@ -20,6 +22,8 @@ import com.jme3.scene.Node;
 import com.jme3.system.AppSettings;
 
 /**
+ * 
+ * @author capdevon
  */
 public class Test_NavMesh extends SimpleApplication {
 
@@ -51,19 +55,17 @@ public class Test_NavMesh extends SimpleApplication {
 
         DirectionalLight light = new DirectionalLight();
         light.setDirection(new Vector3f(-0.3f, -0.5f, -0.2f));
-        getRootNode().addLight(light);
+        rootNode.addLight(light);
 
         AmbientLight amb = new AmbientLight();
         amb.setColor(ColorRGBA.DarkGray);
-        getRootNode().addLight(amb);
+        rootNode.addLight(amb);
 
         Node scene = (Node) assetManager.loadModel("Models/navtest.j3o");
 
         NavMeshBuildSettings nmSettings = new NavMeshBuildSettings();
         try {
-            String dirName = "src/main/resources/Scenes";
-            String fileName = "navmesh.properties";
-            File file = new File(dirName, fileName);
+            File file = Path.of("src/main/resources", "Scenes", "navmesh.properties").toFile();
             nmSettings = NavMeshProperties.load(file);
 
         } catch (IOException ex) {
@@ -91,7 +93,11 @@ public class Test_NavMesh extends SimpleApplication {
         sources.forEach(System.out::println);
         
         NavMeshBuilder builder = new NavMeshBuilder();
+        builder.setTimeout(30, TimeUnit.SECONDS);
+        
         Mesh navMesh = builder.buildNavMesh(sources, nmSettings);
+        
+        builder.shutdown();
         
         NavMeshDebugRenderer navMeshRenderer = new NavMeshDebugRenderer(assetManager);
         navMeshRenderer.drawNavMesh(navMesh);

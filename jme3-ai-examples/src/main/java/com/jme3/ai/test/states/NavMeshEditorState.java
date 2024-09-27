@@ -1,10 +1,10 @@
 package com.jme3.ai.test.states;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,6 +40,8 @@ public class NavMeshEditorState extends MyBaseState {
 
     private Vector2f screenSize;
     private Container container;
+    
+    private NavMeshBuilder builder = new NavMeshBuilder();
     private NavMeshDebugRenderer navMeshRenderer;
     private boolean navMeshDebugEnabled = true;
     private boolean autoSave = true;
@@ -112,32 +114,24 @@ public class NavMeshEditorState extends MyBaseState {
         
         Button button = container.addChild(new Button("Bake NavMesh"));
         button.addClickCommands(source -> {
-            try {
-                generateNavMesh(nmSettings);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            generateNavMesh(nmSettings);
         });
         
         return container;
     }
 
-    /**
-     * creates the NavMesh
-     * @throws IOException 
-     */
-    public void generateNavMesh(NavMeshBuildSettings nmSettings) throws IOException {
+    public void generateNavMesh(NavMeshBuildSettings nmSettings) {
 
         navMeshRenderer.clear();
 
         // the data object to use for storing data related to building the navigation mesh.
         IntermediateData data = new IntermediateData();
-        List<Geometry> sources = GeometryProviderBuilder.collectSources(rootNode);
-        NavMeshBuilder builder = new NavMeshBuilder();
         builder.setIntermediateData(data);
-        builder.setTimeout(40000);
+        builder.setTimeout(40, TimeUnit.SECONDS);
         
         System.out.println("Generating new navmesh... please wait");
+        
+        List<Geometry> sources = GeometryProviderBuilder.collectSources(rootNode);
         Mesh navMesh = builder.buildNavMesh(sources, nmSettings);
 
         if (navMesh != null) {
@@ -151,9 +145,6 @@ public class NavMeshEditorState extends MyBaseState {
             }
 
             navMeshRenderer.drawNavMesh(navMesh);
-            
-        } else {
-            logger.log(Level.SEVERE, "NavMesh generation failed!");
         }
     }
     
@@ -172,6 +163,7 @@ public class NavMeshEditorState extends MyBaseState {
 
     @Override
     protected void cleanup(Application app) {
+        builder.shutdown();
     }
 
     @Override
