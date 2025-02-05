@@ -15,7 +15,6 @@ import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
-import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.scene.mesh.IndexBuffer;
 import com.jme3.util.BufferUtils;
 
@@ -113,29 +112,35 @@ public class NavMesh implements Savable {
     }
 
     /**
-     * Find the closest cell on the mesh to the given point.
-     * 
-     * @param sourcePos
-     * @param maxDistance
-     * @return
+     * Finds the closest cell to the given source position within the specified
+     * maximum distance.
+     *
+     * @param sourcePos   The source position in 3D space.
+     * @param maxDistance The maximum distance to consider for finding the closest cell.
+     * @return The closest cell to the source position, or null if no cell is found
+     *         within the maximum distance.
      */
     public Cell findClosestCell(Vector3f sourcePos, float maxDistance) {
 
+        TempVarAlloc vars = TempVarAlloc.get();
         Cell closestCell = null;
         float closestDistance = maxDistance;
         float closestHeight = maxDistance;
         boolean found = false;
 
         for (Cell cell : cellList) {
+            // Check if the source position is within the cell
             if (cell.contains(sourcePos)) {
                 float distance = Math.abs(cell.getHeightOnCell(sourcePos) - sourcePos.y);
 
                 if (found) {
+                    // If a cell has already been found, compare heights
                     if (distance < closestHeight) {
                         closestCell = cell;
                         closestHeight = distance;
                     }
                 } else {
+                    // If no cell has been found yet, set the initial closest cell
                     closestCell = cell;
                     closestHeight = distance;
                     found = true;
@@ -143,14 +148,21 @@ public class NavMesh implements Savable {
             }
 
             if (!found) {
-                Vector2f start = new Vector2f(cell.getCenter().x, cell.getCenter().z);
-                Vector2f end = new Vector2f(sourcePos.x, sourcePos.z);
+                // If the source position is not within any cell, 
+                // calculate distance to cell boundary
+                Vector2f start = vars.vec21;
+                start.set(cell.getCenter().x, cell.getCenter().z);
+
+                Vector2f end = vars.vec22;
+                end.set(sourcePos.x, sourcePos.z);
+
                 Line2D motionPath = new Line2D(start, end);
 
                 ClassifyResult cResult = cell.classifyPathToCell(motionPath);
 
                 if (cResult.result == Cell.PathResult.ExitingCell) {
-                    Vector3f closestPoint3D = new Vector3f(cResult.intersection.x, 0.0f, cResult.intersection.y);
+                    // If the path intersects the cell's boundary
+                    Vector3f closestPoint3D = vars.vec31.set(cResult.intersection.x, 0.0f, cResult.intersection.y);
                     cell.computeHeightOnCell(closestPoint3D);
 
                     float distance = closestPoint3D.distance(sourcePos);
@@ -163,6 +175,7 @@ public class NavMesh implements Savable {
             }
         }
 
+        vars.release();
         return closestCell;
     }
     
@@ -213,7 +226,7 @@ public class NavMesh implements Savable {
         up.setPlanePoints(Vector3f.UNIT_X, Vector3f.ZERO, Vector3f.UNIT_Z);
 
         IndexBuffer ib = mesh.getIndexBuffer();
-        FloatBuffer pb = mesh.getFloatBuffer(Type.Position);
+        FloatBuffer pb = mesh.getFloatBuffer(VertexBuffer.Type.Position);
         pb.clear();
         
         for (int i = 0; i < mesh.getTriangleCount() * 3; i += 3) {
@@ -225,9 +238,9 @@ public class NavMesh implements Savable {
             BufferUtils.populateFromBuffer(b, pb, i2);
             BufferUtils.populateFromBuffer(c, pb, i3);
 
-            Plane p = new Plane();
-            p.setPlanePoints(a, b, c);
-            if (up.pseudoDistance(p.getNormal()) <= 0.0f) {
+            Plane plane = new Plane();
+            plane.setPlanePoints(a, b, c);
+            if (up.pseudoDistance(plane.getNormal()) <= 0.0f) {
                 logger.warning("Warning, the normal of the plane faces downward!");
                 continue;
             }
