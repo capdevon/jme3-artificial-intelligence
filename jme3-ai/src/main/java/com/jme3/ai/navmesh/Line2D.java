@@ -194,19 +194,24 @@ public class Line2D implements Savable {
     }
     
     /**
-     * this line A = x0, y0 and B = x1, y1
+     * this line A = x0, y0 and B = x1, y1 
      * other is A = x2, y2 and B = x3, y3
-     * @param other
-     * @param intersectionPoint
-     * @return
+     * 
+     * Determines the type of intersection between this line and another line. If
+     * the lines intersect, the intersection point is stored in the provided
+     * Vector2f.
+     *
+     * @param line  The other line to check for intersection.
+     * @param store The point where the lines intersect, if they do. Can be null.
+     * @return The type of intersection, as a value from the LineIntersect enum.
      */
-    public LineIntersect intersect(Line2D other, Vector2f intersectionPoint) {
-        float denom = (other.pointB.y - other.pointA.y) * (this.pointB.x - this.pointA.x)
-                - (other.pointB.x - other.pointA.x) * (this.pointB.y - this.pointA.y);
-        float u0 = (other.pointB.x - other.pointA.x) * (this.pointA.y - other.pointA.y)
-                - (other.pointB.y - other.pointA.y) * (this.pointA.x - other.pointA.x);
-        float u1 = (other.pointA.x - this.pointA.x) * (this.pointB.y - this.pointA.y)
-                - (other.pointA.y - this.pointA.y) * (this.pointB.x - this.pointA.x);
+    public LineIntersect intersect(Line2D line, Vector2f store) {
+        float denom = (line.pointB.y - line.pointA.y) * (this.pointB.x - this.pointA.x)
+                - (line.pointB.x - line.pointA.x) * (this.pointB.y - this.pointA.y);
+        float u0 = (line.pointB.x - line.pointA.x) * (this.pointA.y - line.pointA.y)
+                - (line.pointB.y - line.pointA.y) * (this.pointA.x - line.pointA.x);
+        float u1 = (line.pointA.x - this.pointA.x) * (this.pointB.y - this.pointA.y)
+                - (line.pointA.y - this.pointA.y) * (this.pointB.x - this.pointA.x);
 
         //if parallel
         if (denom == 0.0f) {
@@ -224,9 +229,9 @@ public class Line2D implements Savable {
             float x = this.pointA.x + u0 * (this.pointB.x - this.pointA.x);
             float y = this.pointA.y + u0 * (this.pointB.y - this.pointA.y);
 
-            if (intersectionPoint != null) {
-                intersectionPoint.x = x; //(m_PointA.x + (FactorAB * Bx_minus_Ax));
-                intersectionPoint.y = y; //(m_PointA.y + (FactorAB * By_minus_Ay));
+            if (store != null) {
+                store.x = x; //(m_PointA.x + (FactorAB * Bx_minus_Ax));
+                store.y = y; //(m_PointA.y + (FactorAB * By_minus_Ay));
             }
 
             // now determine the type of intersection
