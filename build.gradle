@@ -35,11 +35,7 @@ gradle.projectsEvaluated {
 }
 
 repositories {
-    //mavenLocal()
     mavenCentral()
-
-    // Read more about repositories here:
-    //   https://docs.gradle.org/current/userguide/dependency_management.html#sec:repositories
 }
 
 dependencies {
@@ -60,7 +56,6 @@ dependencies {
     //runtimeOnly 'org.jmonkeyengine:jme3-lwjgl:' + jmeVersion  // LWJGL 2.x
     runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmeVersion // LWJGL 3.x
 
-    //runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.4.0-alpha6'
         
     // libraries related to the Lemur GUI and Groovy:
@@ -76,21 +71,18 @@ dependencies {
     api files("libs/cai-nmgen-0.2.0.jar")
 }
 
-wrapper {
-    gradleVersion = '8.6'
-}
-
 // cleanup tasks
 clean.dependsOn('cleanDLLs', 'cleanDyLibs', 'cleanLogs', 'cleanSOs')
-task cleanDLLs(type: Delete) {
+
+tasks.register('cleanDLLs', Delete) {
     delete fileTree(dir: '.', include: '*.dll')
 }
-task cleanDyLibs(type: Delete) {
+tasks.register('cleanDyLibs', Delete) {
     delete fileTree(dir: '.', include: '*.dylib')
 }
-task cleanLogs(type: Delete) {
+tasks.register('cleanLogs', Delete) {
     delete fileTree(dir: '.', include: 'hs_err_pid*.log')
 }
-task cleanSOs(type: Delete) {
+tasks.register('cleanSOs', Delete) {
     delete fileTree(dir: '.', include: '*.so')
 }
