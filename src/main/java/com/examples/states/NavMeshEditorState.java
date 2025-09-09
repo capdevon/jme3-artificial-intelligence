@@ -1,4 +1,4 @@
-package com.jme3.ai.test.states;
+package com.examples.states;
 
 import java.io.File;
 import java.nio.file.Path;

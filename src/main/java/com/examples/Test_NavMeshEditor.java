@@ -1,8 +1,8 @@
-package com.jme3.ai.test;
+package com.examples;
 
-import com.jme3.ai.test.states.NavMeshEditorState;
-import com.jme3.ai.test.states.TerrainState;
-import com.jme3.ai.test.util.TogglePhysicsDebugState;
+import com.examples.states.NavMeshEditorState;
+import com.examples.states.TerrainState;
+import com.examples.util.TogglePhysicsDebugState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.math.Vector3f;

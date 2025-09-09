@@ -1,4 +1,4 @@
-package com.jme3.ai.test.util;
+package com.examples.util;
 
 import com.jme3.app.Application;
 import com.jme3.app.state.BaseAppState;

@@ -1,4 +1,4 @@
-package com.jme3.ai.test.terrain;
+package com.examples.terrain;
 
 import java.util.ArrayList;
 import java.util.List;

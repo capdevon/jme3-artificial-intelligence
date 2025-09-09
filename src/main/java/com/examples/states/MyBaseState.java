@@ -1,4 +1,4 @@
-package com.jme3.ai.test.states;
+package com.examples.states;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppStateManager;

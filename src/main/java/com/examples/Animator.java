@@ -1,8 +1,8 @@
-package com.jme3.ai.test;
+package com.examples;
 
 import java.util.Objects;
 
-import com.jme3.ai.test.util.GameObject;
+import com.examples.util.GameObject;
 import com.jme3.anim.AnimComposer;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;

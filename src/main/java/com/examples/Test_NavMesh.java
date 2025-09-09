@@ -1,4 +1,4 @@
-package com.jme3.ai.test;
+package com.examples;
 
 import java.io.File;
 import java.io.IOException;

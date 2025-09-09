@@ -1,7 +1,7 @@
-package com.jme3.ai.test.states;
+package com.examples.states;
 
-import com.jme3.ai.test.terrain.FractalHeightMap;
-import com.jme3.ai.test.terrain.TreeGenerator;
+import com.examples.terrain.FractalHeightMap;
+import com.examples.terrain.TreeGenerator;
 import com.jme3.app.Application;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;

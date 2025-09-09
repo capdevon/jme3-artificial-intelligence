@@ -1,4 +1,4 @@
-package com.jme3.ai.test;
+package com.examples;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -16,10 +16,10 @@ import com.jme3.ai.navmesh.gen.NavMeshBuildSettings;
 import com.jme3.ai.navmesh.gen.NavMeshBuilder;
 import com.jme3.ai.navmesh.gen.NavMeshDebugRenderer;
 import com.jme3.ai.navmesh.gen.NavMeshExporter;
-import com.jme3.ai.test.terrain.FractalHeightMap;
-import com.jme3.ai.test.terrain.TreeGenerator;
-import com.jme3.ai.test.util.MainCamera;
-import com.jme3.ai.test.util.TogglePhysicsDebugState;
+import com.examples.terrain.FractalHeightMap;
+import com.examples.terrain.TreeGenerator;
+import com.examples.util.MainCamera;
+import com.examples.util.TogglePhysicsDebugState;
 import com.jme3.anim.util.AnimMigrationUtils;
 import com.jme3.app.DebugKeysAppState;
 import com.jme3.app.SimpleApplication;

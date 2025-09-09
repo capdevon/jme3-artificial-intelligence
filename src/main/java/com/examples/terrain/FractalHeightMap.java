@@ -1,4 +1,4 @@
-package com.jme3.ai.test.terrain;
+package com.examples.terrain;
 
 import java.nio.FloatBuffer;
 import java.util.logging.Logger;

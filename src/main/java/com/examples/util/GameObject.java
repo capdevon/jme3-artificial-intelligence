@@ -1,4 +1,4 @@
-package com.jme3.ai.test.util;
+package com.examples.util;
 
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
