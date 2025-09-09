@@ -1,7 +1,7 @@
 # jme3-artificial-intelligence
 Updated version of the jME3-ai library.
 
-🔔 If you found this project useful, please let me know by leaving a like to motivate me to improve it. Thanks.
+🔔 Enjoying this project? Give it a star to show your support and motivate me to keep improving it!
 
 ## Requirements
 - [CritterAI](https://github.com/stevefsp/critterai/tree/master) - Stephen Pratt’s NMGen Study project files to generate the navmesh
