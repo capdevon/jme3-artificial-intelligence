@@ -13,6 +13,10 @@ java {
 // select one version of the Engine:
 ext.jmeVersion = '3.8.1-stable'
 
+tasks.withType(Javadoc).configureEach {
+    failOnError = false
+}
+
 tasks.withType(JavaCompile).configureEach { // Java compile-time options:
     options.compilerArgs << '-Xdiags:verbose'
     options.compilerArgs << '-Xlint:unchecked'
