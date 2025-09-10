@@ -143,12 +143,12 @@ public class Test_NavMeshAgent extends SimpleApplication implements ActionListen
         AmbientLight ambient = new AmbientLight();
         rootNode.addLight(ambient);
 
-        DirectionalLight light = new DirectionalLight();
-        light.setDirection(new Vector3f(-0.1f, -0.7f, -1.0f).normalizeLocal());
-        rootNode.addLight(light);
+        DirectionalLight dl = new DirectionalLight();
+        dl.setDirection(new Vector3f(-0.1f, -0.7f, -1.0f).normalizeLocal());
+        rootNode.addLight(dl);
 
-        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 4096, 2);
-        dlsf.setLight(light);
+        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 2048, 3);
+        dlsf.setLight(dl);
         dlsf.setShadowIntensity(0.4f);
         dlsf.setShadowZExtend(256);
         dlsf.setEdgeFilteringMode(EdgeFilteringMode.PCFPOISSON);

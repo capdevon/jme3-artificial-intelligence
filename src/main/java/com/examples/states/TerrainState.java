@@ -17,6 +17,7 @@ import com.jme3.post.filters.FXAAFilter;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Node;
 import com.jme3.shadow.DirectionalLightShadowFilter;
+import com.jme3.shadow.EdgeFilteringMode;
 import com.jme3.terrain.geomipmap.TerrainQuad;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.WrapMode;
@@ -60,25 +61,25 @@ public class TerrainState extends MyBaseState implements ActionListener {
         ColorRGBA skyColor = new ColorRGBA(0.1f, 0.2f, 0.4f, 1f);
         viewPort.setBackgroundColor(skyColor);
 
-        DirectionalLight light = new DirectionalLight();
-        light.setDirection(new Vector3f(-0.5f, -1f, -0.5f).normalizeLocal());
-        light.setName("sun");
-        rootNode.addLight(light);
-
         AmbientLight ambient = new AmbientLight();
-        ambient.setColor(new ColorRGBA(0.25f, 0.25f, 0.25f, 1));
-        ambient.setName("ambient");
+        ambient.setName("Global");
         rootNode.addLight(ambient);
 
-        DirectionalLightShadowFilter shadowFilter = new DirectionalLightShadowFilter(assetManager, 4096, 2);
-        shadowFilter.setLight(light);
-        shadowFilter.setShadowIntensity(0.4f);
-        shadowFilter.setShadowZExtend(256);
+        DirectionalLight dl = new DirectionalLight();
+        dl.setDirection(new Vector3f(-0.5f, -1f, -0.5f).normalizeLocal());
+        dl.setName("Sun");
+        rootNode.addLight(dl);
+
+        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 2048, 3);
+        dlsf.setLight(dl);
+        dlsf.setShadowIntensity(0.4f);
+        dlsf.setShadowZExtend(256);
+        dlsf.setEdgeFilteringMode(EdgeFilteringMode.PCFPOISSON);
 
         FXAAFilter fxaa = new FXAAFilter();
 
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        fpp.addFilter(shadowFilter);
+        fpp.addFilter(dlsf);
         fpp.addFilter(fxaa);
         viewPort.addProcessor(fpp);
     }

@@ -16,9 +16,13 @@ import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.filters.FXAAFilter;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
+import com.jme3.shadow.DirectionalLightShadowFilter;
+import com.jme3.shadow.EdgeFilteringMode;
 import com.jme3.system.AppSettings;
 
 /**
@@ -47,18 +51,9 @@ public class Test_NavMesh extends SimpleApplication {
     public void simpleInitApp() {
 
         flyCam.setMoveSpeed(25);
-        
-        // Set the viewport's background color to light blue.
-        ColorRGBA skyColor = new ColorRGBA(0.1f, 0.2f, 0.4f, 1f);
-        viewPort.setBackgroundColor(skyColor);
+        flyCam.setDragToRotate(true);
 
-        DirectionalLight light = new DirectionalLight();
-        light.setDirection(new Vector3f(-0.3f, -0.5f, -0.2f));
-        rootNode.addLight(light);
-
-        AmbientLight amb = new AmbientLight();
-        amb.setColor(ColorRGBA.DarkGray);
-        rootNode.addLight(amb);
+        initLights();
 
         Node scene = (Node) assetManager.loadModel("Models/navtest.j3o");
 
@@ -109,6 +104,32 @@ public class Test_NavMesh extends SimpleApplication {
 //        scene.attachChild(navGeom);
 
         rootNode.attachChild(scene);
+    }
+
+    private void initLights() {
+        // Set the viewport's background color to light blue.
+        ColorRGBA skyColor = new ColorRGBA(0.1f, 0.2f, 0.4f, 1f);
+        viewPort.setBackgroundColor(skyColor);
+
+        AmbientLight ambient = new AmbientLight();
+        rootNode.addLight(ambient);
+
+        DirectionalLight dl = new DirectionalLight();
+        dl.setDirection(new Vector3f(-0.1f, -0.7f, -1.0f).normalizeLocal());
+        rootNode.addLight(dl);
+
+        DirectionalLightShadowFilter dlsf = new DirectionalLightShadowFilter(assetManager, 2048, 3);
+        dlsf.setLight(dl);
+        dlsf.setShadowIntensity(0.4f);
+        dlsf.setShadowZExtend(256);
+        dlsf.setEdgeFilteringMode(EdgeFilteringMode.PCFPOISSON);
+
+        FXAAFilter fxaa = new FXAAFilter();
+
+        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        fpp.addFilter(dlsf);
+        fpp.addFilter(fxaa);
+        viewPort.addProcessor(fpp);
     }
 
 }
