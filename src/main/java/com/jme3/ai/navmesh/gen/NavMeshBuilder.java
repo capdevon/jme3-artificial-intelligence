@@ -149,7 +149,8 @@ public class NavMeshBuilder {
     /**
      * Sets the data object to use for storing data related to building the
      * navigation mesh. This is useful for debugging and visualization.
-     * * @param intermediateData the {@link org.critterai.nmgen.IntermediateData} object to set
+     *
+     * @param intermediateData the {@link org.critterai.nmgen.IntermediateData} object to set
      */
     public void setIntermediateData(IntermediateData intermediateData) {
         this.intermediateData = intermediateData;
