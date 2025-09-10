@@ -35,49 +35,50 @@ public class NavMeshBuilder {
     private IntermediateData intermediateData;
     private long timeout = 60;
     private TimeUnit timeUnit = TimeUnit.SECONDS;
-    
+
     public NavMeshBuilder() {
         this.executor = Executors.newSingleThreadExecutor();
     }
-    
+
     /**
-     * Takes a list of geometries and optimizes them using
-     * {@link org.critterai.nmgen.NavmeshGenerator}
-     * 
-     * @param sources
-     * @param settings
-     * @return An optimized Triangle mesh to be used for pathfinding.
+     * Takes a list of geometries and builds a navigation mesh from them.
+     * The geometries are first merged into a single mesh, and then this mesh
+     * is processed by the {@link org.critterai.nmgen.NavmeshGenerator}.
+     *
+     * @param sources  A list of Geometry objects to use as source for the navmesh.
+     * @param settings The settings to use for the navigation mesh generation.
+     * @return An optimized Mesh to be used for pathfinding, or {@code null} if generation fails.
      */
     public Mesh buildNavMesh(List<Geometry> sources, NavMeshBuildSettings settings) {
         nmgen = new NavmeshGenerator(
-                settings.cellSize, 
-                settings.cellHeight, 
+                settings.cellSize,
+                settings.cellHeight,
                 settings.minTraversableHeight,
-                settings.maxTraversableStep, 
+                settings.maxTraversableStep,
                 settings.maxTraversableSlope,
-                settings.clipLedges, 
+                settings.clipLedges,
                 settings.traversableAreaBorderSize,
-                settings.smoothingThreshold, 
+                settings.smoothingThreshold,
                 settings.useConservativeExpansion,
-                settings.minUnconnectedRegionSize, 
+                settings.minUnconnectedRegionSize,
                 settings.mergeRegionSize,
-                settings.maxEdgeLength, 
-                settings.edgeMaxDeviation, 
+                settings.maxEdgeLength,
+                settings.edgeMaxDeviation,
                 settings.maxVertsPerPoly,
-                settings.contourSampleDistance, 
+                settings.contourSampleDistance,
                 settings.contourMaxDeviation);
-        
+
         Mesh mesh = new Mesh();
         GeometryBatchFactory.mergeGeometries(sources, mesh);
 
         FloatBuffer pb = mesh.getFloatBuffer(VertexBuffer.Type.Position);
         IndexBuffer ib = mesh.getIndexBuffer();
-        
+
         // copy positions to float array
         float[] positions = new float[pb.capacity()];
         pb.clear();
         pb.get(positions);
-        
+
         // generate int array of indices
         int[] indices = new int[ib.size()];
         for (int i = 0; i < indices.length; i++) {
@@ -99,33 +100,38 @@ public class NavMeshBuilder {
         logger.log(Level.WARNING, "NavMesh generation failed.");
         return null;
     }
-    
+
     /**
      * Generates a navigation mesh (TriangleMesh) using the provided vertex
-     * positions, mesh indices, and intermediate data.
+     * positions and mesh indices. The generation is performed on a separate
+     * thread to prevent blocking the main application thread.
      *
      * @param positions an array of vertex positions
      * @param indices   an array of mesh indices
-     * @return the generated TriangleMesh, or null if the generation fails or times out
+     * @return the generated {@link org.critterai.nmgen.TriangleMesh}, or {@code null} if the generation fails or times out
      */
     private TriangleMesh generateNavMesh(float[] positions, int[] indices) {
         logger.log(Level.INFO, "Starting NavMesh generation task.");
         Future<TriangleMesh> future = executor.submit(() -> nmgen.build(positions, indices, intermediateData));
-        
+
         try {
             return future.get(timeout, timeUnit);
-            
+
         } catch (TimeoutException ex) {
             logger.log(Level.SEVERE, "Task timed out.", ex);
             future.cancel(true);
-            
+
         } catch (InterruptedException | ExecutionException ex) {
-            logger.log(Level.SEVERE, "Task execution interrupted.", ex);
+            logger.log(Level.SEVERE, "Task execution interrupted or failed.", ex);
         }
-        
+
         return null;
     }
-    
+
+    /**
+     * Shuts down the internal executor service, allowing it to complete
+     * any pending tasks and then terminate.
+     */
     public void shutdown() {
         logger.log(Level.INFO, "Shutting down executor.");
         executor.shutdown();
@@ -139,19 +145,18 @@ public class NavMeshBuilder {
             executor.shutdownNow();
         }
     }
-    
+
     /**
-     * The data object to use for storing data related to building the 
-     * navigation mesh.
-     * 
-     * @param {@link org.critterai.nmgen.IntermediateData}
+     * Sets the data object to use for storing data related to building the
+     * navigation mesh. This is useful for debugging and visualization.
+     * * @param intermediateData the {@link org.critterai.nmgen.IntermediateData} object to set
      */
     public void setIntermediateData(IntermediateData intermediateData) {
         this.intermediateData = intermediateData;
     }
-    
+
     /**
-     * Sets the timeout duration for the task execution.
+     * Sets the timeout duration for the navigation mesh generation task.
      *
      * @param timeout  the maximum time to wait for the task to complete
      * @param timeUnit the time unit of the timeout parameter

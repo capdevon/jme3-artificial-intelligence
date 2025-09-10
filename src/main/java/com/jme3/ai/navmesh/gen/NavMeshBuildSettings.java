@@ -9,11 +9,15 @@ import com.jme3.export.OutputCapsule;
 import com.jme3.export.Savable;
 
 /**
+ * A class to hold all the settings used for generating a navigation mesh.
+ * These settings are passed to the {@link org.critterai.nmgen.NavmeshGenerator}.
+ * The class implements {@link com.jme3.export.Savable} to allow it to be
+ * saved to and loaded from a file.
  *
  * @author capdevon
  */
 public class NavMeshBuildSettings implements Savable {
-    
+
     protected float cellSize = 1f;
     protected float cellHeight = 1.5f;
     protected float minTraversableHeight = 7.5f;
@@ -30,7 +34,7 @@ public class NavMeshBuildSettings implements Savable {
     protected int maxVertsPerPoly = 6;
     protected float contourSampleDistance = 25;
     protected float contourMaxDeviation = 25;
-    
+
     @Override
     public void write(JmeExporter ex) throws IOException {
         OutputCapsule oc = ex.getCapsule(this);
@@ -72,18 +76,18 @@ public class NavMeshBuildSettings implements Savable {
         contourSampleDistance       = ic.readFloat("contourSampleDistance", 25);
         contourMaxDeviation         = ic.readFloat("contourMaxDeviation", 25);
     }
-    
+
     /**
-     * @return The height resolution used when sampling the source mesh. Value
-     * must be > 0.
+     * @return The height resolution used when sampling the source mesh.
      */
     public float getCellHeight() {
         return cellHeight;
     }
 
     /**
-     * @param cellHeight - The height resolution used when sampling the source
-     * mesh. Value must be > 0. Constraints: > 0
+     * Sets the height resolution used when sampling the source mesh.
+     * The value must be greater than 0.
+     * @param cellHeight The height resolution.
      */
     public void setCellHeight(float cellHeight) {
         this.cellHeight = cellHeight;
@@ -93,16 +97,16 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     * @return The width and depth resolution used when sampling the the source
-     * mesh.
+     * @return The width and depth resolution used when sampling the source mesh.
      */
     public float getCellSize() {
         return cellSize;
     }
 
     /**
-     * @param cellSize - The width and depth resolution used when sampling the
-     * the source mesh. Constraints: > 0
+     * Sets the width and depth resolution used when sampling the source mesh.
+     * The value must be greater than 0.
+     * @param cellSize The width and depth resolution.
      */
     public void setCellSize(float cellSize) {
         this.cellSize = cellSize;
@@ -112,8 +116,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return Indicates whether ledges are considered un-walkable
+     * @return {@code true} if ledges are considered unwalkable; otherwise, {@code false}.
      */
     public boolean isClipLedges() {
         return clipLedges;
@@ -121,22 +124,21 @@ public class NavMeshBuildSettings implements Savable {
 
     /**
      * Indicates whether ledges should be marked as unwalkable. A ledge is a
-     * normally walkable voxel that has one or more accessible neighbors with a
-     * an un-steppable drop from voxel top to voxel top. E.g. If an agent using
-     * the navmesh were to travel down from the ledge voxel to its neighbor
-     * voxel, it would result in the maximum traversable step distance being
-     * violated. The agent cannot legally "step down" from a ledge to its
+     * normally walkable voxel that has one or more accessible neighbors with
+     * an un-steppable drop from voxel top to voxel top. For example, if an
+     * agent using the navmesh were to travel down from the ledge voxel to its
+     * neighbor voxel, it would result in the maximum traversable step distance
+     * being violated. The agent cannot legally "step down" from a ledge to its
      * neighbor.
      *
-     * @param clipLedges
+     * @param clipLedges {@code true} to clip ledges; {@code false} otherwise.
      */
     public void setClipLedges(boolean clipLedges) {
         this.clipLedges = clipLedges;
     }
 
     /**
-     *
-     * @return the contour max deviation
+     * @return The maximum deviation of the contour from the original geometry's surface.
      */
     public float getContourMaxDeviation() {
         return contourMaxDeviation;
@@ -149,10 +151,10 @@ public class NavMeshBuildSettings implements Savable {
      * argument. The value of this argument has no meaning if the contour sample
      * distance argument is set to zero. Setting the value to zero is not
      * recommended since it can result in a large increase in the number of
-     * triangles in the final navmesh at a high processing cost. Constraints: >=
-     * 0
+     * triangles in the final navmesh at a high processing cost. The value must
+     * be greater than or equal to 0.
      *
-     * @param contourMaxDeviation
+     * @param contourMaxDeviation The maximum deviation.
      */
     public void setContourMaxDeviation(float contourMaxDeviation) {
         this.contourMaxDeviation = contourMaxDeviation;
@@ -162,8 +164,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return the contour sample distance
+     * @return The sampling distance used when matching the navmesh to the original geometry's surface.
      */
     public float getContourSampleDistance() {
         return contourSampleDistance;
@@ -176,9 +177,9 @@ public class NavMeshBuildSettings implements Savable {
      * in a navmesh which conforms more closely to the original geometry's
      * surface at the cost of a higher final triangle count and higher
      * processing cost. Setting this argument to zero will disable this
-     * functionality. Constraints: >= 0
+     * functionality. The value must be greater than or equal to 0.
      *
-     * @param contourSampleDistance
+     * @param contourSampleDistance The sampling distance.
      */
     public void setContourSampleDistance(float contourSampleDistance) {
         this.contourSampleDistance = contourSampleDistance;
@@ -188,8 +189,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return the edge max deviation
+     * @return The maximum deviation of the navmesh edge from the source geometry.
      */
     public float getEdgeMaxDeviation() {
         return edgeMaxDeviation;
@@ -201,9 +201,10 @@ public class NavMeshBuildSettings implements Savable {
      * the geometry contour more accurately at the expense of an increased
      * triangle count. Setting the value to zero is not recommended since it can
      * result in a large increase in the number of triangles in the final
-     * navmesh at a high processing cost. Constraints: >= 0
+     * navmesh at a high processing cost. The value must be greater than or
+     * equal to 0.
      *
-     * @param edgeMaxDeviation
+     * @param edgeMaxDeviation The maximum deviation.
      */
     public void setEdgeMaxDeviation(float edgeMaxDeviation) {
         this.edgeMaxDeviation = edgeMaxDeviation;
@@ -213,8 +214,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return the edge max length
+     * @return The maximum length of polygon edges that represent the border of the navmesh.
      */
     public float getMaxEdgeLength() {
         return maxEdgeLength;
@@ -225,9 +225,9 @@ public class NavMeshBuildSettings implements Savable {
      * navmesh. More vertices will be added to navmesh border edges if this
      * value is exceeded for a particular edge. In certain cases this will
      * reduce the number of thin, long triangles in the navmesh. A value of zero
-     * will disable this feature. Constraints: >= 0
+     * will disable this feature. The value must be greater than or equal to 0.
      *
-     * @param maxEdgeLength
+     * @param maxEdgeLength The maximum edge length.
      */
     public void setMaxEdgeLength(float maxEdgeLength) {
         this.maxEdgeLength = maxEdgeLength;
@@ -237,18 +237,17 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return the maximum traversable slope in degrees
+     * @return The maximum traversable slope in degrees.
      */
     public float getMaxTraversableSlope() {
         return maxTraversableSlope;
     }
 
     /**
-     * The maximum slope that is considered walkable. (Degrees) Constraints: 0
-     * <= value <= 85
+     * Sets the maximum slope that is considered walkable. The value is in
+     * degrees. The value must be between 0 and 85, inclusive.
      *
-     * @param maxTraversableSlope
+     * @param maxTraversableSlope The maximum traversable slope.
      */
     public void setMaxTraversableSlope(float maxTraversableSlope) {
         this.maxTraversableSlope = maxTraversableSlope;
@@ -261,8 +260,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return the maximum traversable step
+     * @return The maximum ledge height that is considered to still be walkable.
      */
     public float getMaxTraversableStep() {
         return maxTraversableStep;
@@ -272,9 +270,9 @@ public class NavMeshBuildSettings implements Savable {
      * Represents the maximum ledge height that is considered to still be
      * walkable. Prevents minor deviations in height from improperly showing as
      * obstructions. Permits detection of stair-like structures, curbs, etc.
-     * Constraints: >= 0
+     * The value must be greater than or equal to 0.
      *
-     * @param maxTraversableStep
+     * @param maxTraversableStep The maximum traversable step.
      */
     public void setMaxTraversableStep(float maxTraversableStep) {
         this.maxTraversableStep = maxTraversableStep;
@@ -284,8 +282,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return the maximum vertices per polygon
+     * @return The maximum number of vertices per polygon.
      */
     public int getMaxVertsPerPoly() {
         return maxVertsPerPoly;
@@ -296,9 +293,9 @@ public class NavMeshBuildSettings implements Savable {
      * the voxel to polygon conversion stage. Higher values reduce performance,
      * but can also result in better formed triangles in the navmesh. A value of
      * around 6 is generally adequate with diminishing returns for values higher
-     * than 6. Contraints: >= 3
+     * than 6. The value must be greater than or equal to 3.
      *
-     * @param maxVertsPerPoly
+     * @param maxVertsPerPoly The maximum vertices per polygon.
      */
     public void setMaxVertsPerPoly(int maxVertsPerPoly) {
         this.maxVertsPerPoly = maxVertsPerPoly;
@@ -308,8 +305,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return the merge region size
+     * @return The size of regions to be merged with larger regions.
      */
     public int getMergeRegionSize() {
         return mergeRegionSize;
@@ -321,10 +317,10 @@ public class NavMeshBuildSettings implements Savable {
      * regions that can be formed. This is especially an issue in diagonal path
      * regions where inherent faults in the region generation algorithm can
      * result in unnecessarily small regions. If a region cannot be legally
-     * merged with a neighbor region, then it will be left alone. Constraints:
-     * >= 0
+     * merged with a neighbor region, then it will be left alone. The value must
+     * be greater than or equal to 0.
      *
-     * @param mergeRegionSize
+     * @param mergeRegionSize The merge region size.
      */
     public void setMergeRegionSize(int mergeRegionSize) {
         this.mergeRegionSize = mergeRegionSize;
@@ -334,8 +330,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return the minimum traversable height
+     * @return The minimum floor to ceiling height that is considered walkable.
      */
     public float getMinTraversableHeight() {
         return minTraversableHeight;
@@ -344,10 +339,10 @@ public class NavMeshBuildSettings implements Savable {
     /**
      * Represents the minimum floor to ceiling height that will still allow the
      * floor area to be considered walkable. Permits detection of overhangs in
-     * the geometry which make the geometry below become unwalkable.
-     * Constraints: > 0
+     * the geometry which make the geometry below become unwalkable. The value
+     * must be greater than 0.
      *
-     * @param minTraversableHeight
+     * @param minTraversableHeight The minimum traversable height.
      */
     public void setMinTraversableHeight(float minTraversableHeight) {
         this.minTraversableHeight = minTraversableHeight;
@@ -357,8 +352,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return the minimum unconnected region size
+     * @return The minimum region size for unconnected (island) regions.
      */
     public int getMinUnconnectedRegionSize() {
         return minUnconnectedRegionSize;
@@ -368,9 +362,9 @@ public class NavMeshBuildSettings implements Savable {
      * The minimum region size for unconnected (island) regions. (Voxels) Any
      * generated regions that are not connected to any other region and are
      * smaller than this size will be culled before final navmesh generation.
-     * I.e. No longer considered walkable. Constraints: > 0
+     * I.e. No longer considered walkable. The value must be greater than 0.
      *
-     * @param minUnconnectedRegionSize
+     * @param minUnconnectedRegionSize The minimum unconnected region size.
      */
     public void setMinUnconnectedRegionSize(int minUnconnectedRegionSize) {
         this.minUnconnectedRegionSize = minUnconnectedRegionSize;
@@ -380,8 +374,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return the smoothing threshold
+     * @return The amount of smoothing to be performed on the distance field.
      */
     public int getSmoothingThreshold() {
         return smoothingThreshold;
@@ -391,9 +384,10 @@ public class NavMeshBuildSettings implements Savable {
      * The amount of smoothing to be performed when generating the distance
      * field. This value impacts region formation and border detection. A higher
      * value results in generally larger regions and larger border sizes. A
-     * value of zero will disable smoothing. Constraints: 0 <= value <= 4
+     * value of zero will disable smoothing. The value must be between 0 and 4,
+     * inclusive.
      *
-     * @param smoothingThreshold
+     * @param smoothingThreshold The smoothing threshold.
      */
     public void setSmoothingThreshold(int smoothingThreshold) {
         this.smoothingThreshold = smoothingThreshold;
@@ -406,8 +400,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return the traversable border size
+     * @return The size of the traversable area border.
      */
     public float getTraversableAreaBorderSize() {
         return traversableAreaBorderSize;
@@ -416,10 +409,10 @@ public class NavMeshBuildSettings implements Savable {
     /**
      * Represents the closest any part of the navmesh can get to an obstruction
      * in the source mesh. Usually set to the maximum bounding radius of
-     * entities utilizing the navmesh for navigation decisions. Constraints: >=
-     * 0
+     * entities utilizing the navmesh for navigation decisions. The value must
+     * be greater than or equal to 0.
      *
-     * @param traversableAreaBorderSize
+     * @param traversableAreaBorderSize The traversable area border size.
      */
     public void setTraversableAreaBorderSize(float traversableAreaBorderSize) {
         this.traversableAreaBorderSize = traversableAreaBorderSize;
@@ -429,8 +422,7 @@ public class NavMeshBuildSettings implements Savable {
     }
 
     /**
-     *
-     * @return whether or not using conservative expansion
+     * @return {@code true} if conservative expansion is enabled; otherwise, {@code false}.
      */
     public boolean isUseConservativeExpansion() {
         return useConservativeExpansion;
@@ -442,7 +434,7 @@ public class NavMeshBuildSettings implements Savable {
      * present, then enabling this feature will likely fix the problem. Enabling
      * this feature significantly increased processing cost.
      *
-     * @param useConservativeExpansion
+     * @param useConservativeExpansion {@code true} to use conservative expansion; {@code false} otherwise.
      */
     public void setUseConservativeExpansion(boolean useConservativeExpansion) {
         this.useConservativeExpansion = useConservativeExpansion;
