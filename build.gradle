@@ -13,32 +13,27 @@ java {
 // select one version of the Engine:
 ext.jmeVersion = '3.8.1-stable'
 
-tasks.withType(Javadoc).configureEach {
-    failOnError = false
-}
-
-tasks.withType(JavaCompile).configureEach { // Java compile-time options:
-    options.compilerArgs << '-Xdiags:verbose'
-    options.compilerArgs << '-Xlint:unchecked'
-    options.deprecation = true // to provide detailed deprecation warnings
-    options.encoding = 'UTF-8'
-    options.release = 11
-}
-
-import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
-Boolean isMacOS = DefaultNativePlatform.currentOperatingSystem.isMacOsX()
-
-tasks.withType(JavaExec).configureEach { // Java runtime options:
-    if (isMacOS) {
-        jvmArgs '-XstartOnFirstThread'
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile).configureEach { // compile-time options:
+        options.compilerArgs << '-Xdiags:verbose'
+        options.compilerArgs << '-Xlint:unchecked'
+        //options.deprecation = true
+        options.encoding = 'UTF-8'
     }
-    classpath sourceSets.main.runtimeClasspath
-    enableAssertions true
-    //jvmArgs '-verbose:gc'
-    //jvmArgs '-Xbatch'
-    //jvmArgs '-Xms256m', '-Xmx256m' // to enlarge the Java heap
-    //jvmArgs '-XX:+PrintCompilation'
-    //jvmArgs '-XX:+UseG1GC', '-XX:MaxGCPauseMillis=10'
+    tasks.withType(JavaExec).tap {
+        configureEach { // runtime options:
+            args = []
+            classpath sourceSets.main.runtimeClasspath
+            //debug true
+            //enableAssertions true
+            //jvmArgs '-verbose:gc'
+            //jvmArgs '-Xbatch'
+            //jvmArgs '-Xms512m', '-Xmx512m'
+            //jvmArgs '-XX:+PrintCompilation'
+            //jvmArgs '-XX:+UseConcMarkSweepGC'
+            jvmArgs '-XX:+UseG1GC', '-XX:MaxGCPauseMillis=10'
+        }
+    }
 }
 
 repositories {
